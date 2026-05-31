@@ -2,9 +2,7 @@ package com.example.final_project.DTO;
 
 import lombok.*;
 
-@Getter
-@Setter
-@ToString
+@Data
 public class JoinDTO {
   private String username;
   private String password;
