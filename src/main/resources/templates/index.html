@@ -1,787 +1,98 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BidRise — 경매의 새로운 기준</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-  <style>
-    /* ───────────────────────────────────────────
-       CSS 변수 (색상·타이포·간격)
-    ─────────────────────────────────────────── */
-    :root {
-      --bg:          #0a0a0a;
-      --surface:     #141414;
-      --surface2:    #1e1e1e;
-      --border:      #2a2a2a;
-      --accent:      #e8630a;       /* 경매 열기 — 주황 */
-      --accent-dim:  #b84d07;
-      --text-1:      #f0f0f0;
-      --text-2:      #a0a0a0;
-      --text-3:      #5a5a5a;
-      --font-display: 'Bebas Neue', sans-serif;
-      --font-body:    'Noto Sans KR', sans-serif;
-      --radius:       10px;
-      --transition:   0.2s ease;
-    }
-
-    /* ───────────────────────────────────────────
-       리셋 & 기본
-    ─────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--text-1);
-      font-family: var(--font-body);
-      font-size: 15px;
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
-    ul { list-style: none; }
-    button { cursor: pointer; font-family: inherit; border: none; background: none; }
-
-    /* ───────────────────────────────────────────
-       레이아웃 유틸
-    ─────────────────────────────────────────── */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-    .section { padding: 80px 0; }
-    .section-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      letter-spacing: 0.04em;
-      color: var(--text-1);
-      margin-bottom: 8px;
-    }
-    .section-sub {
-      font-size: 14px;
-      color: var(--text-2);
-      margin-bottom: 40px;
-    }
-
-    /* ───────────────────────────────────────────
-       버튼
-    ─────────────────────────────────────────── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 500;
-      transition: var(--transition);
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn-primary:hover { background: var(--accent-dim); }
-    .btn-outline {
-      border: 1px solid var(--border);
-      color: var(--text-2);
-    }
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* ───────────────────────────────────────────
-       뱃지
-    ─────────────────────────────────────────── */
-    .badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 500;
-      padding: 3px 9px;
-      border-radius: 20px;
-    }
-    .badge-live  { background: #2a0e04; color: var(--accent); border: 1px solid var(--accent); }
-    .badge-soon  { background: #1a1a2e; color: #6c8fff; border: 1px solid #6c8fff; }
-    .badge-end   { background: #1a1a1a; color: var(--text-3); border: 1px solid var(--border); }
-
-    /* ═══════════════════════════════════════════
-       1. 네비게이션
-    ═══════════════════════════════════════════ */
-    #navbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(10,10,10,0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 60px;
-    }
-    .nav-logo {
-      font-family: var(--font-display);
-      font-size: 1.8rem;
-      letter-spacing: 0.06em;
-      color: var(--text-1);
-    }
-    .nav-logo span { color: var(--accent); }
-    .nav-menu {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-    }
-    .nav-menu a {
-      font-size: 14px;
-      color: var(--text-2);
-      transition: color var(--transition);
-    }
-    .nav-menu a:hover { color: var(--text-1); }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    /* 모바일 햄버거 (JS 토글용) */
-    .hamburger { display: none; font-size: 22px; color: var(--text-2); }
-
-    /* ═══════════════════════════════════════════
-       2. 히어로 섹션
-    ═══════════════════════════════════════════ */
-    #hero {
-      position: relative;
-      padding: 100px 0 80px;
-      overflow: hidden;
-    }
-    /* 배경 장식 */
-    #hero::before {
-      content: '';
-      position: absolute;
-      top: -100px; right: -100px;
-      width: 500px; height: 500px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(232,99,10,0.12) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-kicker {
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 16px;
-    }
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(3rem, 9vw, 7rem);
-      line-height: 1;
-      letter-spacing: 0.03em;
-      margin-bottom: 24px;
-    }
-    .hero-title em {
-      font-style: normal;
-      color: var(--accent);
-    }
-    .hero-desc {
-      max-width: 520px;
-      font-size: 16px;
-      color: var(--text-2);
-      margin-bottom: 36px;
-      line-height: 1.75;
-    }
-    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-
-    /* 실시간 통계 바 */
-    .hero-stats {
-      display: flex;
-      gap: 32px;
-      margin-top: 64px;
-      padding-top: 32px;
-      border-top: 1px solid var(--border);
-      flex-wrap: wrap;
-    }
-    .stat-item {}
-    .stat-value {
-      font-family: var(--font-display);
-      font-size: 2rem;
-      letter-spacing: 0.04em;
-      color: var(--text-1);
-    }
-    .stat-label {
-      font-size: 12px;
-      color: var(--text-3);
-      margin-top: 2px;
-    }
-
-    /* ═══════════════════════════════════════════
-       3. 경매 목록 (카드 그리드)
-    ═══════════════════════════════════════════ */
-    #items { background: var(--surface); }
-
-    /* 탭 필터 */
-    .filter-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
-    }
-    .filter-tab {
-      padding: 7px 18px;
-      border-radius: 20px;
-      font-size: 13px;
-      border: 1px solid var(--border);
-      color: var(--text-2);
-      transition: var(--transition);
-    }
-    .filter-tab:hover,
-    .filter-tab.active {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(232,99,10,0.08);
-    }
-
-    /* 카드 그리드 */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
-
-    /* 경매 카드 */
-    .auction-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: transform var(--transition), border-color var(--transition);
-    }
-    .auction-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent);
-    }
-    .card-thumb {
-      width: 100%;
-      aspect-ratio: 4/3;
-      background: var(--surface);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-3);
-      font-size: 40px;
-      position: relative;
-    }
-    .card-thumb .badge { position: absolute; top: 12px; left: 12px; }
-    .card-body { padding: 16px; }
-    .card-category {
-      font-size: 11px;
-      color: var(--text-3);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
-    }
-    .card-title {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-1);
-      margin-bottom: 12px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .card-price-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-    .card-price-label { font-size: 11px; color: var(--text-3); }
-    .card-price {
-      font-family: var(--font-display);
-      font-size: 1.4rem;
-      color: var(--accent);
-      letter-spacing: 0.02em;
-    }
-    .card-timer {
-      font-size: 12px;
-      color: var(--text-2);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .card-footer {
-      padding: 10px 16px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .card-bids { font-size: 12px; color: var(--text-3); }
-
-    /* ═══════════════════════════════════════════
-       4. 물품 등록 CTA (배너)
-    ═══════════════════════════════════════════ */
-    #cta {
-      background: linear-gradient(135deg, #1a0a02 0%, #0a0a0a 60%);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .cta-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 32px;
-      flex-wrap: wrap;
-    }
-    .cta-title {
-      font-family: var(--font-display);
-      font-size: clamp(1.8rem, 4vw, 3rem);
-      letter-spacing: 0.04em;
-      margin-bottom: 8px;
-    }
-    .cta-title span { color: var(--accent); }
-    .cta-desc { font-size: 14px; color: var(--text-2); max-width: 480px; }
-
-    /* ═══════════════════════════════════════════
-       5. 이용 방법 (How It Works)
-    ═══════════════════════════════════════════ */
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 24px;
-      counter-reset: step;
-    }
-    .step-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 24px;
-      position: relative;
-    }
-    .step-number {
-      font-family: var(--font-display);
-      font-size: 3rem;
-      color: var(--border);
-      line-height: 1;
-      margin-bottom: 12px;
-    }
-    .step-icon {
-      font-size: 24px;
-      color: var(--accent);
-      margin-bottom: 12px;
-    }
-    .step-title {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-1);
-      margin-bottom: 6px;
-    }
-    .step-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; }
-
-    /* ═══════════════════════════════════════════
-       6. 푸터
-    ═══════════════════════════════════════════ */
-    #footer {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: 48px 0 32px;
-    }
-    .footer-inner {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 40px;
-      margin-bottom: 40px;
-    }
-    .footer-brand .nav-logo { margin-bottom: 12px; }
-    .footer-brand p { font-size: 13px; color: var(--text-3); line-height: 1.7; }
-    .footer-col-title {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-3);
-      margin-bottom: 16px;
-    }
-    .footer-links { display: flex; flex-direction: column; gap: 10px; }
-    .footer-links a { font-size: 13px; color: var(--text-2); transition: color var(--transition); }
-    .footer-links a:hover { color: var(--text-1); }
-    .footer-bottom {
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .footer-bottom p { font-size: 12px; color: var(--text-3); }
-
-    /* ═══════════════════════════════════════════
-       반응형
-    ═══════════════════════════════════════════ */
-    @media (max-width: 768px) {
-      .nav-menu { display: none; }
-      .hamburger { display: block; }
-      .footer-inner { grid-template-columns: 1fr 1fr; }
-      .cta-inner { flex-direction: column; }
-    }
-    @media (max-width: 480px) {
-      .footer-inner { grid-template-columns: 1fr; }
-      .hero-stats { gap: 20px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 한계 없는 실시간 경매</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/index.css">
+    <script src="/js/index.js" defer></script>
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════
-       1. 네비게이션
-  ══════════════════════════════════════ -->
-  <nav id="navbar">
-    <div class="container nav-inner">
-      <!-- 로고 -->
-      <a href="/" class="nav-logo">BID<span>RISE</span></a>
-
-      <!-- 메뉴 (데스크탑) -->
-      <ul class="nav-menu">
-        <li><a href="/items">경매 목록</a></li>
-        <li><a href="/items/new">물품 등록</a></li>
-        <li><a href="#">고객센터</a></li>
-      </ul>
-
-      <!-- 로그인/회원가입 버튼 -->
-      <div class="nav-actions">
-        <a href="/login" class="btn btn-outline">로그인</a>
-        <a href="/signup" class="btn btn-primary">
-          <i class="ti ti-user-plus"></i> 회원가입
-        </a>
-        <!-- 로그인 후에는 아이콘 메뉴로 교체 (예: 알림, 계정) -->
-      </div>
-
-      <!-- 모바일 햄버거 -->
-      <button class="hamburger" aria-label="메뉴 열기">
-        <i class="ti ti-menu-2"></i>
-      </button>
-    </div>
-  </nav>
-
-
-  <!-- ══════════════════════════════════════
-       2. 히어로 섹션
-  ══════════════════════════════════════ -->
-  <section id="hero">
-    <div class="container">
-      <p class="hero-kicker">실시간 온라인 경매 플랫폼</p>
-      <h1 class="hero-title">
-        가격이<br><em>오를수록</em><br>기회가 온다
-      </h1>
-      <p class="hero-desc">
-        BidRise에서 희귀 아이템, 한정판 제품, 특별한 물건을 경매로 만나보세요.
-        지금 바로 입찰하고 최고가 낙찰의 짜릿함을 경험하세요.
-      </p>
-      <div class="hero-actions">
-        <a href="/items" class="btn btn-primary">
-          <i class="ti ti-gavel"></i> 경매 참여하기
-        </a>
-        <a href="/items/new" class="btn btn-outline">
-          <i class="ti ti-plus"></i> 물품 등록하기
-        </a>
-      </div>
-
-      <!-- 통계 -->
-      <div class="hero-stats">
-        <div class="stat-item">
-          <div class="stat-value">1,240</div>
-          <div class="stat-label">진행 중인 경매</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">38,900</div>
-          <div class="stat-label">누적 회원 수</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">₩2.4B</div>
-          <div class="stat-label">누적 낙찰 금액</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">99.2%</div>
-          <div class="stat-label">낙찰 만족도</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ══════════════════════════════════════
-       3. 경매 목록 섹션
-  ══════════════════════════════════════ -->
-  <section id="items" class="section">
-    <div class="container">
-      <h2 class="section-title">LIVE AUCTIONS</h2>
-      <p class="section-sub">지금 입찰 가능한 경매 목록입니다</p>
-
-      <!-- 카테고리 필터 탭 -->
-      <div class="filter-bar">
-        <button class="filter-tab active">전체</button>
-        <button class="filter-tab">전자제품</button>
-        <button class="filter-tab">패션/의류</button>
-        <button class="filter-tab">스포츠</button>
-        <button class="filter-tab">수집품</button>
-        <button class="filter-tab">마감 임박</button>
-      </div>
-
-      <!-- 카드 그리드 (Thymeleaf th:each로 교체 예정) -->
-      <div class="card-grid">
-
-        <!-- 카드 예시 1 — 진행 중 -->
-        <article class="auction-card">
-          <div class="card-thumb">
-            <i class="ti ti-device-laptop"></i>
-            <span class="badge badge-live">LIVE</span>
-          </div>
-          <div class="card-body">
-            <p class="card-category">전자제품</p>
-            <p class="card-title">Apple MacBook Pro 14" M3 Pro</p>
-            <div class="card-price-row">
-              <div>
-                <p class="card-price-label">현재 최고가</p>
-                <p class="card-price">₩1,850,000</p>
-              </div>
-              <div class="card-timer">
-                <i class="ti ti-clock"></i>
-                <span>02:14:38</span>
-              </div>
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">BID<span>LIFE</span></a>
+            <nav class="nav-menu">
+                <a href="/items" class="nav-link">경매 둘러보기</a>
+                <a href="/items/new" class="nav-link btn-create">경매 등록</a>
+            </nav>
+            <div class="nav-auth">
+                <a href="/login" class="btn-login">로그인</a>
+                <a href="/signup" class="btn-signup">회원가입</a>
             </div>
-          </div>
-          <div class="card-footer">
-            <span class="card-bids"><i class="ti ti-users"></i> 입찰 23회</span>
-            <a href="/items/1" class="btn btn-primary" style="padding:6px 14px; font-size:13px;">입찰하기</a>
-          </div>
-        </article>
+        </div>
+    </header>
 
-        <!-- 카드 예시 2 — 진행 중 -->
-        <article class="auction-card">
-          <div class="card-thumb">
-            <i class="ti ti-shoe"></i>
-            <span class="badge badge-live">LIVE</span>
-          </div>
-          <div class="card-body">
-            <p class="card-category">패션/의류</p>
-            <p class="card-title">Nike Air Jordan 1 Retro High OG</p>
-            <div class="card-price-row">
-              <div>
-                <p class="card-price-label">현재 최고가</p>
-                <p class="card-price">₩320,000</p>
-              </div>
-              <div class="card-timer">
-                <i class="ti ti-clock"></i>
-                <span>00:42:11</span>
-              </div>
+    <section class="hero-section">
+        <div class="hero-content">
+            <span class="badge">LIVE AUCTION PLATFORM</span>
+            <h1>가장 뜨거운 경매,<br>멈추지 않는 <span>RISE</span></h1>
+            <p>지금 이 순간에도 가치는 상승하고 있습니다. 전 세계 트렌드 세터들과 함께하는 가장 짜릿한 실시간 비딩을 경험하세요.</p>
+            <div class="hero-btns">
+                <a href="/items" class="btn-primary">지금 비딩 참여하기</a>
+                <a href="/items/new" class="btn-secondary">내 물품 출품하기</a>
             </div>
-          </div>
-          <div class="card-footer">
-            <span class="card-bids"><i class="ti ti-users"></i> 입찰 51회</span>
-            <a href="/items/2" class="btn btn-primary" style="padding:6px 14px; font-size:13px;">입찰하기</a>
-          </div>
-        </article>
+        </div>
+        <div class="hero-visual">
+            <div class="glow-sphere"></div>
+        </div>
+    </section>
 
-        <!-- 카드 예시 3 — 예정 -->
-        <article class="auction-card">
-          <div class="card-thumb">
-            <i class="ti ti-camera"></i>
-            <span class="badge badge-soon">예정</span>
-          </div>
-          <div class="card-body">
-            <p class="card-category">전자제품</p>
-            <p class="card-title">Leica M11 디지털 레인지파인더 카메라</p>
-            <div class="card-price-row">
-              <div>
-                <p class="card-price-label">시작가</p>
-                <p class="card-price">₩5,500,000</p>
-              </div>
-              <div class="card-timer">
-                <i class="ti ti-calendar"></i>
-                <span>내일 14:00</span>
-              </div>
+    <section class="live-preview-section">
+        <div class="section-header">
+            <h2>🔥 HOT BIDDING NOW</h2>
+            <a href="/items" class="view-all">전체 상품 보기 &rarr;</a>
+        </div>
+        
+        <div class="card-grid">
+            <div class="item-card">
+                <div class="card-thumb">
+                    <span class="status-badge bidding">LIVE</span>
+                    <div class="dummy-img">👟</div>
+                </div>
+                <div class="card-body">
+                    <h3>[한정판] 에어 조던 1 레트로 하이 오리지널</h3>
+                    <div class="price-info">
+                        <div class="price-box">
+                            <span class="label">현재 최고가</span>
+                            <span class="price">890,000 원</span>
+                        </div>
+                        <div class="time-box">
+                            <span class="label">남은 시간</span>
+                            <span class="time-countdown" data-time="2026-06-15T18:00:00">02:45:12</span>
+                        </div>
+                    </div>
+                    <a href="/items/1" class="btn-bid-now">비딩하기</a>
+                </div>
             </div>
-          </div>
-          <div class="card-footer">
-            <span class="card-bids"><i class="ti ti-bell"></i> 알림 신청 12명</span>
-            <a href="/items/3" class="btn btn-outline" style="padding:6px 14px; font-size:13px;">상세보기</a>
-          </div>
-        </article>
 
-        <!-- 카드 예시 4 — 진행 중 -->
-        <article class="auction-card">
-          <div class="card-thumb">
-            <i class="ti ti-watch"></i>
-            <span class="badge badge-live">LIVE</span>
-          </div>
-          <div class="card-body">
-            <p class="card-category">수집품</p>
-            <p class="card-title">Rolex Submariner Date 116610LN</p>
-            <div class="card-price-row">
-              <div>
-                <p class="card-price-label">현재 최고가</p>
-                <p class="card-price">₩12,000,000</p>
-              </div>
-              <div class="card-timer">
-                <i class="ti ti-clock"></i>
-                <span>05:30:00</span>
-              </div>
+            <div class="item-card">
+                <div class="card-thumb">
+                    <span class="status-badge bidding">LIVE</span>
+                    <div class="dummy-img">🧱</div>
+                </div>
+                <div class="card-body">
+                    <h3>슈프림 한정판 아티스트 콜라보 스케이트 보드 덱</h3>
+                    <div class="price-info">
+                        <div class="price-box">
+                            <span class="label">현재 최고가</span>
+                            <span class="price">420,000 원</span>
+                        </div>
+                        <div class="time-box">
+                            <span class="label">남은 시간</span>
+                            <span class="time-countdown" data-time="2026-06-10T23:59:59">23:11:04</span>
+                        </div>
+                    </div>
+                    <a href="/items/2" class="btn-bid-now">비딩하기</a>
+                </div>
             </div>
-          </div>
-          <div class="card-footer">
-            <span class="card-bids"><i class="ti ti-users"></i> 입찰 8회</span>
-            <a href="/items/4" class="btn btn-primary" style="padding:6px 14px; font-size:13px;">입찰하기</a>
-          </div>
-        </article>
-
-      </div><!-- /.card-grid -->
-
-      <!-- 더 보기 버튼 -->
-      <div style="text-align:center; margin-top:40px;">
-        <a href="/items" class="btn btn-outline">
-          전체 경매 보기 <i class="ti ti-arrow-right"></i>
-        </a>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ══════════════════════════════════════
-       4. 물품 등록 CTA 배너
-  ══════════════════════════════════════ -->
-  <section id="cta" class="section">
-    <div class="container cta-inner">
-      <div>
-        <h2 class="cta-title">당신의 물건을<br><span>경매에 올려보세요</span></h2>
-        <p class="cta-desc">
-          안 쓰는 물건, 희귀 아이템, 한정판 제품을 BidRise에 등록하고
-          최고가 낙찰로 제값을 받아보세요.
-        </p>
-      </div>
-      <a href="/items/new" class="btn btn-primary" style="white-space:nowrap; padding:16px 32px; font-size:15px;">
-        <i class="ti ti-plus"></i> 지금 등록하기
-      </a>
-    </div>
-  </section>
-
-
-  <!-- ══════════════════════════════════════
-       5. 이용 방법 (How It Works)
-  ══════════════════════════════════════ -->
-  <section id="how" class="section">
-    <div class="container">
-      <h2 class="section-title">HOW IT WORKS</h2>
-      <p class="section-sub">BidRise는 3단계로 간단하게 이용할 수 있어요</p>
-      <div class="steps">
-        <div class="step-card">
-          <div class="step-number">01</div>
-          <i class="ti ti-user-check step-icon"></i>
-          <p class="step-title">회원가입</p>
-          <p class="step-desc">이메일로 빠르게 가입하고 경매에 참여할 준비를 하세요.</p>
         </div>
-        <div class="step-card">
-          <div class="step-number">02</div>
-          <i class="ti ti-gavel step-icon"></i>
-          <p class="step-title">입찰하기</p>
-          <p class="step-desc">원하는 물건에 입찰가를 제시하세요. 경쟁자보다 높으면 됩니다.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-number">03</div>
-          <i class="ti ti-trophy step-icon"></i>
-          <p class="step-title">낙찰 & 결제</p>
-          <p class="step-desc">경매 종료 후 최고가 입찰자에게 낙찰 안내 이메일이 발송됩니다.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-number">04</div>
-          <i class="ti ti-truck-delivery step-icon"></i>
-          <p class="step-title">배송 완료</p>
-          <p class="step-desc">결제 확인 후 판매자가 배송을 진행합니다. 안전하게 받으세요.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-
-  <!-- ══════════════════════════════════════
-       6. 푸터
-  ══════════════════════════════════════ -->
-  <footer id="footer">
-    <div class="container">
-      <div class="footer-inner">
-        <!-- 브랜드 -->
-        <div class="footer-brand">
-          <a href="/" class="nav-logo">BID<span>RISE</span></a>
-          <p>경매의 새로운 기준.<br>BidRise와 함께 특별한 거래를 경험하세요.</p>
-        </div>
-        <!-- 서비스 -->
-        <div>
-          <p class="footer-col-title">서비스</p>
-          <ul class="footer-links">
-            <li><a href="/items">경매 목록</a></li>
-            <li><a href="/items/new">물품 등록</a></li>
-            <li><a href="#">카테고리</a></li>
-            <li><a href="#">인기 경매</a></li>
-          </ul>
-        </div>
-        <!-- 계정 -->
-        <div>
-          <p class="footer-col-title">계정</p>
-          <ul class="footer-links">
-            <li><a href="/login">로그인</a></li>
-            <li><a href="/signup">회원가입</a></li>
-            <li><a href="/account">계정 관리</a></li>
-            <li><a href="/account/bids">내 입찰 내역</a></li>
-          </ul>
-        </div>
-        <!-- 고객지원 -->
-        <div>
-          <p class="footer-col-title">고객지원</p>
-          <ul class="footer-links">
-            <li><a href="#">공지사항</a></li>
-            <li><a href="#">자주 묻는 질문</a></li>
-            <li><a href="#">이용약관</a></li>
-            <li><a href="#">개인정보처리방침</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>© 2025 BidRise. All rights reserved.</p>
-        <p>made with Spring Boot 🍃</p>
-      </div>
-    </div>
-  </footer>
-
-
-  <!-- ══════════════════════════════════════
-       JS — 필터 탭 토글 / 카운트다운 타이머
-  ══════════════════════════════════════ -->
-  <script>
-    /* 필터 탭 활성화 */
-    document.querySelectorAll('.filter-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        // TODO: 서버 요청 또는 필터링 로직 추가
-      });
-    });
-
-    /* 카운트다운 타이머 (실제 구현 시 서버 종료 시각 기준으로 변경) */
-    function updateTimers() {
-      document.querySelectorAll('.card-timer span').forEach(el => {
-        const parts = el.textContent.split(':');
-        if (parts.length !== 3) return;
-        let [h, m, s] = parts.map(Number);
-        if (s > 0) s--;
-        else if (m > 0) { m--; s = 59; }
-        else if (h > 0) { h--; m = 59; s = 59; }
-        el.textContent = [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
-      });
-    }
-    setInterval(updateTimers, 1000);
-  </script>
+    <footer class="footer">
+        <p>&copy; 2026 BIDLIFE. All rights reserved. 폴리텍 기말 과제 프로젝트</p>
+    </footer>
 
 </body>
 </html>
