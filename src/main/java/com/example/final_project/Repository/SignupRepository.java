@@ -5,7 +5,11 @@ import org.springframework.stereotype.Repository;
 
 import com.example.final_project.Entity.SignupEntity;
 
+import java.util.Optional;
+
 @Repository
 public interface SignupRepository extends JpaRepository<SignupEntity, Long> {
-    
+    Optional<SignupEntity> findByEmail(String email);
+    boolean existsByEmail(String email);
+    boolean existsByNickname(String nickname);
 }

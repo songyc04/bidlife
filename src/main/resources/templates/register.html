@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 회원가입</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/signup.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">BID<span>LIFE</span></a>
+            <nav class="nav-menu">
+                <a href="/items" class="nav-link">경매 둘러보기</a>
+                <a href="/items/new" class="nav-link btn-create">경매 등록</a>
+            </nav>
+            <div class="nav-auth">
+                <a href="/login" class="btn-login">로그인</a>
+                <a href="/signup" class="btn-signup">회원가입</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="signup-section">
+        <div class="signup-container">
+            <div class="signup-header">
+                <h1>회원가입</h1>
+                <p>BIDLIFE와 함께 경매의 세계에 뛰어드세요</p>
+            </div>
+
+            <form class="signup-form" action="/signup/register" method="post">
+                <div class="step-indicator">
+                    <span class="step completed">1</span>
+                    <span class="step-line completed"></span>
+                    <span class="step active">2</span>
+                </div>
+
+                <input type="hidden" name="email" th:value="${email}">
+
+                <div class="input-group">
+                    <label>이메일</label>
+                    <input type="email" th:value="${email}" readonly class="verified-email">
+                    <span class="verified-badge">인증 완료</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">비밀번호</label>
+                    <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password-confirm">비밀번호 확인</label>
+                    <input type="password" id="password-confirm" placeholder="비밀번호를 다시 입력하세요" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="nickname">닉네임</label>
+                    <input type="text" id="nickname" name="nickname" placeholder="닉네임을 입력하세요" required>
+                </div>
+
+                <button type="submit" class="btn-submit">가입하기</button>
+
+                <div class="signup-footer">
+                    <p>이미 계정이 있으신가요? <a href="/login">로그인</a></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="glow-sphere"></div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 BIDLIFE. All rights reserved. 폴리텍 기말 과제 프로젝트</p>
+    </footer>
+
+    <script>
+        document.querySelector('.signup-form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm').value;
+
+            if (password !== passwordConfirm) {
+                e.preventDefault();
+                alert('비밀번호가 일치하지 않습니다.');
+            }
+        });
+    </script>
+</body>
+</html>

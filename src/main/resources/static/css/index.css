@@ -103,6 +103,32 @@ a {
     box-shadow: 0 4px 15px rgba(255, 90, 0, 0.4);
 }
 
+.btn-mypage {
+    color: #ff5a00;
+    font-weight: 700;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+
+.btn-mypage:hover {
+    color: #ff7c33;
+}
+
+.btn-logout {
+    border: 1px solid #333333;
+    color: #aaaaaa;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-logout:hover {
+    border-color: #ff5a00;
+    color: #ff5a00;
+}
+
 /* 2. 히어로 섹션 디자인 */
 .hero-section {
     max-width: 1200px;
