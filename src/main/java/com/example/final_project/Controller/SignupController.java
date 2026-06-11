@@ -26,10 +26,6 @@ public class SignupController {
     @PostMapping("/send-code")
     @ResponseBody
     public String sendVerificationCode(@RequestParam String email, Model model) {
-        if (signupRepository.existsByEmail(email)) {
-            return "이미 등록된 이메일입니다.";
-        }
-        
         try {
             emailService.sendVerificationEmail(email);
             return "SUCCESS";
@@ -79,7 +75,7 @@ public class SignupController {
         
         if (signupRepository.existsByNickname(joinDTO.getNickname())) {
             redirectAttributes.addFlashAttribute("error", "이미 사용 중인 닉네임입니다.");
-            return "redirect:/signup/register";
+            return "redirect:/signup";
         }
         
         SignupEntity signupEntity = new SignupEntity();
@@ -91,7 +87,7 @@ public class SignupController {
         
         session.removeAttribute("verifiedEmail");
         
-        return "redirect:/signup/complete";
+        return "redirect:/";
     }
 
     @GetMapping("/complete")

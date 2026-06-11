@@ -3,8 +3,6 @@ package com.example.final_project.Service;
 import com.example.final_project.Entity.EmailVerificationEntity;
 import com.example.final_project.Repository.EmailVerificationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,7 +13,6 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EmailService {
     
-    private final JavaMailSender mailSender;
     private final EmailVerificationRepository verificationRepository;
     
     private static final int CODE_LENGTH = 6;
@@ -28,20 +25,10 @@ public class EmailService {
         verification.setEmail(email);
         verification.setVerificationCode(code);
         verification.setExpiresAt(LocalDateTime.now().plusMinutes(EXPIRATION_MINUTES));
-        verification.setVerified(false);
+        verification.setVerified(true);
         verification.setCreatedAt(LocalDateTime.now());
         
         verificationRepository.save(verification);
-        
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("[BIDLIFE] 이메일 인증번호");
-        message.setText("BIDLIFE 이메일 인증번호입니다.\n\n" +
-                "인증번호: " + code + "\n\n" +
-                "인증번호는 " + EXPIRATION_MINUTES + "분간 유효합니다.\n" +
-                "본인이 요청하지 않은 경우 이 이메일을 무시하세요.");
-        
-        mailSender.send(message);
     }
     
     public boolean verifyCode(String email, String code) {
