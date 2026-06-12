@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 찜한 경매</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/account.css">
+    <link rel="stylesheet" href="/css/picklist.css">
+    <script src="/js/picklist.js" defer></script>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">BID<span>LIFE</span></a>
+            <nav class="nav-menu">
+                <a href="/items" class="nav-link">경매 둘러보기</a>
+                <a href="/account/items/new" class="nav-link btn-create">경매 등록</a>
+            </nav>
+            <div class="nav-auth">
+                <a href="/account" class="btn-mypage">마이페이지</a>
+                <a href="/login/logout" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="account-section">
+        <div class="account-container">
+
+            <aside class="account-sidebar">
+                <div class="sidebar-header">
+                    <div class="profile-icon">
+                        <span th:text="${nickname != null ? nickname.substring(0,1) : '?'}">U</span>
+                    </div>
+                    <h3 th:text="${nickname}">닉네임</h3>
+                </div>
+                <nav class="sidebar-menu">
+                    <a href="/account" class="menu-item">
+                        <span class="menu-icon">👤</span>
+                        <span>내 정보</span>
+                    </a>
+                    <a href="/account/bids" class="menu-item">
+                        <span class="menu-icon">💰</span>
+                        <span>내 입찰 내역</span>
+                    </a>
+                    <a href="/account/items" class="menu-item">
+                        <span class="menu-icon">📦</span>
+                        <span>등록한 경매</span>
+                    </a>
+                    <a href="/account/picklist" class="menu-item active">
+                        <span class="menu-icon">⭐</span>
+                        <span>찜한 경매</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <section class="account-content">
+                <div class="content-header">
+                    <h2>찜한 경매</h2>
+                    <p>관심 있게 지켜보고 있는 경매 목록입니다</p>
+                </div>
+
+                <div class="filter-bar">
+                    <button class="filter-btn active" data-filter="all">전체</button>
+                    <button class="filter-btn" data-filter="bidding">경매 진행 중</button>
+                    <button class="filter-btn" data-filter="ended">경매 종료</button>
+                </div>
+
+                <div class="picklist-grid">
+
+                    <div class="pick-card" data-status="bidding">
+                        <div class="pick-thumb">
+                            <span class="status-badge bidding">LIVE</span>
+                            <button class="btn-pick active" title="찜 취소">⭐</button>
+                            <div class="dummy-img">👟</div>
+                        </div>
+                        <div class="pick-body">
+                            <h3>[한정판] 에어 조던 1 레트로 하이 오리지널</h3>
+                            <div class="pick-price">
+                                <span class="price-label">현재 최고가</span>
+                                <span class="price-value">890,000원</span>
+                            </div>
+                            <div class="pick-footer">
+                                <span class="remaining-time">02:45:12</span>
+                                <a href="/items/1" class="btn-go">상세보기</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pick-card" data-status="bidding">
+                        <div class="pick-thumb">
+                            <span class="status-badge bidding">LIVE</span>
+                            <button class="btn-pick active" title="찜 취소">⭐</button>
+                            <div class="dummy-img">🧱</div>
+                        </div>
+                        <div class="pick-body">
+                            <h3>슈프림 한정판 아티스트 콜라보 스케이트 보드 덱</h3>
+                            <div class="pick-price">
+                                <span class="price-label">현재 최고가</span>
+                                <span class="price-value">420,000원</span>
+                            </div>
+                            <div class="pick-footer">
+                                <span class="remaining-time">23:11:04</span>
+                                <a href="/items/2" class="btn-go">상세보기</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pick-card" data-status="ended">
+                        <div class="pick-thumb">
+                            <span class="status-badge ended">ENDED</span>
+                            <button class="btn-pick active" title="찜 취소">⭐</button>
+                            <div class="dummy-img">🎧</div>
+                        </div>
+                        <div class="pick-body">
+                            <h3>에어팟 맥스 실버 미개봉新品</h3>
+                            <div class="pick-price">
+                                <span class="price-label">최종 낙찰가</span>
+                                <span class="price-value">520,000원</span>
+                            </div>
+                            <div class="pick-footer">
+                                <span class="remaining-time ended-text">경매 종료</span>
+                                <a href="/items/4" class="btn-go">상세보기</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="empty-state" style="display: none;">
+                    <div class="empty-icon">⭐</div>
+                    <h3>아직 찜한 경매가 없습니다</h3>
+                    <p>관심 있는 경매에 찜을 해보세요!</p>
+                    <a href="/items" class="btn-go-items">경매 둘러보기</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 BIDLIFE. All rights reserved. 폴리텍 기말 과제 프로젝트</p>
+    </footer>
+
+</body>
+</html>

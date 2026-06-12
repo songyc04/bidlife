@@ -1,0 +1,235 @@
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background-color: #121212;
+    border: 1px solid #222222;
+    color: #888888;
+    padding: 10px 22px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover {
+    border-color: #ff5a00;
+    color: #ffffff;
+}
+
+.filter-btn.active {
+    background-color: #ff5a00;
+    border-color: #ff5a00;
+    color: #000000;
+}
+
+.picklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.pick-card {
+    background-color: #121212;
+    border: 1px solid #222222;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.pick-card:hover {
+    border-color: #ff5a00;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8);
+}
+
+.pick-thumb {
+    height: 200px;
+    background-color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.pick-thumb .dummy-img {
+    font-size: 60px;
+}
+
+.pick-thumb .status-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.bidding {
+    background-color: #ff5a00;
+    color: #000000;
+    animation: blink 1.2s infinite;
+}
+
+.status-badge.ended {
+    background-color: #555555;
+    color: #aaaaaa;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.btn-pick {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-pick:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+.btn-pick.active {
+    background-color: rgba(255, 90, 0, 0.3);
+}
+
+.pick-body {
+    padding: 20px;
+}
+
+.pick-body h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    height: 44px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.pick-price {
+    background-color: #181818;
+    border: 1px solid #252525;
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #666666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.price-value {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.pick-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remaining-time {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff5a00;
+}
+
+.remaining-time.ended-text {
+    color: #888888;
+}
+
+.btn-go {
+    border: 1px solid #333333;
+    color: #aaaaaa;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-go:hover {
+    border-color: #ff5a00;
+    color: #ff5a00;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #888888;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: #555555;
+    margin-bottom: 28px;
+}
+
+.btn-go-items {
+    display: inline-block;
+    background-color: #ff5a00;
+    color: #000000;
+    padding: 12px 28px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-go-items:hover {
+    background-color: #ff7c33;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 90, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+    .picklist-grid {
+        grid-template-columns: 1fr;
+    }
+}

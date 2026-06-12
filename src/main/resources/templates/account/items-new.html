@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 경매 등록</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/account.css">
+    <link rel="stylesheet" href="/css/items-new.css">
+    <script src="/js/items-new.js" defer></script>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">BID<span>LIFE</span></a>
+            <nav class="nav-menu">
+                <a href="/items" class="nav-link">경매 둘러보기</a>
+                <a href="/account/items/new" class="nav-link btn-create">경매 등록</a>
+            </nav>
+            <div class="nav-auth">
+                <a href="/account" class="btn-mypage">마이페이지</a>
+                <a href="/login/logout" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="account-section">
+        <div class="account-container">
+
+            <aside class="account-sidebar">
+                <div class="sidebar-header">
+                    <div class="profile-icon">
+                        <span th:text="${nickname != null ? nickname.substring(0,1) : '?'}">U</span>
+                    </div>
+                    <h3 th:text="${nickname}">닉네임</h3>
+                </div>
+                <nav class="sidebar-menu">
+                    <a href="/account" class="menu-item">
+                        <span class="menu-icon">👤</span>
+                        <span>내 정보</span>
+                    </a>
+                    <a href="/account/bids" class="menu-item">
+                        <span class="menu-icon">💰</span>
+                        <span>내 입찰 내역</span>
+                    </a>
+                    <a href="/account/items" class="menu-item active">
+                        <span class="menu-icon">📦</span>
+                        <span>등록한 경매</span>
+                    </a>
+                    <a href="/account/picklist" class="menu-item">
+                        <span class="menu-icon">⭐</span>
+                        <span>찜한 경매</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <section class="account-content">
+                <div class="content-header">
+                    <h2>경매 등록</h2>
+                    <p>새로운 경매 물품을 등록하세요</p>
+                </div>
+
+                <form class="auction-form" action="/account/items/new" method="post" enctype="multipart/form-data">
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">기본 정보</h3>
+
+                        <div class="form-group">
+                            <label for="title">경매 제목</label>
+                            <input type="text" id="title" name="title" placeholder="경매에 등록할 물품의 제목을 입력하세요" required maxlength="100">
+                            <span class="char-count"><span id="titleCount">0</span>/100</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">카테고리</label>
+                            <select id="category" name="category" required>
+                                <option value="" disabled selected>카테고리를 선택하세요</option>
+                                <option value="electronics">전자기기</option>
+                                <option value="fashion">패션 / 의류</option>
+                                <option value="sneakers">스니커즈</option>
+                                <option value="watches">시계 / 주얼리</option>
+                                <option value="art">예술품 / 컬렉션</option>
+                                <option value="sports">스포츠 / 레저</option>
+                                <option value="games">게임 / 취미</option>
+                                <option value="etc">기타</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">상품 설명</label>
+                            <textarea id="description" name="description" rows="6" placeholder="물품의 상태, 구성품, 구매 시기 등 자세한 정보를 입력하세요" required maxlength="2000"></textarea>
+                            <span class="char-count"><span id="descCount">0</span>/2000</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">이미지 등록</h3>
+
+                        <div class="form-group">
+                            <div class="image-upload-area" id="imageUploadArea">
+                                <div class="upload-placeholder">
+                                    <span class="upload-icon">📷</span>
+                                    <p>클릭 또는 드래그하여 이미지를 첨부하세요</p>
+                                    <span class="upload-hint">최대 5장, 파일당 10MB 이하 (JPG, PNG)</span>
+                                </div>
+                                <input type="file" id="imageInput" name="images" multiple accept="image/jpeg, image/png" style="display: none;">
+                            </div>
+                            <div class="image-preview" id="imagePreview"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">경매 설정</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="startPrice">시작가</label>
+                                <div class="input-with-suffix">
+                                    <input type="number" id="startPrice" name="startPrice" placeholder="100,000" min="1000" required>
+                                    <span class="input-suffix">원</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="buyNowPrice">즉시 구매가 <span class="optional">(선택)</span></label>
+                                <div class="input-with-suffix">
+                                    <input type="number" id="buyNowPrice" name="buyNowPrice" placeholder="500,000" min="0">
+                                    <span class="input-suffix">원</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bidUnit">최소 입찰 단위</label>
+                                <div class="input-with-suffix">
+                                    <input type="number" id="bidUnit" name="bidUnit" placeholder="10,000" min="1000" required>
+                                    <span class="input-suffix">원</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="startTime">경매 시작 시간</label>
+                                <input type="datetime-local" id="startTime" name="startTime" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="endTime">경매 종료 시간</label>
+                                <input type="datetime-local" id="endTime" name="endTime" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="/account/items" class="btn-cancel">취소</a>
+                        <button type="submit" class="btn-submit">경매 등록</button>
+                    </div>
+                </form>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 BIDLIFE. All rights reserved. 폴리텍 기말 과제 프로젝트</p>
+    </footer>
+
+</body>
+</html>

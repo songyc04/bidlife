@@ -34,4 +34,72 @@ public class AccountController {
 
         return "account";
     }
+
+    @GetMapping("/bids")
+    public String bids(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/bids";
+        }
+
+        Optional<SignupEntity> user = signupRepository.findById(userId);
+
+        if (user.isPresent()) {
+            model.addAttribute("nickname", user.get().getNickname());
+        }
+
+        return "account/bids";
+    }
+
+    @GetMapping("/items")
+    public String items(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/items";
+        }
+
+        Optional<SignupEntity> user = signupRepository.findById(userId);
+
+        if (user.isPresent()) {
+            model.addAttribute("nickname", user.get().getNickname());
+        }
+
+        return "account/items";
+    }
+
+    @GetMapping("/picklist")
+    public String picklist(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/picklist";
+        }
+
+        Optional<SignupEntity> user = signupRepository.findById(userId);
+
+        if (user.isPresent()) {
+            model.addAttribute("nickname", user.get().getNickname());
+        }
+
+        return "account/picklist";
+    }
+
+    @GetMapping("/items/new")
+    public String itemsNew(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/items/new";
+        }
+
+        Optional<SignupEntity> user = signupRepository.findById(userId);
+
+        if (user.isPresent()) {
+            model.addAttribute("nickname", user.get().getNickname());
+        }
+
+        return "account/items-new";
+    }
 }
