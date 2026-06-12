@@ -1,0 +1,325 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+}
+
+body {
+    background-color: #050505;
+    color: #ffffff;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.navbar {
+    background-color: rgba(5, 5, 5, 0.85);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 90, 0, 0.15);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+}
+
+.logo span {
+    color: #ff5a00;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 35px;
+}
+
+.nav-link {
+    font-weight: 600;
+    font-size: 15px;
+    color: #888888;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: #ffffff;
+}
+
+.btn-create {
+    color: #ff5a00;
+}
+
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.btn-mypage {
+    color: #ff5a00;
+    font-weight: 700;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+
+.btn-mypage:hover {
+    color: #ff7c33;
+}
+
+.btn-logout {
+    border: 1px solid #333333;
+    color: #aaaaaa;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-logout:hover {
+    border-color: #ff5a00;
+    color: #ff5a00;
+}
+
+.account-section {
+    flex: 1;
+    padding: 120px 20px 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.account-container {
+    display: flex;
+    gap: 40px;
+}
+
+.account-sidebar {
+    width: 280px;
+    background-color: #121212;
+    border: 1px solid #222222;
+    border-radius: 8px;
+    padding: 32px 24px;
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.sidebar-header {
+    text-align: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #222222;
+    margin-bottom: 24px;
+}
+
+.profile-icon {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #ff5a00, #ff0055);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 28px;
+    font-weight: 900;
+    color: #000000;
+}
+
+.sidebar-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #888888;
+    transition: all 0.2s;
+}
+
+.menu-item:hover {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+.menu-item.active {
+    background-color: rgba(255, 90, 0, 0.1);
+    color: #ff5a00;
+    border: 1px solid rgba(255, 90, 0, 0.3);
+}
+
+.menu-icon {
+    font-size: 18px;
+}
+
+.account-content {
+    flex: 1;
+}
+
+.content-header {
+    margin-bottom: 32px;
+}
+
+.content-header h2 {
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.content-header p {
+    color: #888888;
+    font-size: 15px;
+}
+
+.info-card {
+    background-color: #121212;
+    border: 1px solid #222222;
+    border-radius: 8px;
+    padding: 32px;
+    margin-bottom: 24px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row label {
+    width: 120px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #888888;
+}
+
+.info-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.btn-edit {
+    background-color: #ff5a00;
+    color: #000000;
+    border: none;
+    border-radius: 4px;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit:hover {
+    background-color: #ff7c33;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 90, 0, 0.4);
+}
+
+.btn-logout-main {
+    border: 1px solid #333333;
+    background-color: transparent;
+    color: #aaaaaa;
+    border-radius: 4px;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 700;
+    transition: all 0.2s;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-logout-main:hover {
+    border-color: #ff5a00;
+    color: #ff5a00;
+}
+
+.footer {
+    border-top: 1px solid #151515;
+    padding: 50px 20px;
+    text-align: center;
+    color: #444444;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: auto;
+}
+
+@media (max-width: 768px) {
+    .account-container {
+        flex-direction: column;
+    }
+
+    .account-sidebar {
+        width: 100%;
+        position: static;
+    }
+
+    .sidebar-menu {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .menu-item {
+        white-space: nowrap;
+    }
+
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .info-row label {
+        width: auto;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+}
