@@ -61,6 +61,10 @@
                     <p>내가 등록한 경매 물품을 관리하세요</p>
                 </div>
 
+                <div class="alert-success" th:if="${successMessage != null}" th:text="${successMessage}">
+                    경매가 성공적으로 등록되었습니다.
+                </div>
+
                 <div class="filter-bar">
                     <button class="filter-btn active" data-filter="all">전체</button>
                     <button class="filter-btn" data-filter="bidding">경매 진행 중</button>

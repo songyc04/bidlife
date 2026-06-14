@@ -59,8 +59,10 @@ public class ItemEntity {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (status == null) {
+        if (startTime != null && endTime != null) {
             updateTimeBasedStatus();
+        } else if (status == null) {
+            status = "upcoming";
         }
     }
 

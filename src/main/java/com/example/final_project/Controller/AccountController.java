@@ -5,6 +5,7 @@ import com.example.final_project.Repository.SignupRepository;
 import com.example.final_project.Service.ItemService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,11 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/account")
@@ -123,7 +126,8 @@ public class AccountController {
                                @RequestParam Integer bidUnit,
                                @RequestParam String startTime,
                                @RequestParam String endTime,
-                               @RequestParam(required = false) MultipartFile[] images) {
+                               @RequestParam(required = false) MultipartFile[] images,
+                               RedirectAttributes redirectAttributes) {
 
         Long userId = (Long) session.getAttribute("userId");
 
@@ -137,9 +141,12 @@ public class AccountController {
 
             itemService.saveItem(title, category, description, startPrice, buyNowPrice, bidUnit, startDt, endDt, userId, images);
 
+            redirectAttributes.addFlashAttribute("successMessage", "경매가 성공적으로 등록되었습니다.");
             return "redirect:/account/items";
         } catch (Exception e) {
-            return "redirect:/account/items/new?error=true";
+            log.error("경매 등록 실패: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("errorMessage", "경매 등록 중 오류가 발생했습니다: " + e.getMessage());
+            return "redirect:/account/items/new";
         }
     }
 }

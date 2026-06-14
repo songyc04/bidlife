@@ -2,13 +2,17 @@ package com.example.final_project.Service;
 
 import com.example.final_project.Entity.ItemEntity;
 import com.example.final_project.Repository.ItemRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +27,19 @@ public class ItemService {
     @Value("${file.upload-dir:uploads/items}")
     private String uploadDir;
 
+    private String absoluteUploadDir;
+
+    @PostConstruct
+    public void init() {
+        Path path = Paths.get(uploadDir).toAbsolutePath();
+        absoluteUploadDir = path.toString();
+        File dir = new File(absoluteUploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+    }
+
+    @Transactional
     public ItemEntity saveItem(String title, String category, String description,
                                Integer startPrice, Integer buyNowPrice, Integer bidUnit,
                                LocalDateTime startTime, LocalDateTime endTime,
@@ -52,11 +69,6 @@ public class ItemService {
     private List<String> saveImages(MultipartFile[] images) throws IOException {
         List<String> paths = new ArrayList<>();
 
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-
         for (MultipartFile image : images) {
             if (image.isEmpty()) continue;
 
@@ -67,9 +79,7 @@ public class ItemService {
             }
 
             String fileName = UUID.randomUUID().toString() + extension;
-            String filePath = uploadDir + "/" + fileName;
-
-            File dest = new File(filePath);
+            File dest = new File(absoluteUploadDir, fileName);
             image.transferTo(dest);
 
             paths.add("/uploads/items/" + fileName);
