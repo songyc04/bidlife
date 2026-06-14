@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 경매 둘러보기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
+    <script src="/js/items.js" defer></script>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">BID<span>LIFE</span></a>
+            <nav class="nav-menu">
+                <a href="/items" class="nav-link">경매 둘러보기</a>
+                <a th:href="${isLoggedIn} ? '/account/items/new' : '/login?redirect=/account/items/new'" class="nav-link btn-create">경매 등록</a>
+            </nav>
+            <div class="nav-auth" th:if="${!isLoggedIn}">
+                <a href="/login" class="btn-login">로그인</a>
+                <a href="/signup" class="btn-signup">회원가입</a>
+            </div>
+            <div class="nav-auth" th:if="${isLoggedIn}">
+                <a href="/account" class="btn-mypage">마이페이지</a>
+                <a href="/login/logout" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="items-section">
+        <div class="items-container">
+
+            <div class="page-header">
+                <h1>경매 둘러보기</h1>
+                <p>지금 진행 중인 다양한 경매를 만나보세요</p>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="검색어를 입력하세요">
+                    <button type="button" id="searchBtn" class="btn-search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="toolbar-actions">
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="all">전체 카테고리</option>
+                        <option value="electronics">전자기기</option>
+                        <option value="fashion">패션 / 의류</option>
+                        <option value="sneakers">스니커즈</option>
+                        <option value="watches">시계 / 주얼리</option>
+                        <option value="art">예술품 / 컬렉션</option>
+                        <option value="sports">스포츠 / 레저</option>
+                        <option value="games">게임 / 취미</option>
+                        <option value="etc">기타</option>
+                    </select>
+
+                    <select id="sortSelect" class="filter-select">
+                        <option value="recent">최신순</option>
+                        <option value="ending">마감임박순</option>
+                        <option value="price-low">낮은 가격순</option>
+                        <option value="price-high">높은 가격순</option>
+                        <option value="bids">입찰 많은순</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="status-tabs" th:if="${items != null && !items.isEmpty()}">
+                <button class="status-tab active" data-status="all">전체 <span class="count" th:text="${items.size()}">0</span></button>
+                <button class="status-tab" data-status="bidding">진행 중 <span class="count" th:text="${items.stream().filter(i -> i.status == 'bidding').count()}">0</span></button>
+                <button class="status-tab" data-status="upcoming">시작 예정 <span class="count" th:text="${items.stream().filter(i -> i.status == 'upcoming').count()}">0</span></button>
+                <button class="status-tab" data-status="ended">종료 <span class="count" th:text="${items.stream().filter(i -> i.status == 'ended').count()}">0</span></button>
+            </div>
+
+            <div class="card-grid" id="cardGrid" th:if="${items != null && !items.isEmpty()}">
+
+                <div class="item-card"
+                     th:each="item : ${items}"
+                     th:attr="data-category=${item.category}, data-status=${item.status}, data-price=${item.startPrice}, data-time=${item.endTime}, data-bids=0">
+                    <div class="card-thumb">
+                        <span class="status-badge" th:classappend="${item.status == 'bidding'} ? 'bidding' : (${item.status == 'upcoming'} ? 'upcoming' : 'ended')"
+                              th:text="${item.status == 'bidding'} ? 'LIVE' : (${item.status == 'upcoming'} ? 'UPCOMING' : 'ENDED')">LIVE</span>
+                        <button class="btn-pick" title="찜하기">☆</button>
+                        <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
+                            <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                        </div>
+                        <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
+                    </div>
+                    <div class="card-body">
+                        <h3 th:text="${item.title}">경매 제목</h3>
+                        <div class="price-info">
+                            <div class="price-box">
+                                <span class="label" th:text="${item.status == 'bidding'} ? '현재 최고가' : (${item.status == 'upcoming'} ? '시작가' : '최종 낙찰가')">현재 최고가</span>
+                                <span class="price" th:text="${#numbers.formatInteger(item.startPrice, 3, 'COMMA')} + '원'">0원</span>
+                            </div>
+                            <div class="time-box">
+                                <span class="label" th:text="${item.status == 'bidding'} ? '남은 시간' : (${item.status == 'upcoming'} ? '시작까지' : '상태')">남은 시간</span>
+                                <span class="time-countdown" th:if="${item.status != 'ended'}"
+                                      th:attr="data-time=${item.endTime}" th:text="${item.endTime}">00:00:00</span>
+                                <span class="time-countdown ended" th:if="${item.status == 'ended'}">경매 종료</span>
+                            </div>
+                        </div>
+                        <div class="card-meta">
+                            <span class="meta-tag" th:classappend="${item.status == 'upcoming'} ? 'upcoming-tag' : (${item.status == 'ended'} ? 'ended-tag' : '')"
+                                  th:text="${item.status == 'bidding'} ? '입찰 0회' : (${item.status == 'upcoming'} ? '시작 예정' : '종료')">입찰 0회</span>
+                        </div>
+                        <a th:href="${isLoggedIn} ? '/items/' + ${item.id} : '/login?redirect=/items/' + ${item.id}"
+                           class="btn-bid-now"
+                           th:text="${item.status == 'bidding'} ? '비딩하기' : (${item.status == 'upcoming'} ? '상세보기' : '결과보기')">비딩하기</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">🔍</div>
+                <h3>검색 결과가 없습니다</h3>
+                <p>다른 검색어나 필터를 시도해보세요</p>
+            </div>
+
+            <div class="empty-state" th:if="${items == null || items.isEmpty()}">
+                <div class="empty-icon">📦</div>
+                <h3>아직 등록된 경매가 없습니다</h3>
+                <p>첫 번째 경매 물품을 등록해보세요!</p>
+                <a th:href="${isLoggedIn} ? '/account/items/new' : '/login?redirect=/account/items/new'" class="btn-register">경매 등록하기</a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 BIDLIFE. All rights reserved. 폴리텍 기말 과제 프로젝트</p>
+    </footer>
+
+</body>
+</html>

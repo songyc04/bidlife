@@ -3,6 +3,7 @@ package com.example.final_project.Config;
 import com.example.final_project.Interceptor.LoginInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -14,5 +15,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/account/items/new")
                 .addPathPatterns("/items/*/bid")
                 .addPathPatterns("/account/**");
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:uploads/");
     }
 }

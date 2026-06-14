@@ -95,6 +95,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function toLocalDatetimeString(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    const startTimeInput = document.getElementById('startTime');
+    const endTimeInput = document.getElementById('endTime');
+
+    if (startTimeInput && endTimeInput) {
+        const now = new Date();
+        startTimeInput.value = toLocalDatetimeString(now);
+
+        const defaultEnd = new Date(now);
+        defaultEnd.setDate(defaultEnd.getDate() + 7);
+        defaultEnd.setHours(12, 0, 0, 0);
+        endTimeInput.value = toLocalDatetimeString(defaultEnd);
+    }
+
     if (auctionForm) {
         auctionForm.addEventListener('submit', (e) => {
             const startPrice = document.getElementById('startPrice').value;

@@ -43,52 +43,34 @@
         </div>
     </section>
 
-    <section class="live-preview-section">
+    <section class="live-preview-section" th:if="${hotItems != null && !hotItems.isEmpty()}">
         <div class="section-header">
             <h2>🔥 HOT BIDDING NOW</h2>
             <a href="/items" class="view-all">전체 상품 보기 &rarr;</a>
         </div>
         
         <div class="card-grid">
-            <div class="item-card">
+            <div class="item-card" th:each="item : ${hotItems}">
                 <div class="card-thumb">
                     <span class="status-badge bidding">LIVE</span>
-                    <div class="dummy-img">👟</div>
+                    <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
+                        <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                    </div>
+                    <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
                 </div>
                 <div class="card-body">
-                    <h3>[한정판] 에어 조던 1 레트로 하이 오리지널</h3>
+                    <h3 th:text="${item.title}">경매 제목</h3>
                     <div class="price-info">
                         <div class="price-box">
                             <span class="label">현재 최고가</span>
-                            <span class="price">890,000 원</span>
+                            <span class="price" th:text="${#numbers.formatInteger(item.startPrice, 3, 'COMMA')} + ' 원'">0 원</span>
                         </div>
                         <div class="time-box">
                             <span class="label">남은 시간</span>
-                            <span class="time-countdown" data-time="2026-06-15T18:00:00">02:45:12</span>
+                            <span class="time-countdown" th:attr="data-time=${item.endTime}" th:text="${item.endTime}">00:00:00</span>
                         </div>
                     </div>
-                    <a th:href="${isLoggedIn} ? '/items/1' : '/login?redirect=/items/1'" class="btn-bid-now">비딩하기</a>
-                </div>
-            </div>
-
-            <div class="item-card">
-                <div class="card-thumb">
-                    <span class="status-badge bidding">LIVE</span>
-                    <div class="dummy-img">🧱</div>
-                </div>
-                <div class="card-body">
-                    <h3>슈프림 한정판 아티스트 콜라보 스케이트 보드 덱</h3>
-                    <div class="price-info">
-                        <div class="price-box">
-                            <span class="label">현재 최고가</span>
-                            <span class="price">420,000 원</span>
-                        </div>
-                        <div class="time-box">
-                            <span class="label">남은 시간</span>
-                            <span class="time-countdown" data-time="2026-06-10T23:59:59">23:11:04</span>
-                        </div>
-                    </div>
-                    <a th:href="${isLoggedIn} ? '/items/2' : '/login?redirect=/items/2'" class="btn-bid-now">비딩하기</a>
+                    <a th:href="${isLoggedIn} ? '/items/' + ${item.id} : '/login?redirect=/items/' + ${item.id}" class="btn-bid-now">비딩하기</a>
                 </div>
             </div>
         </div>

@@ -68,95 +68,48 @@
                     <button class="filter-btn" data-filter="cancelled">취소</button>
                 </div>
 
-                <div class="items-grid">
+                <div class="items-grid" th:if="${myItems != null && !myItems.isEmpty()}">
 
-                    <div class="my-item-card" data-status="bidding">
+                    <div class="my-item-card" th:each="item : ${myItems}"
+                         th:attr="data-status=${item.status == 'bidding'} ? 'bidding' : (${item.status == 'ended'} ? 'completed' : 'cancelled')">
                         <div class="item-thumb">
-                            <span class="status-badge bidding">LIVE</span>
-                            <div class="dummy-img">🧱</div>
+                            <span class="status-badge"
+                                  th:classappend="${item.status == 'bidding'} ? 'bidding' : (${item.status == 'ended'} ? 'completed' : 'cancelled')"
+                                  th:text="${item.status == 'bidding'} ? 'LIVE' : (${item.status == 'ended'} ? 'ENDED' : 'CANCELLED')">LIVE</span>
+                            <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
+                                <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}" style="width:100%;height:100%;object-fit:cover;">
+                            </div>
+                            <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
                         </div>
                         <div class="item-body">
-                            <h3>슈프림 한정판 아티스트 콜라보 스케이트 보드 덱</h3>
+                            <h3 th:text="${item.title}">경매 제목</h3>
                             <div class="item-stats">
                                 <div class="stat-box">
                                     <span class="stat-label">시작가</span>
-                                    <span class="stat-value">300,000원</span>
+                                    <span class="stat-value" th:text="${#numbers.formatInteger(item.startPrice, 3, 'COMMA')} + '원'">0원</span>
                                 </div>
                                 <div class="stat-box">
-                                    <span class="stat-label">현재 최고가</span>
-                                    <span class="stat-value highlight">420,000원</span>
-                                </div>
-                                <div class="stat-box">
-                                    <span class="stat-label">입찰 수</span>
-                                    <span class="stat-value">7회</span>
-                                </div>
-                            </div>
-                            <div class="item-footer">
-                                <span class="remaining-time">남은 시간: 23:11:04</span>
-                                <a href="/items/2" class="btn-manage">관리하기</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="my-item-card" data-status="completed">
-                        <div class="item-thumb">
-                            <span class="status-badge completed">SOLD</span>
-                            <div class="dummy-img">📷</div>
-                        </div>
-                        <div class="item-body">
-                            <h3>라이카 M11 레드 페인트 미개봉</h3>
-                            <div class="item-stats">
-                                <div class="stat-box">
-                                    <span class="stat-label">시작가</span>
-                                    <span class="stat-value">5,000,000원</span>
-                                </div>
-                                <div class="stat-box">
-                                    <span class="stat-label">최종 낙찰가</span>
-                                    <span class="stat-value highlight">8,200,000원</span>
+                                    <span class="stat-label" th:text="${item.status == 'ended'} ? '최종 낙찰가' : '현재 최고가'">현재 최고가</span>
+                                    <span class="stat-value highlight" th:text="${#numbers.formatInteger(item.startPrice, 3, 'COMMA')} + '원'">0원</span>
                                 </div>
                                 <div class="stat-box">
                                     <span class="stat-label">입찰 수</span>
-                                    <span class="stat-value">15회</span>
+                                    <span class="stat-value">0회</span>
                                 </div>
                             </div>
                             <div class="item-footer">
-                                <span class="remaining-time completed-text">경매 종료</span>
-                                <a href="/items/5" class="btn-manage">상세보기</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="my-item-card" data-status="cancelled">
-                        <div class="item-thumb">
-                            <span class="status-badge cancelled">CANCELLED</span>
-                            <div class="dummy-img">🎮</div>
-                        </div>
-                        <div class="item-body">
-                            <h3>닌텐도 스위치 OLED 에디션 + 게임 3종</h3>
-                            <div class="item-stats">
-                                <div class="stat-box">
-                                    <span class="stat-label">시작가</span>
-                                    <span class="stat-value">250,000원</span>
-                                </div>
-                                <div class="stat-box">
-                                    <span class="stat-label">현재 최고가</span>
-                                    <span class="stat-value">280,000원</span>
-                                </div>
-                                <div class="stat-box">
-                                    <span class="stat-label">입찰 수</span>
-                                    <span class="stat-value">3회</span>
-                                </div>
-                            </div>
-                            <div class="item-footer">
-                                <span class="remaining-time cancelled-text">취소된 경매</span>
-                                <a href="/items/6" class="btn-manage">상세보기</a>
+                                <span class="remaining-time" th:if="${item.status == 'bidding'}">남은 시간: <span class="time-countdown" th:attr="data-time=${item.endTime}">00:00:00</span></span>
+                                <span class="remaining-time completed-text" th:if="${item.status == 'ended'}">경매 종료</span>
+                                <span class="remaining-time cancelled-text" th:if="${item.status == 'upcoming'}">시작 예정</span>
+                                <a th:href="'/items/' + ${item.id}" class="btn-manage"
+                                   th:text="${item.status == 'bidding'} ? '관리하기' : '상세보기'">관리하기</a>
                             </div>
                         </div>
                     </div>
 
                 </div>
 
-                <div class="empty-state" style="display: none;">
+                <div class="empty-state" th:if="${myItems == null || myItems.isEmpty()}">
                     <div class="empty-icon">📦</div>
                     <h3>아직 등록한 경매가 없습니다</h3>
                     <p>첫 번째 경매를 등록해보세요!</p>
