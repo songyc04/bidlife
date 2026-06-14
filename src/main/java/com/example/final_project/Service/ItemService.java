@@ -89,9 +89,22 @@ public class ItemService {
     }
 
     public List<ItemEntity> getAllItems() {
-        List<ItemEntity> items = itemRepository.findAllByOrderByCreatedAtDesc();
-        items.forEach(ItemEntity::updateTimeBasedStatus);
-        return items;
+        try {
+            List<ItemEntity> items = itemRepository.findAllByOrderByCreatedAtDesc();
+            if (items == null) {
+                return new ArrayList<>();
+            }
+            items.forEach(item -> {
+                try {
+                    item.updateTimeBasedStatus();
+                } catch (Exception e) {
+                    // Skip status update for problematic items
+                }
+            });
+            return items;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     public List<ItemEntity> getItemsBySeller(Long sellerId) {

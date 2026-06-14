@@ -65,25 +65,24 @@
                         <option value="ending">마감임박순</option>
                         <option value="price-low">낮은 가격순</option>
                         <option value="price-high">높은 가격순</option>
-                        <option value="bids">입찰 많은순</option>
                     </select>
                 </div>
             </div>
 
             <div class="status-tabs" th:if="${items != null && !items.isEmpty()}">
                 <button class="status-tab active" data-status="all">전체 <span class="count" th:text="${items.size()}">0</span></button>
-                <button class="status-tab" data-status="bidding">진행 중 <span class="count" th:text="${items.stream().filter(i -> i.status == 'bidding').count()}">0</span></button>
-                <button class="status-tab" data-status="upcoming">시작 예정 <span class="count" th:text="${items.stream().filter(i -> i.status == 'upcoming').count()}">0</span></button>
-                <button class="status-tab" data-status="ended">종료 <span class="count" th:text="${items.stream().filter(i -> i.status == 'ended').count()}">0</span></button>
+                <button class="status-tab" data-status="bidding">진행 중 <span class="count" th:text="${items.?[status == 'bidding'].size()}">0</span></button>
+                <button class="status-tab" data-status="upcoming">시작 예정 <span class="count" th:text="${items.?[status == 'upcoming'].size()}">0</span></button>
+                <button class="status-tab" data-status="ended">종료 <span class="count" th:text="${items.?[status == 'ended'].size()}">0</span></button>
             </div>
 
             <div class="card-grid" id="cardGrid" th:if="${items != null && !items.isEmpty()}">
 
                 <div class="item-card"
                      th:each="item : ${items}"
-                     th:attr="data-category=${item.category}, data-status=${item.status}, data-price=${item.startPrice}, data-time=${item.endTime}, data-bids=0">
+                     th:attr="data-category=${item.category}, data-status=${item.status}, data-price=${item.startPrice}, data-time=${item.status == 'upcoming'} ? ${item.startTime} : ${item.endTime}">
                     <div class="card-thumb">
-                        <span class="status-badge" th:classappend="${item.status == 'bidding'} ? 'bidding' : (${item.status == 'upcoming'} ? 'upcoming' : 'ended')"
+                        <span class="status-badge" th:classappend="${item.status}"
                               th:text="${item.status == 'bidding'} ? 'LIVE' : (${item.status == 'upcoming'} ? 'UPCOMING' : 'ENDED')">LIVE</span>
                         <button class="btn-pick" title="찜하기">☆</button>
                         <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
@@ -101,11 +100,20 @@
                             <div class="time-box">
                                 <span class="label" th:text="${item.status == 'bidding'} ? '남은 시간' : (${item.status == 'upcoming'} ? '시작까지' : '상태')">남은 시간</span>
                                 <span class="time-countdown" th:if="${item.status != 'ended'}"
-                                      th:attr="data-time=${item.endTime}" th:text="${item.endTime}">00:00:00</span>
+                                      th:attr="data-time=${item.status == 'upcoming'} ? ${item.startTime} : ${item.endTime}"
+                                      th:text="${item.status == 'upcoming'} ? ${item.startTime} : ${item.endTime}">00:00:00</span>
                                 <span class="time-countdown ended" th:if="${item.status == 'ended'}">경매 종료</span>
                             </div>
                         </div>
                         <div class="card-meta">
+                            <span class="category-tag" th:text="${
+                                item.category == 'electronics'} ? '전자기기' : (${
+                                item.category == 'fashion'} ? '패션/의류' : (${
+                                item.category == 'sneakers'} ? '스니커즈' : (${
+                                item.category == 'watches'} ? '시계/주얼리' : (${
+                                item.category == 'art'} ? '예술품/컬렉션' : (${
+                                item.category == 'sports'} ? '스포츠/레저' : (${
+                                item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
                             <span class="meta-tag" th:classappend="${item.status == 'upcoming'} ? 'upcoming-tag' : (${item.status == 'ended'} ? 'ended-tag' : '')"
                                   th:text="${item.status == 'bidding'} ? '입찰 0회' : (${item.status == 'upcoming'} ? '시작 예정' : '종료')">입찰 0회</span>
                         </div>

@@ -10,18 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemCards = document.querySelectorAll('.item-card');
     const emptyState = document.getElementById('emptyState');
     const pickBtns = document.querySelectorAll('.btn-pick');
-    const pageBtns = document.querySelectorAll('.page-btn');
 
     let currentStatus = 'all';
     let currentCategory = 'all';
     let currentSort = 'recent';
     let currentSearch = '';
 
-    if (!cardGrid || itemCards.length === 0) return;
+    if (!cardGrid || itemCards.length === 0) {
+        console.log("No items to display.");
+        return;
+    }
 
     function filterAndSortCards() {
         let visibleCount = 0;
-
         const cardsArray = Array.from(itemCards);
 
         cardsArray.forEach(card => {
@@ -52,20 +53,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (currentSort !== 'recent') {
-            const sortedCards = cardsArray.sort((a, b) => {
-                switch (currentSort) {
-                    case 'price-low':
-                        return parseInt(a.dataset.price) - parseInt(b.dataset.price);
-                    case 'price-high':
-                        return parseInt(b.dataset.price) - parseInt(a.dataset.price);
-                    case 'bids':
-                        return parseInt(b.dataset.bids) - parseInt(a.dataset.bids);
-                    case 'ending':
-                        return new Date(a.dataset.time) - new Date(b.dataset.time);
-                    default:
-                        return 0;
-                }
-            });
+            const sortedCards = cardsArray
+                .filter(card => card.style.display !== 'none')
+                .sort((a, b) => {
+                    switch (currentSort) {
+                        case 'price-low':
+                            return parseInt(a.dataset.price) - parseInt(b.dataset.price);
+                        case 'price-high':
+                            return parseInt(b.dataset.price) - parseInt(a.dataset.price);
+                        case 'ending':
+                            return new Date(a.dataset.time) - new Date(b.dataset.time);
+                        default:
+                            return 0;
+                    }
+                });
 
             sortedCards.forEach(card => {
                 cardGrid.appendChild(card);
@@ -74,39 +75,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (visibleCount === 0) {
             cardGrid.style.display = 'none';
-            emptyState.style.display = 'block';
+            if (emptyState) {
+                emptyState.style.display = 'block';
+            }
         } else {
             cardGrid.style.display = 'grid';
-            emptyState.style.display = 'none';
+            if (emptyState) {
+                emptyState.style.display = 'none';
+            }
         }
     }
 
-    searchBtn.addEventListener('click', () => {
-        currentSearch = searchInput.value.trim();
-        filterAndSortCards();
-    });
-
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
             currentSearch = searchInput.value.trim();
             filterAndSortCards();
-        }
-    });
+        });
+    }
 
-    searchInput.addEventListener('input', () => {
-        currentSearch = searchInput.value.trim();
-        filterAndSortCards();
-    });
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                currentSearch = searchInput.value.trim();
+                filterAndSortCards();
+            }
+        });
 
-    categoryFilter.addEventListener('change', () => {
-        currentCategory = categoryFilter.value;
-        filterAndSortCards();
-    });
+        searchInput.addEventListener('input', () => {
+            currentSearch = searchInput.value.trim();
+            filterAndSortCards();
+        });
+    }
 
-    sortSelect.addEventListener('change', () => {
-        currentSort = sortSelect.value;
-        filterAndSortCards();
-    });
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', () => {
+            currentCategory = categoryFilter.value;
+            filterAndSortCards();
+        });
+    }
+
+    if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+            currentSort = sortSelect.value;
+            filterAndSortCards();
+        });
+    }
 
     statusTabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -129,14 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.add('active');
                 btn.textContent = '⭐';
             }
-        });
-    });
-
-    pageBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            pageBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
 
