@@ -108,9 +108,22 @@ public class ItemService {
     }
 
     public List<ItemEntity> getItemsBySeller(Long sellerId) {
-        List<ItemEntity> items = itemRepository.findBySellerIdOrderByCreatedAtDesc(sellerId);
-        items.forEach(ItemEntity::updateTimeBasedStatus);
-        return items;
+        try {
+            List<ItemEntity> items = itemRepository.findBySellerIdOrderByCreatedAtDesc(sellerId);
+            if (items == null) {
+                return new ArrayList<>();
+            }
+            items.forEach(item -> {
+                try {
+                    item.updateTimeBasedStatus();
+                } catch (Exception e) {
+                    // Skip status update for problematic items
+                }
+            });
+            return items;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     public ItemEntity getItemById(Long id) {

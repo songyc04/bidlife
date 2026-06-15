@@ -71,11 +71,11 @@
                         <div class="stat-desc">전체 등록</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" th:text="${myItems.stream().filter(i -> i.status == 'bidding').count()}">0</div>
+                        <div class="stat-number" th:text="${myItems.?[status == 'bidding'].size()}">0</div>
                         <div class="stat-desc">진행 중</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" th:text="${myItems.stream().filter(i -> i.status == 'ended').count()}">0</div>
+                        <div class="stat-number" th:text="${myItems.?[status == 'ended'].size()}">0</div>
                         <div class="stat-desc">종료</div>
                     </div>
                 </div>

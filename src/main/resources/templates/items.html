@@ -106,6 +106,7 @@
                             </div>
                         </div>
                         <div class="card-meta">
+                            <span class="seller-tag" th:text="${sellerNicknames[item.sellerId]}">판매자</span>
                             <span class="category-tag" th:text="${
                                 item.category == 'electronics'} ? '전자기기' : (${
                                 item.category == 'fashion'} ? '패션/의류' : (${

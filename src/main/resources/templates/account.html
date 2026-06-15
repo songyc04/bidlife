@@ -60,7 +60,16 @@
                     <p>계정 정보를 확인하고 관리하세요</p>
                 </div>
 
+                <div class="alert-success" th:if="${successMessage != null}" th:text="${successMessage}">
+                    성공적으로 변경되었습니다.
+                </div>
+
+                <div class="alert-error" th:if="${errorMessage != null}" th:text="${errorMessage}">
+                    오류가 발생했습니다.
+                </div>
+
                 <div class="info-card">
+                    <h3 class="info-card-title">기본 정보</h3>
                     <div class="info-row">
                         <label>이메일</label>
                         <span class="info-value" th:text="${email}">email@example.com</span>
@@ -71,8 +80,48 @@
                     </div>
                 </div>
 
+                <div class="info-card">
+                    <h3 class="info-card-title">닉네임 변경</h3>
+                    <form action="/account/update-nickname" method="post" class="edit-form">
+                        <div class="form-group">
+                            <label for="newNickname">새 닉네임</label>
+                            <input type="text" id="newNickname" name="newNickname" 
+                                   th:value="${nickname}" required maxlength="50"
+                                   placeholder="새 닉네임을 입력하세요">
+                        </div>
+                        <button type="submit" class="btn-edit">닉네임 변경</button>
+                    </form>
+                </div>
+
+                <div class="info-card">
+                    <h3 class="info-card-title">비밀번호 변경</h3>
+                    <div class="alert-error" th:if="${passwordErrorMessage != null}" th:text="${passwordErrorMessage}">
+                        오류가 발생했습니다.
+                    </div>
+                    <div class="alert-success" th:if="${passwordSuccessMessage != null}" th:text="${passwordSuccessMessage}">
+                        성공적으로 변경되었습니다.
+                    </div>
+                    <form action="/account/update-password" method="post" class="edit-form" id="passwordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">현재 비밀번호</label>
+                            <input type="password" id="currentPassword" name="currentPassword" 
+                                   required placeholder="현재 비밀번호를 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">새 비밀번호</label>
+                            <input type="password" id="newPassword" name="newPassword" 
+                                   required minlength="6" placeholder="6자 이상 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">새 비밀번호 확인</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" 
+                                   required minlength="6" placeholder="새 비밀번호를 다시 입력하세요">
+                        </div>
+                        <button type="submit" class="btn-edit">비밀번호 변경</button>
+                    </form>
+                </div>
+
                 <div class="action-buttons">
-                    <button class="btn-edit" id="editProfileBtn">프로필 수정</button>
                     <a href="/login/logout" class="btn-logout-main">로그아웃</a>
                 </div>
             </section>
