@@ -1,8 +1,13 @@
 package com.example.final_project.Controller;
 
+import com.example.final_project.Entity.BidEntity;
+import com.example.final_project.Entity.FavoriteEntity;
+import com.example.final_project.Entity.ItemEntity;
 import com.example.final_project.Entity.NotificationEntity;
 import com.example.final_project.Entity.SignupEntity;
 import com.example.final_project.Repository.SignupRepository;
+import com.example.final_project.Service.BidService;
+import com.example.final_project.Service.FavoriteService;
 import com.example.final_project.Service.ItemService;
 import com.example.final_project.Service.NotificationService;
 import jakarta.annotation.PostConstruct;
@@ -10,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +31,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,6 +46,8 @@ public class AccountController {
     private final SignupRepository signupRepository;
     private final ItemService itemService;
     private final NotificationService notificationService;
+    private final BidService bidService;
+    private final FavoriteService favoriteService;
 
     @Value("${file.upload-dir:uploads/profile}")
     private String uploadDir;
@@ -87,6 +98,30 @@ public class AccountController {
             model.addAttribute("profileImage", user.get().getProfileImage());
         }
 
+        try {
+            List<BidEntity> myBids = bidService.getBidsByBidderId(userId);
+            List<Map<String, Object>> bidDetails = new ArrayList<>();
+
+            if (myBids != null) {
+                for (BidEntity bid : myBids) {
+                    Map<String, Object> bidDetail = new HashMap<>();
+                    bidDetail.put("bid", bid);
+
+                    ItemEntity item = itemService.getItemById(bid.getItemId());
+                    if (item != null) {
+                        bidDetail.put("item", item);
+                    }
+
+                    bidDetails.add(bidDetail);
+                }
+            }
+
+            model.addAttribute("bidDetails", bidDetails);
+        } catch (Exception e) {
+            log.error("Error loading bid history", e);
+            model.addAttribute("bidDetails", new ArrayList<>());
+        }
+
         return "account/bids";
     }
 
@@ -130,6 +165,30 @@ public class AccountController {
         if (user.isPresent()) {
             model.addAttribute("nickname", user.get().getNickname());
             model.addAttribute("profileImage", user.get().getProfileImage());
+        }
+
+        try {
+            List<FavoriteEntity> favorites = favoriteService.getFavoritesByUserId(userId);
+            List<Map<String, Object>> favoriteDetails = new ArrayList<>();
+
+            if (favorites != null) {
+                for (FavoriteEntity favorite : favorites) {
+                    Map<String, Object> favoriteDetail = new HashMap<>();
+                    favoriteDetail.put("favorite", favorite);
+
+                    ItemEntity item = itemService.getItemById(favorite.getItemId());
+                    if (item != null) {
+                        favoriteDetail.put("item", item);
+                    }
+
+                    favoriteDetails.add(favoriteDetail);
+                }
+            }
+
+            model.addAttribute("favoriteDetails", favoriteDetails);
+        } catch (Exception e) {
+            log.error("Error loading favorites", e);
+            model.addAttribute("favoriteDetails", new ArrayList<>());
         }
 
         return "account/picklist";
@@ -185,6 +244,89 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("errorMessage", "경매 등록 중 오류가 발생했습니다: " + e.getMessage());
             return "redirect:/account/items/new";
         }
+    }
+
+    @PostMapping("/items/{id}/delete")
+    public String deleteItem(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/items";
+        }
+
+        try {
+            itemService.deleteItem(id, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "경매가 성공적으로 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            log.error("Error deleting item", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "경매 삭제 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/account/items";
+    }
+
+    @GetMapping("/items/{id}/manage")
+    public String manageItem(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/items/" + id + "/manage";
+        }
+
+        try {
+            Optional<SignupEntity> user = signupRepository.findById(userId);
+            if (user.isPresent()) {
+                model.addAttribute("nickname", user.get().getNickname());
+                model.addAttribute("profileImage", user.get().getProfileImage());
+            }
+
+            ItemEntity item = itemService.getItemById(id);
+            if (item == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "존재하지 않는 경매입니다.");
+                return "redirect:/account/items";
+            }
+
+            if (!item.getSellerId().equals(userId)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "관리 권한이 없습니다.");
+                return "redirect:/account/items";
+            }
+
+            model.addAttribute("item", item);
+            return "account/items-manage";
+        } catch (Exception e) {
+            log.error("Error loading manage page", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "관리 페이지를 불러오는 중 오류가 발생했습니다.");
+            return "redirect:/account/items";
+        }
+    }
+
+    @PostMapping("/items/{id}/end")
+    public String endItemEarly(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/items";
+        }
+
+        try {
+            itemService.endItemEarly(id, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "경매가 조기 종료되었습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            log.error("Error ending item", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "경매 종료 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/account/items/" + id + "/manage";
     }
 
     @PostMapping("/update-nickname")
@@ -373,5 +515,31 @@ public class AccountController {
 
         notificationService.markAllAsRead(userId);
         return "redirect:/account/notifications";
+    }
+
+    @PostMapping("/favorites/toggle")
+    public ResponseEntity<Map<String, Object>> toggleFavorite(@RequestParam Long itemId, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        Map<String, Object> response = new HashMap<>();
+
+        if (userId == null) {
+            response.put("success", false);
+            response.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(401).body(response);
+        }
+
+        try {
+            boolean isFavorite = favoriteService.toggleFavorite(userId, itemId);
+            response.put("success", true);
+            response.put("isFavorite", isFavorite);
+            response.put("message", isFavorite ? "찜 목록에 추가되었습니다." : "찜 목록에서 제거되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error toggling favorite", e);
+            response.put("success", false);
+            response.put("message", "처리 중 오류가 발생했습니다.");
+            return ResponseEntity.status(500).body(response);
+        }
     }
 }

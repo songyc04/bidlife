@@ -4,6 +4,7 @@ import com.example.final_project.Entity.ItemEntity;
 import com.example.final_project.Entity.SignupEntity;
 import com.example.final_project.Repository.SignupRepository;
 import com.example.final_project.Service.BidService;
+import com.example.final_project.Service.FavoriteService;
 import com.example.final_project.Service.ItemService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Controller
@@ -29,6 +32,7 @@ public class ItemsController {
     private final ItemService itemService;
     private final SignupRepository signupRepository;
     private final BidService bidService;
+    private final FavoriteService favoriteService;
 
     @GetMapping("/items")
     public String items(HttpSession session, Model model) {
@@ -52,15 +56,20 @@ public class ItemsController {
             model.addAttribute("items", items != null ? items : new ArrayList<>());
 
             Map<Long, String> sellerNicknames = new HashMap<>();
+            Set<Long> favoriteItemIds = new HashSet<>();
             if (items != null) {
                 for (ItemEntity item : items) {
                     if (!sellerNicknames.containsKey(item.getSellerId())) {
                         SignupEntity seller = signupRepository.findById(item.getSellerId()).orElse(null);
                         sellerNicknames.put(item.getSellerId(), seller != null ? seller.getNickname() : "알 수 없음");
                     }
+                    if (userId != null && favoriteService.isFavorite(userId, item.getId())) {
+                        favoriteItemIds.add(item.getId());
+                    }
                 }
             }
             model.addAttribute("sellerNicknames", sellerNicknames);
+            model.addAttribute("favoriteItemIds", favoriteItemIds);
 
             return "items";
         } catch (Exception e) {
@@ -68,6 +77,7 @@ public class ItemsController {
             model.addAttribute("isLoggedIn", false);
             model.addAttribute("items", new ArrayList<>());
             model.addAttribute("sellerNicknames", new HashMap<>());
+            model.addAttribute("favoriteItemIds", new HashSet<>());
             return "items";
         }
     }
@@ -91,6 +101,12 @@ public class ItemsController {
             }
 
             model.addAttribute("item", item);
+
+            boolean isOwner = userId != null && userId.equals(item.getSellerId());
+            model.addAttribute("isOwner", isOwner);
+
+            boolean isFavorite = userId != null && favoriteService.isFavorite(userId, id);
+            model.addAttribute("isFavorite", isFavorite);
 
             SignupEntity seller = signupRepository.findById(item.getSellerId()).orElse(null);
             model.addAttribute("sellerNickname", seller != null ? seller.getNickname() : "알 수 없음");

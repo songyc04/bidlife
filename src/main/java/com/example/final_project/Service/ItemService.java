@@ -1,7 +1,10 @@
 package com.example.final_project.Service;
 
 import com.example.final_project.Entity.ItemEntity;
+import com.example.final_project.Repository.BidRepository;
+import com.example.final_project.Repository.FavoriteRepository;
 import com.example.final_project.Repository.ItemRepository;
+import com.example.final_project.Repository.NotificationRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +26,9 @@ import java.util.UUID;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final BidRepository bidRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final NotificationRepository notificationRepository;
 
     @Value("${file.upload-dir:uploads/items}")
     private String uploadDir;
@@ -150,5 +156,39 @@ public class ItemService {
             item.updateTimeBasedStatus();
         }
         return item;
+    }
+
+    @Transactional
+    public void deleteItem(Long itemId, Long userId) {
+        ItemEntity item = itemRepository.findById(itemId).orElse(null);
+        if (item == null) {
+            throw new IllegalArgumentException("존재하지 않는 경매입니다.");
+        }
+        if (!item.getSellerId().equals(userId)) {
+            throw new SecurityException("삭제 권한이 없습니다.");
+        }
+
+        notificationRepository.deleteByItemId(itemId);
+        favoriteRepository.deleteByItemId(itemId);
+        bidRepository.deleteByItemId(itemId);
+        itemRepository.delete(item);
+    }
+
+    @Transactional
+    public void endItemEarly(Long itemId, Long userId) {
+        ItemEntity item = itemRepository.findById(itemId).orElse(null);
+        if (item == null) {
+            throw new IllegalArgumentException("존재하지 않는 경매입니다.");
+        }
+        if (!item.getSellerId().equals(userId)) {
+            throw new SecurityException("종료 권한이 없습니다.");
+        }
+        if (item.getStatus().equals("ended")) {
+            throw new IllegalStateException("이미 종료된 경매입니다.");
+        }
+
+        item.setEndTime(LocalDateTime.now());
+        item.setStatus("ended");
+        itemRepository.save(item);
     }
 }

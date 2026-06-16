@@ -1,0 +1,254 @@
+.manage-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 32px;
+}
+
+.manage-preview {
+    background-color: #121212;
+    border: 1px solid #222222;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.preview-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background-color: #1a1a1a;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-image .card-image {
+    width: 100%;
+    height: 100%;
+}
+
+.preview-image .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-image .dummy-img {
+    font-size: 80px;
+    opacity: 0.5;
+}
+
+.preview-image .status-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    z-index: 1;
+}
+
+.preview-info {
+    padding: 24px;
+}
+
+.preview-info h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.preview-stats {
+    background-color: #181818;
+    border: 1px solid #252525;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #222222;
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #888888;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.stat-value.highlight {
+    color: #ff5a00;
+    font-size: 17px;
+}
+
+.preview-time {
+    background-color: #181818;
+    border: 1px solid #252525;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.time-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.time-label {
+    font-size: 13px;
+    color: #888888;
+    font-weight: 600;
+}
+
+.time-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.time-value.countdown {
+    color: #ff5a00;
+    font-size: 16px;
+}
+
+.manage-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.action-card {
+    background-color: #121212;
+    border: 1px solid #222222;
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.action-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-icon {
+    font-size: 20px;
+}
+
+.btn-view {
+    background-color: transparent;
+    border-color: #333333;
+    color: #ffffff;
+}
+
+.btn-view:hover {
+    background-color: #1a1a1a;
+    border-color: #ff5a00;
+    color: #ff5a00;
+}
+
+.btn-end {
+    background-color: transparent;
+    border-color: #ff9800;
+    color: #ff9800;
+}
+
+.btn-end:hover {
+    background-color: rgba(255, 152, 0, 0.1);
+    border-color: #ffb74d;
+    color: #ffb74d;
+}
+
+.btn-delete {
+    background-color: transparent;
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+.btn-delete:hover {
+    background-color: rgba(255, 68, 68, 0.1);
+    border-color: #ff6666;
+    color: #ff6666;
+}
+
+.info-text {
+    font-size: 14px;
+    color: #888888;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.back-link {
+    margin-top: 32px;
+}
+
+.btn-back {
+    display: inline-block;
+    color: #888888;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.btn-back:hover {
+    color: #ff5a00;
+}
+
+@media (max-width: 968px) {
+    .manage-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .preview-info h3 {
+        font-size: 18px;
+    }
+
+    .stat-value {
+        font-size: 14px;
+    }
+
+    .stat-value.highlight {
+        font-size: 16px;
+    }
+}

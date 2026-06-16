@@ -111,33 +111,48 @@
                         </div>
                     </div>
 
-                    <div class="bid-panel" th:if="${item.status == 'bidding'}">
+                    <div class="bid-panel" th:if="${item.status == 'bidding' and !isOwner}">
                         <div class="alert-success" th:if="${bidSuccessMessage != null}" th:text="${bidSuccessMessage}" style="margin-bottom: 16px;">
                             입찰이 완료되었습니다.
                         </div>
                         <div class="alert-error" th:if="${bidErrorMessage != null}" th:text="${bidErrorMessage}" style="margin-bottom: 16px;">
                             오류가 발생했습니다.
                         </div>
-                        <form th:action="'/items/' + ${item.id} + '/bid'" method="post" th:if="${isLoggedIn}">
-                            <div class="bid-input-group">
-                                <label for="bidAmount">입찰 금액</label>
-                                <div class="input-wrapper">
-                                    <input type="number" id="bidAmount" name="bidAmount"
-                                           th:attr="min=${(item.currentPrice != null ? item.currentPrice : item.startPrice) + item.bidUnit}, step=${item.bidUnit}"
-                                           th:value="${(item.currentPrice != null ? item.currentPrice : item.startPrice) + item.bidUnit}">
-                                    <span class="input-suffix">원</span>
+                        <div th:if="${isLoggedIn}">
+                            <form th:action="'/items/' + ${item.id} + '/bid'" method="post">
+                                <div class="bid-input-group">
+                                    <label for="bidAmount">최소 입찰 금액</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" id="bidAmount" name="bidAmount"
+                                               th:attr="min=${(item.currentPrice != null ? item.currentPrice : item.startPrice) + item.bidUnit}, step=${item.bidUnit}"
+                                               th:value="${(item.currentPrice != null ? item.currentPrice : item.startPrice) + item.bidUnit}">
+                                        <div class="input-spinner">
+                                            <button type="button" id="btnIncrease">&#9650;</button>
+                                            <button type="button" id="btnDecrease">&#9660;</button>
+                                        </div>
+                                        <span class="input-suffix">원</span>
+                                    </div>
+                                    <p class="bid-hint" th:text="'최소 ' + ${#numbers.formatInteger(item.bidUnit, 3, 'COMMA')} + '원 단위로 입찰 가능'">최소 10,000원 단위로 입찰 가능</p>
                                 </div>
-                                <p class="bid-hint" th:text="'최소 ' + ${#numbers.formatInteger(item.bidUnit, 3, 'COMMA')} + '원 단위로 입찰 가능'">최소 10,000원 단위로 입찰 가능</p>
-                            </div>
-                            <div class="bid-actions">
-                                <button type="submit" class="btn-bid">비딩하기</button>
-                                <button type="button" class="btn-buy-now" th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}"
-                                        th:text="'즉시 구매 (' + ${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')} + '원)'">즉시 구매</button>
-                            </div>
-                        </form>
-                        <div th:unless="${isLoggedIn}">
-                            <a th:href="'/login?redirect=/items/' + ${item.id}" class="btn-bid" style="display: block; text-align: center;">로그인 후 비딩하기</a>
+                                <div class="bid-actions">
+                                    <button type="submit" class="btn-bid">비딩하기</button>
+                                    <button type="button" class="btn-buy-now" th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}"
+                                            th:text="'즉시 구매 (' + ${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')} + '원)'">즉시 구매</button>
+                                </div>
+                            </form>
                         </div>
+                        <div th:unless="${isLoggedIn}" class="bid-locked">
+                            <div class="bid-locked-content">
+                                <span class="bid-locked-icon">🔒</span>
+                                <p class="bid-locked-message">로그인 후 비딩에 참여할 수 있습니다</p>
+                                <a th:href="'/login?redirect=/items/' + ${item.id}" class="btn-bid">로그인하러 가기</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bid-panel upcoming-panel" th:if="${item.status == 'bidding' and isOwner}">
+                        <p class="panel-message">내 경매 물품입니다</p>
+                        <p class="panel-submessage">판매자는 입찰에 참여할 수 없습니다</p>
                     </div>
 
                     <div class="bid-panel upcoming-panel" th:if="${item.status == 'upcoming'}">
@@ -150,6 +165,10 @@
                     </div>
 
                     <div class="action-buttons">
+                        <button class="btn-pick" th:classappend="${isFavorite} ? 'active'"
+                                th:attr="data-item-id=${item.id}" id="detailPickBtn">
+                            <span th:text="${isFavorite} ? '★ 찜완료' : '☆ 찜하기'">☆ 찜하기</span>
+                        </button>
                         <button class="btn-share">공유하기</button>
                     </div>
                 </div>

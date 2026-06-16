@@ -11,4 +11,5 @@ public interface BidRepository extends JpaRepository<BidEntity, Long> {
     List<BidEntity> findByItemIdOrderByCreatedAtDesc(Long itemId);
     List<BidEntity> findByBidderIdOrderByCreatedAtDesc(Long bidderId);
     List<BidEntity> findByItemIdAndStatusOrderByBidAmountDesc(Long itemId, String status);
+    void deleteByItemId(Long itemId);
 }

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 경매 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/account.css">
+    <link rel="stylesheet" href="/css/items-manage.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">BID<span>LIFE</span></a>
+            <nav class="nav-menu">
+                <a href="/items" class="nav-link">경매 둘러보기</a>
+                <a href="/account/items/new" class="nav-link btn-create">경매 등록</a>
+            </nav>
+            <div class="nav-auth">
+                <a href="/account" class="btn-mypage">마이페이지</a>
+                <a href="/login/logout" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="account-section">
+        <div class="account-container">
+
+            <aside class="account-sidebar">
+                <div class="sidebar-header">
+                    <div class="profile-icon" th:attr="data-seed=${nickname}">
+                        <img th:if="${profileImage != null and !profileImage.isEmpty()}" 
+                             th:src="${profileImage}" 
+                             th:alt="${nickname}" 
+                             class="profile-img">
+                        <span th:if="${profileImage == null or profileImage.isEmpty()}" 
+                              th:text="${nickname != null ? nickname.substring(0,1) : '?'}">U</span>
+                    </div>
+                    <h3 th:text="${nickname}">닉네임</h3>
+                </div>
+                <nav class="sidebar-menu">
+                    <a href="/account" class="menu-item">
+                        <span class="menu-icon">👤</span>
+                        <span>내 정보</span>
+                    </a>
+                    <a href="/account/notifications" class="menu-item">
+                        <span class="menu-icon">🔔</span>
+                        <span>알림</span>
+                    </a>
+                    <a href="/account/bids" class="menu-item">
+                        <span class="menu-icon">💰</span>
+                        <span>내 입찰 내역</span>
+                    </a>
+                    <a href="/account/items" class="menu-item active">
+                        <span class="menu-icon">📦</span>
+                        <span>등록한 경매</span>
+                    </a>
+                    <a href="/account/picklist" class="menu-item">
+                        <span class="menu-icon">⭐</span>
+                        <span>찜한 경매</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <section class="account-content">
+                <div class="content-header">
+                    <h2>경매 관리</h2>
+                    <p>내 경매를 관리하세요</p>
+                </div>
+
+                <div class="alert-success" th:if="${successMessage != null}" th:text="${successMessage}">
+                    성공적으로 처리되었습니다.
+                </div>
+
+                <div class="alert-error" th:if="${errorMessage != null}" th:text="${errorMessage}">
+                    오류가 발생했습니다.
+                </div>
+
+                <div class="manage-layout">
+                    <div class="manage-preview">
+                        <div class="preview-image">
+                            <span class="status-badge" th:classappend="${item.status}"
+                                  th:text="${item.status == 'bidding'} ? 'LIVE' : (${item.status == 'upcoming'} ? 'UPCOMING' : 'ENDED')">LIVE</span>
+                            <div th:if="${item.imagePaths != null and !item.imagePaths.isEmpty()}" class="card-image">
+                                <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                            </div>
+                            <div th:unless="${item.imagePaths != null and !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
+                        </div>
+                        <div class="preview-info">
+                            <h3 th:text="${item.title}">경매 제목</h3>
+                            <div class="preview-stats">
+                                <div class="stat-row">
+                                    <span class="stat-label">시작가</span>
+                                    <span class="stat-value" th:text="${#numbers.formatInteger(item.startPrice, 3, 'COMMA')} + '원'">0원</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">현재가</span>
+                                    <span class="stat-value highlight" th:text="${#numbers.formatInteger(item.currentPrice != null ? item.currentPrice : item.startPrice, 3, 'COMMA')} + '원'">0원</span>
+                                </div>
+                                <div class="stat-row" th:if="${item.buyNowPrice != null}">
+                                    <span class="stat-label">즉시구매가</span>
+                                    <span class="stat-value" th:text="${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')} + '원'">0원</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">입찰단위</span>
+                                    <span class="stat-value" th:text="${#numbers.formatInteger(item.bidUnit, 3, 'COMMA')} + '원'">0원</span>
+                                </div>
+                            </div>
+                            <div class="preview-time">
+                                <div class="time-row">
+                                    <span class="time-label">시작</span>
+                                    <span class="time-value" th:text="${#temporals.format(item.startTime, 'yyyy-MM-dd HH:mm')}">2026-01-01 12:00</span>
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-label">종료</span>
+                                    <span class="time-value" th:text="${#temporals.format(item.endTime, 'yyyy-MM-dd HH:mm')}">2026-01-08 12:00</span>
+                                </div>
+                                <div class="time-row" th:if="${item.status == 'bidding'}">
+                                    <span class="time-label">남은 시간</span>
+                                    <span class="time-value countdown" th:attr="data-time=${item.endTime}">00:00:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="manage-actions">
+                        <div class="action-card">
+                            <h4>경매 관리</h4>
+                            <div class="action-buttons">
+                                <a th:href="'/items/' + ${item.id}" class="btn-action btn-view">
+                                    <span class="btn-icon">👁️</span>
+                                    <span>상세보기</span>
+                                </a>
+                                <form th:action="'/account/items/' + ${item.id} + '/end'" method="post" 
+                                      th:if="${item.status != 'ended'}"
+                                      onsubmit="return confirm('경매를 조기 종료하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+                                    <button type="submit" class="btn-action btn-end">
+                                        <span class="btn-icon">⏹️</span>
+                                        <span>조기 종료</span>
+                                    </button>
+                                </form>
+                                <form th:action="'/account/items/' + ${item.id} + '/delete'" method="post"
+                                      onsubmit="return confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+                                    <button type="submit" class="btn-action btn-delete">
+                                        <span class="btn-icon">🗑️</span>
+                                        <span>삭제</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="action-card" th:if="${item.status == 'ended'}">
+                            <h4>경매 결과</h4>
+                            <p class="info-text">이 경매는 종료되었습니다.</p>
+                            <a th:href="'/items/' + ${item.id}" class="btn-action btn-view">
+                                <span class="btn-icon">📊</span>
+                                <span>결과 확인하기</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="back-link">
+                    <a href="/account/items" class="btn-back">← 목록으로 돌아가기</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 BIDLIFE. All rights reserved. 폴리텍 기말 과제 프로젝트</p>
+    </footer>
+
+    <script>
+        function updateCountdowns() {
+            const countdowns = document.querySelectorAll('.countdown');
+            countdowns.forEach(el => {
+                const targetTime = new Date(el.dataset.time).getTime();
+                const now = new Date().getTime();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    el.textContent = '종료';
+                    el.classList.add('ended');
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                if (days > 0) {
+                    el.textContent = `${days}일 ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                } else {
+                    el.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }
+            });
+        }
+
+        updateCountdowns();
+        setInterval(updateCountdowns, 1000);
+    </script>
+
+</body>
+</html>

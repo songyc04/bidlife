@@ -129,6 +129,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    const pickBtns = document.querySelectorAll('.btn-pick');
+    pickBtns.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const itemId = btn.dataset.itemId;
+            if (!itemId) return;
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('itemId', itemId);
+
+                const response = await fetch('/account/favorites/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString()
+                });
+
+                if (response.status === 401) {
+                    window.location.href = '/login?redirect=/items';
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const starSpan = btn.querySelector('span');
+                    if (data.isFavorite) {
+                        btn.classList.add('active');
+                        if (starSpan) starSpan.textContent = '★';
+                    } else {
+                        btn.classList.remove('active');
+                        if (starSpan) starSpan.textContent = '☆';
+                    }
+                } else {
+                    alert(data.message || '처리 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('Favorite toggle error:', error);
+                alert('서버 연결에 실패했습니다.');
+            }
+        });
+    });
+
     function updateCountdowns() {
         const countdowns = document.querySelectorAll('.time-countdown:not(.ended)');
         countdowns.forEach(el => {

@@ -70,10 +70,45 @@
                     <p>참여한 입찰 기록을 확인하세요</p>
                 </div>
 
-                <div class="bid-list">
+                <div class="bid-list" th:if="${bidDetails != null and !bidDetails.isEmpty()}">
+                    <div class="bid-card" th:each="detail : ${bidDetails}"
+                         th:attr="data-status=${detail.bid.status == 'active' ? 'bidding' : (detail.bid.status == 'outbid' ? 'lost' : 'won')}">
+                        <div class="bid-thumb">
+                            <span class="status-badge" 
+                                  th:classappend="${detail.item.status == 'bidding'} ? 'bidding' : ((detail.item.status == 'upcoming') ? 'upcoming' : 'ended')"
+                                  th:text="${detail.item.status == 'bidding'} ? 'LIVE' : ((detail.item.status == 'upcoming') ? 'UPCOMING' : 'ENDED')">LIVE</span>
+                            <div th:if="${detail.item.imagePaths != null and !detail.item.imagePaths.isEmpty()}" class="card-image">
+                                <img th:src="${detail.item.imagePaths.split(',')[0]}" th:alt="${detail.item.title}">
+                            </div>
+                            <div th:unless="${detail.item.imagePaths != null and !detail.item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
+                        </div>
+                        <div class="bid-info">
+                            <h3 th:text="${detail.item.title}">경매 제목</h3>
+                            <div class="bid-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">내 입찰가</span>
+                                    <span class="meta-value my-bid" th:text="${#numbers.formatInteger(detail.bid.bidAmount, 3, 'COMMA')} + '원'">0원</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">현재 최고가</span>
+                                    <span class="meta-value current-bid" th:text="${#numbers.formatInteger(detail.item.currentPrice != null ? detail.item.currentPrice : detail.item.startPrice, 3, 'COMMA')} + '원'">0원</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">입찰 일시</span>
+                                    <span class="meta-value" th:text="${#temporals.format(detail.bid.createdAt, 'yyyy.MM.dd HH:mm')}">2026.01.01 12:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bid-action">
+                            <span class="bid-status" 
+                                  th:classappend="${detail.bid.status == 'active' ? 'bidding' : 'lost'}"
+                                  th:text="${detail.bid.status == 'active' ? '입찰 중' : '낙찰 실패'}">입찰 중</span>
+                            <a th:href="'/items/' + ${detail.item.id}" class="btn-detail">상세보기</a>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="empty-state">
+                <div class="empty-state" th:if="${bidDetails == null || bidDetails.isEmpty()}">
                     <div class="empty-icon">💰</div>
                     <h3>아직 입찰 내역이 없습니다</h3>
                     <p>관심 있는 경매에 참여해보세요!</p>

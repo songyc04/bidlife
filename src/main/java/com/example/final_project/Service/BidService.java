@@ -28,6 +28,7 @@ public class BidService {
             throw new IllegalArgumentException("존재하지 않는 경매입니다.");
         }
 
+        item.updateTimeBasedStatus();
         if (!"bidding".equals(item.getStatus())) {
             throw new IllegalStateException("현재 입찰이 가능한 경매가 아닙니다.");
         }
@@ -36,9 +37,10 @@ public class BidService {
             throw new IllegalStateException("자신의 경매에는 입찰할 수 없습니다.");
         }
 
-        Integer minBid = item.getCurrentPrice() + item.getBidUnit();
+        Integer currentPrice = item.getCurrentPrice() != null ? item.getCurrentPrice() : item.getStartPrice();
+        Integer minBid = currentPrice + item.getBidUnit();
         if (bidAmount < minBid) {
-            throw new IllegalArgumentException("최소 입찰 금액은 " + minBid + "원입니다.");
+            throw new IllegalArgumentException("최소 입찰 금액은 " + String.format("%,d", minBid) + "원입니다.");
         }
 
         List<BidEntity> existingBids = bidRepository.findByItemIdAndStatusOrderByBidAmountDesc(itemId, "active");
@@ -62,7 +64,7 @@ public class BidService {
 
         notificationService.createNotification(
                 item.getSellerId(),
-                bidderName + "님이 [" + item.getTitle() + "]에 " + bidAmount + "원으로 입찰했습니다.",
+                bidderName + "님이 [" + item.getTitle() + "]에 " + String.format("%,d", bidAmount) + "원으로 입찰했습니다.",
                 itemId,
                 "new_bid"
         );

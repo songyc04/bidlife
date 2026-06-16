@@ -252,6 +252,33 @@
     color: #000000;
 }
 
+.item-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.delete-form {
+    display: inline;
+}
+
+.btn-delete {
+    background-color: transparent;
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #ff4444;
+    color: #ffffff;
+}
+
 .empty-state {
     text-align: center;
     padding: 80px 20px;

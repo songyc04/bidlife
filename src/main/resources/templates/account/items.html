@@ -134,8 +134,13 @@
                                     시작까지: <span class="time-countdown" th:attr="data-time=${item.startTime}">00:00:00</span>
                                 </span>
                                 <span class="remaining-time completed-text" th:if="${item.status == 'ended'}">경매 종료</span>
-                                <a th:href="'/items/' + ${item.id}" class="btn-manage"
-                                   th:text="${item.status == 'bidding'} ? '관리하기' : (${item.status == 'upcoming'} ? '상세보기' : '결과보기')">관리하기</a>
+                                <div class="item-actions">
+                                    <a th:href="'/account/items/' + ${item.id} + '/manage'" class="btn-manage">관리하기</a>
+                                    <form th:action="'/account/items/' + ${item.id} + '/delete'" method="post" class="delete-form"
+                                          onsubmit="return confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+                                        <button type="submit" class="btn-delete">삭제</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>

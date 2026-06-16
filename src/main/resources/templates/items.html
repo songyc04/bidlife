@@ -80,17 +80,24 @@
 
                 <div class="item-card"
                      th:each="item : ${items}"
-                     th:attr="data-category=${item.category}, data-status=${item.status}, data-price=${item.startPrice}, data-time=${item.status == 'upcoming'} ? ${item.startTime} : ${item.endTime}">
+                     th:attr="data-category=${item.category}, data-status=${item.status}, data-price=${item.startPrice}, data-time=${item.status == 'upcoming'} ? ${item.startTime} : ${item.endTime}, data-item-id=${item.id}">
                     <div class="card-thumb">
                         <span class="status-badge" th:classappend="${item.status}"
                               th:text="${item.status == 'bidding'} ? 'LIVE' : (${item.status == 'upcoming'} ? 'UPCOMING' : 'ENDED')">LIVE</span>
+                        <button class="btn-pick" th:classappend="${favoriteItemIds.contains(item.id)} ? 'active'"
+                                th:attr="data-item-id=${item.id}" title="찜하기">
+                            <span th:text="${favoriteItemIds.contains(item.id)} ? '★' : '☆'">☆</span>
+                        </button>
                         <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
                             <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
                         </div>
                         <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
                     </div>
                     <div class="card-body">
-                        <h3 th:text="${item.title}">경매 제목</h3>
+                        <h3>
+                            <a th:href="'/items/' + ${item.id}" 
+                               th:text="${item.title}" style="color: inherit; text-decoration: none;">경매 제목</a>
+                        </h3>
                         <div class="price-info">
                             <div class="price-box">
                                 <span class="label" th:text="${item.status == 'bidding'} ? '현재 최고가' : (${item.status == 'upcoming'} ? '시작가' : '최종 낙찰가')">현재 최고가</span>
@@ -117,9 +124,6 @@
                             <span class="meta-tag" th:classappend="${item.status == 'upcoming'} ? 'upcoming-tag' : (${item.status == 'ended'} ? 'ended-tag' : '')"
                                   th:text="${item.status == 'upcoming'} ? '시작 예정' : (${item.status == 'ended'} ? '종료' : '진행 중')">진행 중</span>
                         </div>
-                        <a th:href="${isLoggedIn} ? '/items/' + ${item.id} : '/login?redirect=/items/' + ${item.id}"
-                           class="btn-bid-now"
-                           th:text="${item.status == 'bidding'} ? '비딩하기' : (${item.status == 'upcoming'} ? '상세보기' : '결과보기')">비딩하기</a>
                     </div>
                 </div>
 

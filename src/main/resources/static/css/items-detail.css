@@ -190,16 +190,20 @@ a {
     border-radius: 8px;
     overflow: hidden;
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     margin-bottom: 16px;
+}
+
+.main-image .gallery-main {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .main-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
 .gallery-placeholder {
@@ -439,7 +443,7 @@ a {
     background-color: #0a0a0a;
     border: 1px solid #252525;
     border-radius: 4px;
-    padding: 16px 60px 16px 16px;
+    padding: 16px 80px 16px 16px;
     font-size: 18px;
     font-weight: 700;
     color: #ffffff;
@@ -449,6 +453,50 @@ a {
 
 .input-wrapper input:focus {
     border-color: #ff5a00;
+}
+
+.input-wrapper input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.input-wrapper input[type="number"]::-webkit-outer-spin-button,
+.input-wrapper input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input-spinner {
+    position: absolute;
+    right: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.input-spinner button {
+    width: 28px;
+    height: 20px;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 3px;
+    color: #888;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.input-spinner button:hover {
+    background-color: #ff5a00;
+    border-color: #ff5a00;
+    color: #000;
+}
+
+.input-spinner button:active {
+    transform: scale(0.95);
 }
 
 .input-suffix {
@@ -524,6 +572,40 @@ a {
 .panel-submessage {
     font-size: 14px;
     color: #888888;
+}
+
+.bid-locked {
+    position: relative;
+    background: linear-gradient(135deg, rgba(18, 18, 18, 0.95), rgba(30, 30, 30, 0.95));
+    backdrop-filter: blur(8px);
+    border-radius: 4px;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.bid-locked-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.bid-locked-icon {
+    font-size: 48px;
+    opacity: 0.7;
+}
+
+.bid-locked-message {
+    font-size: 15px;
+    font-weight: 600;
+    color: #aaaaaa;
+}
+
+.bid-locked .btn-bid {
+    display: inline-block;
+    text-decoration: none;
+    padding: 14px 32px;
+    width: auto;
 }
 
 .alert-success {

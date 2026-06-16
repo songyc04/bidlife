@@ -15,6 +15,72 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    const bidInput = document.getElementById('bidAmount');
+    const btnIncrease = document.getElementById('btnIncrease');
+    const btnDecrease = document.getElementById('btnDecrease');
+
+    if (bidInput && btnIncrease && btnDecrease) {
+        const step = parseInt(bidInput.step) || 10000;
+        const min = parseInt(bidInput.min) || 0;
+
+        btnIncrease.addEventListener('click', () => {
+            const currentValue = parseInt(bidInput.value) || 0;
+            bidInput.value = currentValue + step;
+        });
+
+        btnDecrease.addEventListener('click', () => {
+            const currentValue = parseInt(bidInput.value) || 0;
+            const newValue = currentValue - step;
+            if (newValue >= min) {
+                bidInput.value = newValue;
+            }
+        });
+    }
+
+    const detailPickBtn = document.getElementById('detailPickBtn');
+    if (detailPickBtn) {
+        detailPickBtn.addEventListener('click', async () => {
+            const itemId = detailPickBtn.dataset.itemId;
+            if (!itemId) return;
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('itemId', itemId);
+
+                const response = await fetch('/account/favorites/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString()
+                });
+
+                if (response.status === 401) {
+                    window.location.href = '/login?redirect=/items/' + itemId;
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const starSpan = detailPickBtn.querySelector('span');
+                    if (data.isFavorite) {
+                        detailPickBtn.classList.add('active');
+                        if (starSpan) starSpan.textContent = '★ 찜완료';
+                    } else {
+                        detailPickBtn.classList.remove('active');
+                        if (starSpan) starSpan.textContent = '☆ 찜하기';
+                    }
+                } else {
+                    alert(data.message || '처리 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('Favorite toggle error:', error);
+                alert('서버 연결에 실패했습니다.');
+            }
+        });
+    }
+
     function updateCountdowns() {
         const countdowns = document.querySelectorAll('.countdown');
         countdowns.forEach(el => {

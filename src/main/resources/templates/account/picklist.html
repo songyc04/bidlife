@@ -70,10 +70,39 @@
                     <p>관심 있게 지켜보고 있는 경매 목록입니다</p>
                 </div>
 
-                <div class="picklist-grid">
+                <div class="picklist-grid" th:if="${favoriteDetails != null and !favoriteDetails.isEmpty()}">
+                    <div class="pick-card" th:each="detail : ${favoriteDetails}"
+                         th:attr="data-status=${detail.item.status}">
+                        <div class="pick-thumb">
+                            <span class="status-badge" 
+                                  th:classappend="${detail.item.status == 'bidding'} ? 'bidding' : ((detail.item.status == 'upcoming') ? 'upcoming' : 'ended')"
+                                  th:text="${detail.item.status == 'bidding'} ? 'LIVE' : ((detail.item.status == 'upcoming') ? 'UPCOMING' : 'ENDED')">LIVE</span>
+                            <button class="btn-pick active" th:attr="data-item-id=${detail.item.id}" title="찜 취소">
+                                <span>★</span>
+                            </button>
+                            <div th:if="${detail.item.imagePaths != null and !detail.item.imagePaths.isEmpty()}" class="card-image">
+                                <img th:src="${detail.item.imagePaths.split(',')[0]}" th:alt="${detail.item.title}">
+                            </div>
+                            <div th:unless="${detail.item.imagePaths != null and !detail.item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
+                        </div>
+                        <div class="pick-body">
+                            <h3 th:text="${detail.item.title}">경매 제목</h3>
+                            <div class="pick-price">
+                                <span class="price-label" th:text="${detail.item.status == 'bidding'} ? '현재 최고가' : ((detail.item.status == 'upcoming') ? '시작가' : '최종 낙찰가')">현재 최고가</span>
+                                <span class="price-value" th:text="${#numbers.formatInteger(detail.item.currentPrice != null ? detail.item.currentPrice : detail.item.startPrice, 3, 'COMMA')} + '원'">0원</span>
+                            </div>
+                            <div class="pick-footer">
+                                <span class="remaining-time" th:if="${detail.item.status != 'ended'}"
+                                      th:attr="data-time=${detail.item.status == 'upcoming'} ? ${detail.item.startTime} : ${detail.item.endTime}"
+                                      th:text="${detail.item.status == 'upcoming'} ? ${detail.item.startTime} : ${detail.item.endTime}">00:00:00</span>
+                                <span class="remaining-time ended-text" th:if="${detail.item.status == 'ended'}">경매 종료</span>
+                                <a th:href="'/items/' + ${detail.item.id}" class="btn-go">상세보기</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="empty-state">
+                <div class="empty-state" th:if="${favoriteDetails == null || favoriteDetails.isEmpty()}">
                     <div class="empty-icon">⭐</div>
                     <h3>아직 찜한 경매가 없습니다</h3>
                     <p>관심 있는 경매에 찜을 해보세요!</p>
