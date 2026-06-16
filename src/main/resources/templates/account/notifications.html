@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 알림</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/account.css">
+    <style>
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .btn-read-all {
+            background: transparent;
+            border: 1px solid #444;
+            color: #aaa;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-read-all:hover {
+            border-color: #ff5a00;
+            color: #ff5a00;
+        }
+        .notification-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background: #121212;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 16px 20px;
+            transition: all 0.2s;
+        }
+        .notification-item:hover {
+            border-color: #333;
+        }
+        .notification-item.unread {
+            border-left: 3px solid #ff5a00;
+            background: #1a1a1a;
+        }
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .notification-icon.bid {
+            background: rgba(255, 90, 0, 0.15);
+        }
+        .notification-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .notification-message {
+            font-size: 14px;
+            color: #ddd;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .notification-item.unread .notification-message {
+            color: #fff;
+            font-weight: 500;
+        }
+        .notification-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #666;
+        }
+        .notification-time {
+            color: #555;
+        }
+        .notification-link {
+            color: #ff5a00;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .notification-link:hover {
+            text-decoration: underline;
+        }
+        .notification-actions {
+            display: flex;
+            align-items: center;
+        }
+        .btn-mark-read {
+            background: transparent;
+            border: 1px solid #333;
+            color: #888;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-mark-read:hover {
+            border-color: #ff5a00;
+            color: #ff5a00;
+        }
+        .empty-notifications {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .empty-notifications-icon {
+            font-size: 60px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        .empty-notifications h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #888;
+        }
+        .empty-notifications p {
+            font-size: 14px;
+            color: #555;
+        }
+        .unread-badge {
+            background: #ff5a00;
+            color: #000;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">BID<span>LIFE</span></a>
+            <nav class="nav-menu">
+                <a href="/items" class="nav-link">경매 둘러보기</a>
+                <a href="/account/items/new" class="nav-link btn-create">경매 등록</a>
+            </nav>
+            <div class="nav-auth">
+                <a href="/account" class="btn-mypage">마이페이지</a>
+                <a href="/login/logout" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="account-section">
+        <div class="account-container">
+
+            <aside class="account-sidebar">
+                <div class="sidebar-header">
+                    <div class="profile-icon" th:attr="data-seed=${nickname}">
+                        <img th:if="${profileImage != null and !profileImage.isEmpty()}" 
+                             th:src="${profileImage}" 
+                             th:alt="${nickname}" 
+                             class="profile-img">
+                        <span th:if="${profileImage == null or profileImage.isEmpty()}" 
+                              th:text="${nickname != null ? nickname.substring(0,1) : '?'}">U</span>
+                    </div>
+                    <h3 th:text="${nickname}">닉네임</h3>
+                </div>
+                <nav class="sidebar-menu">
+                    <a href="/account" class="menu-item">
+                        <span class="menu-icon">👤</span>
+                        <span>내 정보</span>
+                    </a>
+                    <a href="/account/notifications" class="menu-item active">
+                        <span class="menu-icon">🔔</span>
+                        <span>알림</span>
+                        <span class="unread-badge" th:if="${unreadCount > 0}" th:text="${unreadCount}">0</span>
+                    </a>
+                    <a href="/account/bids" class="menu-item">
+                        <span class="menu-icon">💰</span>
+                        <span>내 입찰 내역</span>
+                    </a>
+                    <a href="/account/items" class="menu-item">
+                        <span class="menu-icon">📦</span>
+                        <span>등록한 경매</span>
+                    </a>
+                    <a href="/account/picklist" class="menu-item">
+                        <span class="menu-icon">⭐</span>
+                        <span>찜한 경매</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <section class="account-content">
+                <div class="content-header">
+                    <h2>알림</h2>
+                    <p>경매 관련 알림을 확인하세요</p>
+                </div>
+
+                <div class="notification-header" th:if="${notifications != null and !notifications.isEmpty()}">
+                    <span style="color: #888; font-size: 14px;">
+                        총 <span th:text="${notifications.size()}">0</span>개의 알림
+                        <span th:if="${unreadCount > 0}" style="color: #ff5a00;">
+                            (읽지 않음 <span th:text="${unreadCount}">0</span>개)
+                        </span>
+                    </span>
+                    <form action="/account/notifications/read-all" method="post" th:if="${unreadCount > 0}">
+                        <button type="submit" class="btn-read-all">모두 읽음 처리</button>
+                    </form>
+                </div>
+
+                <div class="notification-list" th:if="${notifications != null and !notifications.isEmpty()}">
+                    <div class="notification-item" 
+                         th:each="notification : ${notifications}"
+                         th:classappend="${!notification.isRead} ? 'unread'">
+                        <div class="notification-icon bid">
+                            <span th:if="${notification.type == 'new_bid'}">💰</span>
+                            <span th:if="${notification.type != 'new_bid'}">🔔</span>
+                        </div>
+                        <div class="notification-body">
+                            <p class="notification-message" th:text="${notification.message}">알림 메시지</p>
+                            <div class="notification-meta">
+                                <span class="notification-time" 
+                                      th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd HH:mm')}">2026-01-01 12:00</span>
+                                <a th:if="${notification.itemId != null}" 
+                                   th:href="'/items/' + ${notification.itemId}" 
+                                   class="notification-link">경매 보기</a>
+                            </div>
+                        </div>
+                        <div class="notification-actions" th:if="${!notification.isRead}">
+                            <form th:action="'/account/notifications/' + ${notification.id} + '/read'" method="post">
+                                <button type="submit" class="btn-mark-read">읽음</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-notifications" th:if="${notifications == null || notifications.isEmpty()}">
+                    <div class="empty-notifications-icon">🔔</div>
+                    <h3>알림이 없습니다</h3>
+                    <p>새로운 입찰이 발생하면 여기에 알림이 표시됩니다</p>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 BIDLIFE. All rights reserved. 폴리텍 기말 과제 프로젝트</p>
+    </footer>
+
+</body>
+</html>

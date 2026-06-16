@@ -13,7 +13,6 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/account/items/new")
-                .addPathPatterns("/items/*/bid")
                 .addPathPatterns("/account/**");
     }
 

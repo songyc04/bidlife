@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'BIDLIFE | ' + ${seller.nickname} + '님의 프로필'">BIDLIFE | 판매자님의 프로필</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
+    <style>
+        .seller-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 140px 20px 60px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .seller-profile-card {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .seller-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
+        }
+        .seller-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .seller-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .seller-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e94560;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        .seller-section .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e94560;
+            display: inline-block;
+        }
+        .seller-section {
+            margin-bottom: 50px;
+        }
+        .empty-section {
+            text-align: center;
+            padding: 40px;
+            background: #121212;
+            border: 1px solid #222222;
+            border-radius: 12px;
+            color: #666;
+        }
+        .empty-section-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">BID<span>LIFE</span></a>
+            <nav class="nav-menu">
+                <a href="/items" class="nav-link">경매 둘러보기</a>
+                <a th:href="${isLoggedIn} ? '/account/items/new' : '/login?redirect=/account/items/new'" class="nav-link btn-create">경매 등록</a>
+            </nav>
+            <div class="nav-auth" th:if="${!isLoggedIn}">
+                <a href="/login" class="btn-login">로그인</a>
+                <a href="/signup" class="btn-signup">회원가입</a>
+            </div>
+            <div class="nav-auth" th:if="${isLoggedIn}">
+                <a href="/account" class="btn-mypage">마이페이지</a>
+                <a href="/login/logout" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="seller-header">
+            <div class="seller-profile-card">
+                <div class="seller-avatar">
+                    <img th:if="${seller.profileImage != null and !seller.profileImage.isEmpty()}" 
+                         th:src="${seller.profileImage}" 
+                         th:alt="${seller.nickname}">
+                    <span th:if="${seller.profileImage == null or seller.profileImage.isEmpty()}" 
+                          th:text="${seller.nickname != null ? seller.nickname.substring(0,1) : '?'}">U</span>
+                </div>
+                <h1 class="seller-name" th:text="${seller.nickname}">판매자 닉네임</h1>
+                <div class="seller-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" th:text="${activeItemCount}">0</div>
+                        <div class="stat-label">판매 중</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" th:text="${soldItemCount}">0</div>
+                        <div class="stat-label">판매 완료</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="items-section">
+            <div class="items-container">
+                <section class="seller-section">
+                    <h2 class="section-title">판매 중인 경매</h2>
+                    <div class="card-grid" th:if="${activeItems != null && !activeItems.isEmpty()}">
+                        <div class="item-card"
+                             th:each="item : ${activeItems}"
+                             th:attr="data-category=${item.category}, data-status=${item.status}, data-price=${item.startPrice}, data-time=${item.status == 'upcoming'} ? ${item.startTime} : ${item.endTime}">
+                            <div class="card-thumb">
+                                <span class="status-badge" th:classappend="${item.status}"
+                                      th:text="${item.status == 'bidding'} ? 'LIVE' : 'UPCOMING'">LIVE</span>
+                                <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
+                                    <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                                </div>
+                                <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
+                            </div>
+                            <div class="card-body">
+                                <h3 th:text="${item.title}">경매 제목</h3>
+                                <div class="price-info">
+                                    <div class="price-box">
+                                        <span class="label" th:text="${item.status == 'bidding'} ? '현재 최고가' : '시작가'">현재 최고가</span>
+                                        <span class="price" th:text="${#numbers.formatInteger(item.currentPrice != null ? item.currentPrice : item.startPrice, 3, 'COMMA')} + '원'">0원</span>
+                                    </div>
+                                    <div class="time-box">
+                                        <span class="label" th:text="${item.status == 'bidding'} ? '남은 시간' : '시작까지'">남은 시간</span>
+                                        <span class="time-countdown" th:if="${item.status != 'ended'}"
+                                              th:attr="data-time=${item.status == 'upcoming'} ? ${item.startTime} : ${item.endTime}"
+                                              th:text="${item.status == 'upcoming'} ? ${item.startTime} : ${item.endTime}">00:00:00</span>
+                                    </div>
+                                </div>
+                                <div class="card-meta">
+                                    <span class="category-tag" th:text="${
+                                        item.category == 'electronics'} ? '전자기기' : (${
+                                        item.category == 'fashion'} ? '패션/의류' : (${
+                                        item.category == 'sneakers'} ? '스니커즈' : (${
+                                        item.category == 'watches'} ? '시계/주얼리' : (${
+                                        item.category == 'art'} ? '예술품/컬렉션' : (${
+                                        item.category == 'sports'} ? '스포츠/레저' : (${
+                                        item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
+                                </div>
+                                <a th:href="${isLoggedIn} ? '/items/' + ${item.id} : '/login?redirect=/items/' + ${item.id}"
+                                   class="btn-bid-now"
+                                   th:text="${item.status == 'bidding'} ? '비딩하기' : '상세보기'">비딩하기</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="empty-section" th:if="${activeItems == null || activeItems.isEmpty()}">
+                        <div class="empty-section-icon">📦</div>
+                        <p>현재 판매 중인 경매가 없습니다</p>
+                    </div>
+                </section>
+
+                <section class="seller-section">
+                    <h2 class="section-title">판매 완료</h2>
+                    <div class="card-grid" th:if="${soldItems != null && !soldItems.isEmpty()}">
+                        <div class="item-card ended-card"
+                             th:each="item : ${soldItems}"
+                             th:attr="data-category=${item.category}, data-status='ended', data-price=${item.startPrice}">
+                            <div class="card-thumb">
+                                <span class="status-badge ended">ENDED</span>
+                                <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
+                                    <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                                </div>
+                                <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
+                            </div>
+                            <div class="card-body">
+                                <h3 th:text="${item.title}">경매 제목</h3>
+                                <div class="price-info">
+                                <div class="price-box">
+                                    <span class="label">최종 낙찰가</span>
+                                    <span class="price" th:text="${#numbers.formatInteger(item.currentPrice != null ? item.currentPrice : item.startPrice, 3, 'COMMA')} + '원'">0원</span>
+                                </div>
+                                </div>
+                                <div class="card-meta">
+                                    <span class="category-tag" th:text="${
+                                        item.category == 'electronics'} ? '전자기기' : (${
+                                        item.category == 'fashion'} ? '패션/의류' : (${
+                                        item.category == 'sneakers'} ? '스니커즈' : (${
+                                        item.category == 'watches'} ? '시계/주얼리' : (${
+                                        item.category == 'art'} ? '예술품/컬렉션' : (${
+                                        item.category == 'sports'} ? '스포츠/레저' : (${
+                                        item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
+                                    <span class="meta-tag ended-tag">종료</span>
+                                </div>
+                                <a th:href="${isLoggedIn} ? '/items/' + ${item.id} : '/login?redirect=/items/' + ${item.id}"
+                                   class="btn-bid-now">결과보기</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="empty-section" th:if="${soldItems == null || soldItems.isEmpty()}">
+                        <div class="empty-section-icon">🏆</div>
+                        <p>아직 판매 완료된 경매가 없습니다</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 BIDLIFE. All rights reserved. 폴리텍 기말 과제 프로젝트</p>
+    </footer>
+
+    <script>
+        function updateCountdowns() {
+            const countdowns = document.querySelectorAll('.time-countdown:not(.ended)');
+            countdowns.forEach(el => {
+                const targetTime = new Date(el.dataset.time).getTime();
+                const now = new Date().getTime();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    el.textContent = '종료';
+                    el.classList.add('ended');
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                if (days > 0) {
+                    el.textContent = `${days}일 ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                } else {
+                    el.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }
+            });
+        }
+        updateCountdowns();
+        setInterval(updateCountdowns, 1000);
+    </script>
+
+</body>
+</html>

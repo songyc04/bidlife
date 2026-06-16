@@ -22,4 +22,7 @@ public class SignupEntity {
     
     @Column(nullable = false, unique = true, length = 50)
     private String nickname;
+    
+    @Column(name = "profile_image", length = 255)
+    private String profileImage;
 }

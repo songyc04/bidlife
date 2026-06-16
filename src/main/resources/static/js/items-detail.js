@@ -3,9 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const thumbnails = document.querySelectorAll('.thumbnail');
     const mainImage = document.getElementById('mainImage');
-    const pickBtn = document.querySelector('.btn-pick');
-    const bidBtn = document.querySelector('.btn-bid');
-    const bidAmountInput = document.getElementById('bidAmount');
 
     thumbnails.forEach(thumb => {
         thumb.addEventListener('click', () => {
@@ -17,29 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
-    if (pickBtn) {
-        pickBtn.addEventListener('click', () => {
-            if (pickBtn.classList.contains('active')) {
-                pickBtn.classList.remove('active');
-                pickBtn.textContent = '☆ 찜하기';
-            } else {
-                pickBtn.classList.add('active');
-                pickBtn.textContent = '★ 찜완료';
-            }
-        });
-    }
-
-    if (bidBtn && bidAmountInput) {
-        bidBtn.addEventListener('click', () => {
-            const amount = parseInt(bidAmountInput.value);
-            if (isNaN(amount) || amount <= 0) {
-                alert('올바른 입찰 금액을 입력해주세요.');
-                return;
-            }
-            alert('입찰 금액: ' + amount.toLocaleString() + '원\n(비딩 기능은 추후 구현됩니다)');
-        });
-    }
 
     function updateCountdowns() {
         const countdowns = document.querySelectorAll('.countdown');

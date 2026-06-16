@@ -29,6 +29,9 @@ public class ItemEntity {
     private Integer startPrice;
 
     @Column
+    private Integer currentPrice;
+
+    @Column
     private Integer buyNowPrice;
 
     @Column(nullable = false)
@@ -59,6 +62,9 @@ public class ItemEntity {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (currentPrice == null) {
+            currentPrice = startPrice;
+        }
         if (startTime != null && endTime != null) {
             updateTimeBasedStatus();
         } else if (status == null) {

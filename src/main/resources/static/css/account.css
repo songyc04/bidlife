@@ -137,7 +137,6 @@ a {
 .profile-icon {
     width: 72px;
     height: 72px;
-    background: linear-gradient(135deg, #ff5a00, #ff0055);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -146,6 +145,15 @@ a {
     font-size: 28px;
     font-weight: 900;
     color: #000000;
+    overflow: hidden;
+    position: relative;
+}
+
+.profile-icon .profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .sidebar-header h3 {
@@ -306,6 +314,103 @@ a {
     font-size: 16px;
     font-weight: 600;
     color: #ffffff;
+}
+
+.edit-section {
+    display: none;
+}
+
+.edit-section.active {
+    display: block;
+}
+
+.btn-edit-wrapper {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-edit-wrapper .btn-edit {
+    padding: 10px 24px;
+    font-size: 14px;
+}
+
+.profile-upload-area {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 0;
+}
+
+.profile-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #1a1a1a;
+    border: 2px dashed #333333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-preview .preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-preview .preview-placeholder {
+    color: #555555;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.upload-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-upload-select {
+    background-color: #1a1a1a;
+    border: 1px solid #333333;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: fit-content;
+}
+
+.btn-upload-select:hover {
+    border-color: #ff5a00;
+    color: #ff5a00;
+}
+
+.upload-hint {
+    color: #666666;
+    font-size: 12px;
+    margin: 0;
+}
+
+.btn-edit:disabled {
+    background-color: #333333;
+    color: #666666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-edit:disabled:hover {
+    background-color: #333333;
+    color: #666666;
+    transform: none;
+    box-shadow: none;
 }
 
 .action-buttons {

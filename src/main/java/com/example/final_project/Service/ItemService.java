@@ -107,6 +107,24 @@ public class ItemService {
         }
     }
 
+    public List<ItemEntity> getAllItemsExcludingSeller(Long sellerId) {
+        try {
+            List<ItemEntity> items = itemRepository.findAllBySellerIdNotOrderByCreatedAtDesc(sellerId);
+            if (items == null) {
+                return new ArrayList<>();
+            }
+            items.forEach(item -> {
+                try {
+                    item.updateTimeBasedStatus();
+                } catch (Exception e) {
+                }
+            });
+            return items;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
     public List<ItemEntity> getItemsBySeller(Long sellerId) {
         try {
             List<ItemEntity> items = itemRepository.findBySellerIdOrderByCreatedAtDesc(sellerId);

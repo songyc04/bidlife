@@ -3,6 +3,7 @@ package com.example.final_project.Controller;
 import com.example.final_project.Entity.ItemEntity;
 import com.example.final_project.Entity.SignupEntity;
 import com.example.final_project.Repository.SignupRepository;
+import com.example.final_project.Service.BidService;
 import com.example.final_project.Service.ItemService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +28,7 @@ public class ItemsController {
 
     private final ItemService itemService;
     private final SignupRepository signupRepository;
+    private final BidService bidService;
 
     @GetMapping("/items")
     public String items(HttpSession session, Model model) {
@@ -38,7 +43,12 @@ public class ItemsController {
                 model.addAttribute("isLoggedIn", false);
             }
 
-            List<ItemEntity> items = itemService.getAllItems();
+            List<ItemEntity> items;
+            if (userId != null) {
+                items = itemService.getAllItemsExcludingSeller(userId);
+            } else {
+                items = itemService.getAllItems();
+            }
             model.addAttribute("items", items != null ? items : new ArrayList<>());
 
             Map<Long, String> sellerNicknames = new HashMap<>();
@@ -90,5 +100,31 @@ public class ItemsController {
             log.error("Error loading item detail page", e);
             return "redirect:/items";
         }
+    }
+
+    @PostMapping("/items/{id}/bid")
+    public String placeBid(@PathVariable Long id,
+                           @RequestParam Integer bidAmount,
+                           HttpSession session,
+                           RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/items/" + id;
+        }
+
+        try {
+            bidService.placeBid(id, userId, bidAmount);
+            redirectAttributes.addFlashAttribute("bidSuccessMessage", "입찰이 완료되었습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("bidErrorMessage", e.getMessage());
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("bidErrorMessage", e.getMessage());
+        } catch (Exception e) {
+            log.error("입찰 실패: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("bidErrorMessage", "입찰 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/items/" + id;
     }
 }

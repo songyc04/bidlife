@@ -84,7 +84,6 @@
                     <div class="card-thumb">
                         <span class="status-badge" th:classappend="${item.status}"
                               th:text="${item.status == 'bidding'} ? 'LIVE' : (${item.status == 'upcoming'} ? 'UPCOMING' : 'ENDED')">LIVE</span>
-                        <button class="btn-pick" title="찜하기">☆</button>
                         <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
                             <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
                         </div>
@@ -95,7 +94,7 @@
                         <div class="price-info">
                             <div class="price-box">
                                 <span class="label" th:text="${item.status == 'bidding'} ? '현재 최고가' : (${item.status == 'upcoming'} ? '시작가' : '최종 낙찰가')">현재 최고가</span>
-                                <span class="price" th:text="${#numbers.formatInteger(item.startPrice, 3, 'COMMA')} + '원'">0원</span>
+                                <span class="price" th:text="${#numbers.formatInteger(item.currentPrice != null ? item.currentPrice : item.startPrice, 3, 'COMMA')} + '원'">0원</span>
                             </div>
                             <div class="time-box">
                                 <span class="label" th:text="${item.status == 'bidding'} ? '남은 시간' : (${item.status == 'upcoming'} ? '시작까지' : '상태')">남은 시간</span>
@@ -106,7 +105,7 @@
                             </div>
                         </div>
                         <div class="card-meta">
-                            <span class="seller-tag" th:text="${sellerNicknames[item.sellerId]}">판매자</span>
+                            <a th:href="'/sellers/' + ${item.sellerId}" class="seller-tag" th:text="${sellerNicknames[item.sellerId]}">판매자</a>
                             <span class="category-tag" th:text="${
                                 item.category == 'electronics'} ? '전자기기' : (${
                                 item.category == 'fashion'} ? '패션/의류' : (${
@@ -116,7 +115,7 @@
                                 item.category == 'sports'} ? '스포츠/레저' : (${
                                 item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
                             <span class="meta-tag" th:classappend="${item.status == 'upcoming'} ? 'upcoming-tag' : (${item.status == 'ended'} ? 'ended-tag' : '')"
-                                  th:text="${item.status == 'bidding'} ? '입찰 0회' : (${item.status == 'upcoming'} ? '시작 예정' : '종료')">입찰 0회</span>
+                                  th:text="${item.status == 'upcoming'} ? '시작 예정' : (${item.status == 'ended'} ? '종료' : '진행 중')">진행 중</span>
                         </div>
                         <a th:href="${isLoggedIn} ? '/items/' + ${item.id} : '/login?redirect=/items/' + ${item.id}"
                            class="btn-bid-now"

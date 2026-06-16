@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardGrid = document.getElementById('cardGrid');
     const itemCards = document.querySelectorAll('.item-card');
     const emptyState = document.getElementById('emptyState');
-    const pickBtns = document.querySelectorAll('.btn-pick');
 
     let currentStatus = 'all';
     let currentCategory = 'all';
@@ -127,21 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tab.classList.add('active');
             currentStatus = tab.dataset.status;
             filterAndSortCards();
-        });
-    });
-
-    pickBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (btn.classList.contains('active')) {
-                btn.classList.remove('active');
-                btn.textContent = '☆';
-            } else {
-                btn.classList.add('active');
-                btn.textContent = '⭐';
-            }
         });
     });
 
