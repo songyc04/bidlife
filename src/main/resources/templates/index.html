@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BIDLIFE | 한계 없는 실시간 경매</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
     <link rel="stylesheet" href="/css/index.css">
     <script src="/js/index.js" defer></script>
+    <script src="/js/items.js" defer></script>
 </head>
 <body>
 
@@ -32,7 +34,7 @@
         <div class="hero-content">
             <span class="badge">LIVE AUCTION PLATFORM</span>
             <h1>가장 뜨거운 경매,<br>멈추지 않는 <span>LIFE</span></h1>
-            <p>지금 이 순간에도 가치는 상승하고 있습니다. 전 세계 트렌드 세터들과 함께하는 가장 짜릿한 실시간 비딩을 경험하세요.</p>
+            <p>지금 이 순간에도 가치는 상승하고 있습니다. <br>전 세계 트렌드 세터들과 함께하는 가장 짜릿한 실시간 비딩을 경험하세요.</p>
             <div class="hero-btns">
                 <a th:href="${isLoggedIn} ? '/items' : '/login?redirect=/items'" class="btn-primary">지금 비딩 참여하기</a>
                 <a th:href="${isLoggedIn} ? '/account/items/new' : '/login?redirect=/account/items/new'" class="btn-secondary">내 물품 출품하기</a>
@@ -40,6 +42,36 @@
         </div>
         <div class="hero-visual">
             <div class="glow-sphere"></div>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-number" th:text="${#numbers.formatInteger(totalMembers, 1, 'COMMA')}">0</div>
+                        <div class="stat-label">회원 수</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <div class="stat-number" th:text="${#numbers.formatInteger(totalItems, 1, 'COMMA')}">0</div>
+                        <div class="stat-label">등록된 경매</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-info">
+                        <div class="stat-number" th:text="${#numbers.formatInteger(activeAuctions, 1, 'COMMA')}">0</div>
+                        <div class="stat-label">진행 중인 경매</div>
+                    </div>
+                </div>
+                <div class="stat-card highlight">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <div class="stat-number" th:text="${#numbers.formatInteger(highestBid, 1, 'COMMA')} + '원'">0원</div>
+                        <div class="stat-label">최고가 낙찰</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -50,27 +82,48 @@
         </div>
         
         <div class="card-grid">
-            <div class="item-card" th:each="item : ${hotItems}">
+            <div class="item-card" th:each="item : ${hotItems}"
+                 th:attr="data-category=${item.category}, data-status=${item.status}, data-price=${item.startPrice}, data-time=${item.endTime}, data-item-id=${item.id}">
                 <div class="card-thumb">
                     <span class="status-badge bidding">LIVE</span>
+                    <button class="btn-pick" th:classappend="${favoriteItemIds.contains(item.id)} ? 'active'"
+                            th:attr="data-item-id=${item.id}" title="찜하기">
+                        <span th:text="${favoriteItemIds.contains(item.id)} ? '★' : '☆'">☆</span>
+                    </button>
+                    <a th:href="'/sellers/' + ${item.sellerId}" class="seller-badge" th:text="${sellerNicknames[item.sellerId]}">판매자</a>
                     <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
-                        <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                        <img th:src="${item.imagePaths.split(',')[0].startsWith('/') ? item.imagePaths.split(',')[0] : '/' + item.imagePaths.split(',')[0]}" th:alt="${item.title}">
                     </div>
                     <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
                 </div>
                 <div class="card-body">
-                    <h3 th:text="${item.title}">경매 제목</h3>
+                    <h3>
+                        <a th:href="'/items/' + ${item.id}" 
+                           th:text="${item.title}" style="color: inherit; text-decoration: none;">경매 제목</a>
+                    </h3>
                     <div class="price-info">
                         <div class="price-box">
                             <span class="label">현재 최고가</span>
-                            <span class="price" th:text="${#numbers.formatInteger(item.startPrice, 3, 'COMMA')} + ' 원'">0 원</span>
+                            <span class="price" th:text="${#numbers.formatInteger(item.currentPrice != null ? item.currentPrice : item.startPrice, 3, 'COMMA')} + '원'">0원</span>
                         </div>
                         <div class="time-box">
                             <span class="label">남은 시간</span>
-                            <span class="time-countdown" th:attr="data-time=${item.endTime}" th:text="${item.endTime}">00:00:00</span>
+                            <span class="time-countdown" th:attr="data-time=${item.endTime}"
+                                  th:text="${item.endTime}">00:00:00</span>
                         </div>
                     </div>
-                    <a th:href="${isLoggedIn} ? '/items/' + ${item.id} : '/login?redirect=/items/' + ${item.id}" class="btn-bid-now">비딩하기</a>
+                    <div class="card-meta">
+                        <span class="category-tag" th:text="${
+                            item.category == 'electronics'} ? '전자기기' : (${
+                            item.category == 'fashion'} ? '패션/의류' : (${
+                            item.category == 'sneakers'} ? '스니커즈' : (${
+                            item.category == 'watches'} ? '시계/주얼리' : (${
+                            item.category == 'art'} ? '예술품/컬렉션' : (${
+                            item.category == 'sports'} ? '스포츠/레저' : (${
+                            item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
+                        <span class="bidder-count-tag" th:text="'입찰 ' + ${bidderCounts[item.id]} + '명'">입찰 0명</span>
+                        <span class="meta-tag">진행 중</span>
+                    </div>
                 </div>
             </div>
         </div>

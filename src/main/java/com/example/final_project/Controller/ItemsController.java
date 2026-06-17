@@ -57,6 +57,7 @@ public class ItemsController {
 
             Map<Long, String> sellerNicknames = new HashMap<>();
             Set<Long> favoriteItemIds = new HashSet<>();
+            Map<Long, Long> bidderCounts = new HashMap<>();
             if (items != null) {
                 for (ItemEntity item : items) {
                     if (!sellerNicknames.containsKey(item.getSellerId())) {
@@ -66,10 +67,12 @@ public class ItemsController {
                     if (userId != null && favoriteService.isFavorite(userId, item.getId())) {
                         favoriteItemIds.add(item.getId());
                     }
+                    bidderCounts.put(item.getId(), bidService.getBidderCount(item.getId()));
                 }
             }
             model.addAttribute("sellerNicknames", sellerNicknames);
             model.addAttribute("favoriteItemIds", favoriteItemIds);
+            model.addAttribute("bidderCounts", bidderCounts);
 
             return "items";
         } catch (Exception e) {
@@ -108,6 +111,9 @@ public class ItemsController {
             boolean isFavorite = userId != null && favoriteService.isFavorite(userId, id);
             model.addAttribute("isFavorite", isFavorite);
 
+            long bidderCount = bidService.getBidderCount(id);
+            model.addAttribute("bidderCount", bidderCount);
+
             SignupEntity seller = signupRepository.findById(item.getSellerId()).orElse(null);
             model.addAttribute("sellerNickname", seller != null ? seller.getNickname() : "알 수 없음");
 
@@ -139,6 +145,31 @@ public class ItemsController {
         } catch (Exception e) {
             log.error("입찰 실패: {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("bidErrorMessage", "입찰 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/items/" + id;
+    }
+
+    @PostMapping("/items/{id}/buy-now")
+    public String buyNow(@PathVariable Long id,
+                         HttpSession session,
+                         RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/items/" + id;
+        }
+
+        try {
+            itemService.buyNow(id, userId);
+            redirectAttributes.addFlashAttribute("bidSuccessMessage", "즉시 구매가 완료되었습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("bidErrorMessage", e.getMessage());
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("bidErrorMessage", e.getMessage());
+        } catch (Exception e) {
+            log.error("즉시 구매 실패: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("bidErrorMessage", "즉시 구매 중 오류가 발생했습니다.");
         }
 
         return "redirect:/items/" + id;

@@ -5,6 +5,13 @@
     margin-bottom: 32px;
 }
 
+.content-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
 .manage-preview {
     background-color: #121212;
     border: 1px solid #222222;
@@ -158,6 +165,7 @@
 .btn-action {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     padding: 16px 20px;
     border-radius: 6px;
@@ -167,6 +175,8 @@
     border: 1px solid transparent;
     cursor: pointer;
     text-decoration: none;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .btn-icon {
@@ -216,10 +226,6 @@
     line-height: 1.5;
 }
 
-.back-link {
-    margin-top: 32px;
-}
-
 .btn-back {
     display: inline-block;
     color: #888888;
@@ -227,10 +233,15 @@
     font-weight: 600;
     text-decoration: none;
     transition: color 0.2s;
+    padding: 8px 16px;
+    border: 1px solid #333333;
+    border-radius: 4px;
+    white-space: nowrap;
 }
 
 .btn-back:hover {
     color: #ff5a00;
+    border-color: #ff5a00;
 }
 
 @media (max-width: 968px) {

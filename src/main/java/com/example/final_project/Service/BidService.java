@@ -87,4 +87,8 @@ public class BidService {
         }
         return activeBids.get(0).getBidAmount();
     }
+
+    public long getBidderCount(Long itemId) {
+        return bidRepository.countDistinctBidderByItemId(itemId);
+    }
 }

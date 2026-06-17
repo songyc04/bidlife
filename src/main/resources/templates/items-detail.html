@@ -45,7 +45,9 @@
                               th:classappend="${item.status}"
                               th:text="${item.status == 'bidding'} ? 'LIVE' : (${item.status == 'upcoming'} ? 'UPCOMING' : 'ENDED')">LIVE</span>
                         <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="gallery-main">
-                            <img id="mainImage" th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                            <img id="mainImage" 
+                                 th:src="${item.imagePaths.split(',')[0].startsWith('/') ? item.imagePaths.split(',')[0] : '/' + item.imagePaths.split(',')[0]}" 
+                                 th:alt="${item.title}">
                         </div>
                         <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="gallery-placeholder">
                             <span class="placeholder-icon">📦</span>
@@ -55,7 +57,8 @@
                     <div class="thumbnail-list" th:if="${item.imagePaths != null && item.imagePaths.split(',').length > 1}">
                         <div class="thumbnail" th:each="img, iter : ${item.imagePaths.split(',')}"
                              th:classappend="${iter.index == 0} ? 'active' : ''">
-                            <img th:src="${img}" th:alt="${item.title} + ' 이미지 ' + (${iter.index} + 1)"
+                            <img th:src="${img.startsWith('/') ? img : '/' + img}" 
+                                 th:alt="${item.title} + ' 이미지 ' + (${iter.index} + 1)"
                                  th:attr="data-index=${iter.index}">
                         </div>
                     </div>
@@ -72,15 +75,22 @@
                                 item.category == 'art'} ? '예술품/컬렉션' : (${
                                 item.category == 'sports'} ? '스포츠/레저' : (${
                                 item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
-                            <a th:href="'/sellers/' + ${item.sellerId}" class="seller-tag" th:text="'판매자: ' + ${sellerNickname}">판매자: 닉네임</a>
                         </div>
                         <h1 th:text="${item.title}">상품 제목</h1>
+                        <div class="seller-info">
+                            <span class="seller-label">판매자</span>
+                            <a th:href="'/sellers/' + ${item.sellerId}" class="seller-link" th:text="${sellerNickname}">닉네임</a>
+                        </div>
                     </div>
 
                     <div class="price-panel">
                         <div class="price-row">
                             <span class="price-label" th:text="${item.status == 'bidding'} ? '현재 최고가' : (${item.status == 'upcoming'} ? '시작가' : '최종 낙찰가')">현재 최고가</span>
                             <span class="price-value" th:text="${#numbers.formatInteger(item.currentPrice != null ? item.currentPrice : item.startPrice, 3, 'COMMA')} + '원'">0원</span>
+                        </div>
+                        <div class="price-row" th:if="${item.status == 'bidding'}">
+                            <span class="price-label">입찰 참여자</span>
+                            <span class="price-value highlight" th:text="${bidderCount} + '명'">0명</span>
                         </div>
                         <div class="price-row" th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}">
                             <span class="price-label">즉시 구매가</span>
@@ -136,9 +146,12 @@
                                 </div>
                                 <div class="bid-actions">
                                     <button type="submit" class="btn-bid">비딩하기</button>
-                                    <button type="button" class="btn-buy-now" th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}"
-                                            th:text="'즉시 구매 (' + ${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')} + '원)'">즉시 구매</button>
                                 </div>
+                            </form>
+                            <form th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}" 
+                                  th:action="'/items/' + ${item.id} + '/buy-now'" method="post" style="margin-top: 12px;">
+                                <button type="submit" class="btn-buy-now"
+                                        th:text="'즉시 구매 (' + ${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')} + '원)'">즉시 구매</button>
                             </form>
                         </div>
                         <div th:unless="${isLoggedIn}" class="bid-locked">

@@ -138,6 +138,7 @@ a {
     align-items: center;
     justify-content: space-between;
     min-height: 85vh;
+    gap: 80px;
 }
 
 .hero-content {
@@ -233,6 +234,74 @@ a {
     animation: pulse 5s infinite alternate;
 }
 
+.stats-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 16px;
+    padding: 20px;
+}
+
+.stat-card {
+    background: rgba(18, 18, 18, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 90, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: rgba(255, 90, 0, 0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(255, 90, 0, 0.2);
+}
+
+.stat-card.highlight {
+    background: rgba(255, 90, 0, 0.1);
+    border-color: rgba(255, 90, 0, 0.4);
+}
+
+.stat-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.stat-card.highlight .stat-number {
+    color: #ff5a00;
+}
+
+.stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 @keyframes pulse {
     0% { transform: scale(0.9); opacity: 0.4; }
     100% { transform: scale(1.15); opacity: 0.6; }
@@ -266,135 +335,25 @@ a {
     font-size: 14px;
 }
 
-.card-grid {
+.live-preview-section .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 28px;
 }
 
-.item-card {
-    background-color: #121212; /* 다크 그레이 카드 배경 */
-    border: 1px solid #222222;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.3s;
+@media (max-width: 1024px) {
+    .live-preview-section .card-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
 }
 
-.item-card:hover {
-    transform: translateY(-4px);
-    border-color: #ff5a00;
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8);
+@media (max-width: 768px) {
+    .live-preview-section .card-grid {
+        grid-template-columns: 1fr !important;
+    }
 }
 
-.card-thumb {
-    height: 220px;
-    background-color: #1a1a1a;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.card-image {
-    width: 100%;
-    height: 100%;
-}
-
-.card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.dummy-img {
-    font-size: 70px;
-}
-
-.status-badge {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    padding: 4px 12px;
-    border-radius: 2px;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-}
-
-.status-badge.bidding {
-    background-color: #ff5a00;
-    color: #000000;
-    animation: blink 1.2s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-.card-body {
-    padding: 24px;
-}
-
-.card-body h3 {
-    font-size: 19px;
-    font-weight: 700;
-    margin-bottom: 24px;
-    line-height: 1.4;
-    height: 52px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.price-info {
-    display: flex;
-    justify-content: space-between;
-    background-color: #181818;
-    padding: 14px 18px;
-    border-radius: 4px;
-    margin-bottom: 24px;
-    border: 1px solid #252525;
-}
-
-.label {
-    display: block;
-    font-size: 11px;
-    color: #666666;
-    margin-bottom: 6px;
-    font-weight: 700;
-}
-
-.price {
-    font-size: 17px;
-    font-weight: 700;
-    color: #ffffff; /* 흰색으로 정갈하게 처리 */
-}
-
-.time-countdown {
-    font-size: 17px;
-    font-weight: 700;
-    color: #ff5a00; /* 카운트다운을 오렌지색으로 강조하여 긴박감 부여 */
-}
-
-.btn-bid-now {
-    display: block;
-    text-align: center;
-    background-color: transparent;
-    border: 1px solid #333333;
-    color: #ffffff;
-    padding: 14px;
-    border-radius: 4px;
-    font-weight: 700;
-    transition: all 0.2s;
-}
-
-.btn-bid-now:hover {
-    background-color: #ff5a00;
-    border-color: #ff5a00;
-    color: #000000;
-}
+/* 카드 스타일은 items.css에서 가져옴 */
 
 /* 4. 푸터 디자인 */
 .footer {

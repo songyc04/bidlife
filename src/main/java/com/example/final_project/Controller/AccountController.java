@@ -80,6 +80,10 @@ public class AccountController {
             model.addAttribute("profileImage", user.get().getProfileImage());
         }
 
+        // 읽지 않은 알림 개수
+        long unreadCount = notificationService.getUnreadCount(userId);
+        model.addAttribute("unreadCount", unreadCount);
+
         return "account";
     }
 
@@ -97,6 +101,10 @@ public class AccountController {
             model.addAttribute("nickname", user.get().getNickname());
             model.addAttribute("profileImage", user.get().getProfileImage());
         }
+
+        // 읽지 않은 알림 개수
+        long unreadCount = notificationService.getUnreadCount(userId);
+        model.addAttribute("unreadCount", unreadCount);
 
         try {
             List<BidEntity> myBids = bidService.getBidsByBidderId(userId);
@@ -141,6 +149,10 @@ public class AccountController {
                 model.addAttribute("profileImage", user.get().getProfileImage());
             }
 
+            // 읽지 않은 알림 개수
+            long unreadCount = notificationService.getUnreadCount(userId);
+            model.addAttribute("unreadCount", unreadCount);
+
             List<com.example.final_project.Entity.ItemEntity> myItems = itemService.getItemsBySeller(userId);
             model.addAttribute("myItems", myItems != null ? myItems : new java.util.ArrayList<>());
 
@@ -166,6 +178,10 @@ public class AccountController {
             model.addAttribute("nickname", user.get().getNickname());
             model.addAttribute("profileImage", user.get().getProfileImage());
         }
+
+        // 읽지 않은 알림 개수
+        long unreadCount = notificationService.getUnreadCount(userId);
+        model.addAttribute("unreadCount", unreadCount);
 
         try {
             List<FavoriteEntity> favorites = favoriteService.getFavoritesByUserId(userId);
@@ -208,6 +224,10 @@ public class AccountController {
             model.addAttribute("nickname", user.get().getNickname());
             model.addAttribute("profileImage", user.get().getProfileImage());
         }
+
+        // 읽지 않은 알림 개수
+        long unreadCount = notificationService.getUnreadCount(userId);
+        model.addAttribute("unreadCount", unreadCount);
 
         return "account/items-new";
     }
@@ -283,6 +303,10 @@ public class AccountController {
                 model.addAttribute("nickname", user.get().getNickname());
                 model.addAttribute("profileImage", user.get().getProfileImage());
             }
+
+            // 읽지 않은 알림 개수
+            long unreadCount = notificationService.getUnreadCount(userId);
+            model.addAttribute("unreadCount", unreadCount);
 
             ItemEntity item = itemService.getItemById(id);
             if (item == null) {
@@ -484,11 +508,12 @@ public class AccountController {
             model.addAttribute("profileImage", user.get().getProfileImage());
         }
 
-        List<NotificationEntity> notifications = notificationService.getNotificationsByUserId(userId);
-        model.addAttribute("notifications", notifications);
-
+        // 읽지 않은 알림 개수
         long unreadCount = notificationService.getUnreadCount(userId);
         model.addAttribute("unreadCount", unreadCount);
+
+        List<NotificationEntity> notifications = notificationService.getNotificationsByUserId(userId);
+        model.addAttribute("notifications", notifications);
 
         return "account/notifications";
     }

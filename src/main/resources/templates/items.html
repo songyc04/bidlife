@@ -88,8 +88,9 @@
                                 th:attr="data-item-id=${item.id}" title="찜하기">
                             <span th:text="${favoriteItemIds.contains(item.id)} ? '★' : '☆'">☆</span>
                         </button>
+                        <a th:href="'/sellers/' + ${item.sellerId}" class="seller-badge" th:text="${sellerNicknames[item.sellerId]}">판매자</a>
                         <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
-                            <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                            <img th:src="${item.imagePaths.split(',')[0].startsWith('/') ? item.imagePaths.split(',')[0] : '/' + item.imagePaths.split(',')[0]}" th:alt="${item.title}">
                         </div>
                         <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
                     </div>
@@ -112,7 +113,6 @@
                             </div>
                         </div>
                         <div class="card-meta">
-                            <a th:href="'/sellers/' + ${item.sellerId}" class="seller-tag" th:text="${sellerNicknames[item.sellerId]}">판매자</a>
                             <span class="category-tag" th:text="${
                                 item.category == 'electronics'} ? '전자기기' : (${
                                 item.category == 'fashion'} ? '패션/의류' : (${
@@ -121,6 +121,7 @@
                                 item.category == 'art'} ? '예술품/컬렉션' : (${
                                 item.category == 'sports'} ? '스포츠/레저' : (${
                                 item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
+                            <span class="bidder-count-tag" th:text="'입찰 ' + ${bidderCounts[item.id]} + '명'">입찰 0명</span>
                             <span class="meta-tag" th:classappend="${item.status == 'upcoming'} ? 'upcoming-tag' : (${item.status == 'ended'} ? 'ended-tag' : '')"
                                   th:text="${item.status == 'upcoming'} ? '시작 예정' : (${item.status == 'ended'} ? '종료' : '진행 중')">진행 중</span>
                         </div>
@@ -146,7 +147,7 @@
     </main>
 
     <footer class="footer">
-        <p>&copy; 2026 BIDLIFE. All rights reserved. 폴리텍 기말 과제 프로젝트</p>
+        <p>&copy; 2026 BIDLIFE. All rights reserved. 2026-1 Spring boot Final Project</p>
     </footer>
 
 </body>

@@ -9,7 +9,6 @@
     <script src="/js/account.js" defer></script>
 </head>
 <body>
-
     <header class="navbar">
         <div class="nav-container">
             <a href="/" class="logo">BID<span>LIFE</span></a>
@@ -47,6 +46,7 @@
                     <a href="/account/notifications" class="menu-item">
                         <span class="menu-icon">🔔</span>
                         <span>알림</span>
+                        <span class="unread-badge" th:if="${unreadCount > 0}" th:text="${unreadCount}">0</span>
                     </a>
                     <a href="/account/bids" class="menu-item">
                         <span class="menu-icon">💰</span>
@@ -157,10 +157,6 @@
                             <button type="submit" class="btn-edit">비밀번호 변경</button>
                         </form>
                     </div>
-                </div>
-
-                <div class="action-buttons">
-                    <a href="/login/logout" class="btn-logout-main">로그아웃</a>
                 </div>
             </section>
 

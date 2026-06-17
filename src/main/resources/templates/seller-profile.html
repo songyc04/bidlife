@@ -143,7 +143,7 @@
                                 <span class="status-badge" th:classappend="${item.status}"
                                       th:text="${item.status == 'bidding'} ? 'LIVE' : 'UPCOMING'">LIVE</span>
                                 <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
-                                    <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                                    <img th:src="${item.imagePaths.split(',')[0].startsWith('/') ? item.imagePaths.split(',')[0] : '/' + item.imagePaths.split(',')[0]}" th:alt="${item.title}">
                                 </div>
                                 <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
                             </div>
@@ -192,7 +192,7 @@
                             <div class="card-thumb">
                                 <span class="status-badge ended">ENDED</span>
                                 <div th:if="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="card-image">
-                                    <img th:src="${item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                                    <img th:src="${item.imagePaths.split(',')[0].startsWith('/') ? item.imagePaths.split(',')[0] : '/' + item.imagePaths.split(',')[0]}" th:alt="${item.title}">
                                 </div>
                                 <div th:unless="${item.imagePaths != null && !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
                             </div>

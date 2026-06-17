@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/account.css">
     <link rel="stylesheet" href="/css/picklist.css">
+    <script src="/js/account.js" defer></script>
     <script src="/js/picklist.js" defer></script>
 </head>
 <body>
@@ -48,6 +49,7 @@
                     <a href="/account/notifications" class="menu-item">
                         <span class="menu-icon">🔔</span>
                         <span>알림</span>
+                        <span class="unread-badge" th:if="${unreadCount > 0}" th:text="${unreadCount}">0</span>
                     </a>
                     <a href="/account/bids" class="menu-item">
                         <span class="menu-icon">💰</span>
@@ -81,7 +83,7 @@
                                 <span>★</span>
                             </button>
                             <div th:if="${detail.item.imagePaths != null and !detail.item.imagePaths.isEmpty()}" class="card-image">
-                                <img th:src="${detail.item.imagePaths.split(',')[0]}" th:alt="${detail.item.title}">
+                                <img th:src="${detail.item.imagePaths.split(',')[0].startsWith('/') ? detail.item.imagePaths.split(',')[0] : '/' + detail.item.imagePaths.split(',')[0]}" th:alt="${detail.item.title}">
                             </div>
                             <div th:unless="${detail.item.imagePaths != null and !detail.item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
                         </div>

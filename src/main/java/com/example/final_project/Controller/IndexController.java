@@ -1,6 +1,11 @@
 package com.example.final_project.Controller;
 
 import com.example.final_project.Entity.ItemEntity;
+import com.example.final_project.Entity.SignupEntity;
+import com.example.final_project.Repository.ItemRepository;
+import com.example.final_project.Repository.SignupRepository;
+import com.example.final_project.Service.BidService;
+import com.example.final_project.Service.FavoriteService;
 import com.example.final_project.Service.ItemService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -16,6 +21,10 @@ import java.util.stream.Collectors;
 public class IndexController {
 
     private final ItemService itemService;
+    private final BidService bidService;
+    private final FavoriteService favoriteService;
+    private final SignupRepository signupRepository;
+    private final ItemRepository itemRepository;
 
     @GetMapping("/")
     public String index(HttpSession session, Model model) {
@@ -31,9 +40,50 @@ public class IndexController {
 
         List<ItemEntity> hotItems = itemService.getAllItems().stream()
                 .filter(item -> "bidding".equals(item.getStatus()))
-                .limit(2)
+                .sorted(Comparator
+                        .comparingLong((ItemEntity item) -> bidService.getBidderCount(item.getId())).reversed()
+                        .thenComparing(Comparator.comparingInt((ItemEntity item) -> 
+                                item.getCurrentPrice() != null ? item.getCurrentPrice() : item.getStartPrice()).reversed())
+                        .thenComparing(ItemEntity::getEndTime))
+                .limit(6)
                 .collect(Collectors.toList());
         model.addAttribute("hotItems", hotItems);
+
+        Map<Long, String> sellerNicknames = new HashMap<>();
+        Map<Long, Long> bidderCounts = new HashMap<>();
+        Set<Long> favoriteItemIds = new HashSet<>();
+        
+        for (ItemEntity item : hotItems) {
+            if (!sellerNicknames.containsKey(item.getSellerId())) {
+                SignupEntity seller = signupRepository.findById(item.getSellerId()).orElse(null);
+                sellerNicknames.put(item.getSellerId(), seller != null ? seller.getNickname() : "알 수 없음");
+            }
+            bidderCounts.put(item.getId(), bidService.getBidderCount(item.getId()));
+            if (userId != null && favoriteService.isFavorite(userId, item.getId())) {
+                favoriteItemIds.add(item.getId());
+            }
+        }
+        
+        model.addAttribute("sellerNicknames", sellerNicknames);
+        model.addAttribute("bidderCounts", bidderCounts);
+        model.addAttribute("favoriteItemIds", favoriteItemIds);
+
+        // 통계 데이터
+        long totalMembers = signupRepository.count();
+        long totalItems = itemRepository.count();
+        long activeAuctions = itemRepository.countByStatus("bidding");
+        
+        // 최고가 낙찰 찾기 (ended 상태 중 currentPrice가 가장 높은 것)
+        Integer highestBid = itemService.getAllItems().stream()
+                .filter(item -> "ended".equals(item.getStatus()))
+                .map(item -> item.getCurrentPrice() != null ? item.getCurrentPrice() : item.getStartPrice())
+                .max(Integer::compareTo)
+                .orElse(0);
+        
+        model.addAttribute("totalMembers", totalMembers);
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("activeAuctions", activeAuctions);
+        model.addAttribute("highestBid", highestBid);
 
         return "index";
     }
