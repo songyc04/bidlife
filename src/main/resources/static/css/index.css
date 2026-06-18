@@ -132,6 +132,7 @@ a {
 /* 2. 히어로 섹션 디자인 */
 .hero-section {
     max-width: 1200px;
+    /*max-width: 100%;*/
     margin: 0 auto;
     padding: 180px 20px 80px 20px;
     display: flex;

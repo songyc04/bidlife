@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<aside th:fragment="accountSidebar(activeMenu)" class="account-sidebar">
+    <div class="sidebar-header">
+        <div class="profile-icon" th:attr="data-seed=${nickname != null ? nickname : 'U'}">
+            <img th:if="${profileImage != null and !profileImage.isEmpty()}" 
+                 th:src="${profileImage}" 
+                 th:alt="${nickname}" 
+                 class="profile-img">
+            <span th:if="${profileImage == null or profileImage.isEmpty()}" 
+                  th:text="${nickname != null ? nickname.substring(0,1) : '?'}">U</span>
+        </div>
+        <h3 th:text="${nickname != null ? nickname : '사용자'}">닉네임</h3>
+    </div>
+    <nav class="sidebar-menu">
+        <a href="/account" class="menu-item" th:classappend="${activeMenu == 'info'} ? 'active'">
+            <span class="menu-icon">👤</span>
+            <span>내 정보</span>
+        </a>
+        <a href="/account/notifications" class="menu-item" th:classappend="${activeMenu == 'notifications'} ? 'active'">
+            <span class="menu-icon">🔔</span>
+            <span>알림</span>
+            <span class="unread-badge" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}">0</span>
+        </a>
+        <a href="/account/bids" class="menu-item" th:classappend="${activeMenu == 'bids'} ? 'active'">
+            <span class="menu-icon">💰</span>
+            <span>내 입찰 내역</span>
+        </a>
+        <a href="/account/items" class="menu-item" th:classappend="${activeMenu == 'items'} ? 'active'">
+            <span class="menu-icon">📦</span>
+            <span>등록한 경매</span>
+        </a>
+        <a href="/account/picklist" class="menu-item" th:classappend="${activeMenu == 'picklist'} ? 'active'">
+            <span class="menu-icon">⭐</span>
+            <span>찜한 경매</span>
+        </a>
+    </nav>
+</aside>
+</html>

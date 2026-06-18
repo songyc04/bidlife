@@ -112,4 +112,52 @@ public class EmailService {
         
         return code.toString();
     }
+    
+    public String sendTemporaryPassword(String email) {
+        // 도메인 검증
+        String domain = email.substring(email.indexOf("@") + 1);
+        if (!ALLOWED_DOMAINS.contains(domain)) {
+            throw new IllegalArgumentException("gmail.com, naver.com, test.com 이메일만 사용 가능합니다.");
+        }
+        
+        // 임시 비밀번호 생성 (8자리: 영문 대소문자 + 숫자)
+        String tempPassword = generateTempPassword();
+        
+        // test.com인 경우 테스트 모드로 처리
+        if (domain.equals("test.com")) {
+            System.out.println("========================================");
+            System.out.println("[테스트 모드] 임시 비밀번호: " + tempPassword);
+            System.out.println("========================================");
+            return tempPassword;
+        }
+        
+        // 실제 이메일 발송
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("[BIDLIFE] 임시 비밀번호 안내");
+            message.setText("안녕하세요, BIDLIFE입니다.\n\n" +
+                          "요청하신 임시 비밀번호는 다음과 같습니다:\n\n" +
+                          "임시 비밀번호: " + tempPassword + "\n\n" +
+                          "로그인 후 반드시 비밀번호를 변경해주세요.\n" +
+                          "감사합니다.");
+            
+            mailSender.send(message);
+            return tempPassword;
+        } catch (Exception e) {
+            throw new RuntimeException("이메일 발송에 실패했습니다: " + e.getMessage());
+        }
+    }
+    
+    private String generateTempPassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder password = new StringBuilder();
+        
+        for (int i = 0; i < 8; i++) {
+            password.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        
+        return password.toString();
+    }
 }

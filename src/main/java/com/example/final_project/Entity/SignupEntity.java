@@ -25,4 +25,7 @@ public class SignupEntity {
     
     @Column(name = "profile_image", length = 255)
     private String profileImage;
+    
+    @Column(name = "is_temporary_password", nullable = false)
+    private boolean isTemporaryPassword = false;
 }
