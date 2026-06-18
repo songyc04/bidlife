@@ -6,6 +6,8 @@
     <title>BIDLIFE | 회원가입</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/signup.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <script src="/js/modal.js"></script>
 </head>
 <body>
 
@@ -40,15 +42,16 @@
                 <div class="input-group">
                     <label for="email">이메일</label>
                     <div class="input-with-btn">
-                        <input type="email" id="email" placeholder="이메일을 입력하세요" required>
+                        <input type="email" id="email" placeholder="gmail.com 또는 naver.com 으로만 가입할 수 있어요" required>
                         <button type="button" id="sendCodeBtn" class="btn-code">인증번호 발송</button>
                     </div>
+                    <span class="hint">다른 메일 계정 회원가입 기능은 준비 중이예요</span>
                 </div>
 
                 <div class="input-group" id="codeGroup" style="display: none;">
                     <label for="code">인증번호</label>
                     <div class="input-with-btn">
-                        <input type="text" id="code" placeholder="6자리 인증번호" maxlength="6">
+                        <input type="text" id="code" placeholder="5자리 인증번호" maxlength="5">
                         <button type="button" id="verifyCodeBtn" class="btn-code">확인</button>
                     </div>
                     <span class="timer" id="timer"></span>
@@ -75,13 +78,20 @@
             const email = document.getElementById('email').value;
             
             if (!email) {
-                alert('이메일을 입력해주세요.');
+                showAlert('이메일을 입력해주세요.', '📧');
                 return;
             }
 
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
-                alert('올바른 이메일 형식이 아닙니다.');
+                showAlert('올바른 이메일 형식이 아닙니다.', '📧');
+                return;
+            }
+
+            // 도메인 검증
+            const domain = email.split('@')[1];
+            if (domain !== 'gmail.com' && domain !== 'naver.com' && domain !== 'test.com') {
+                showAlert('gmail.com, naver.com, test.com 이메일만 가입 가능합니다.', '📧');
                 return;
             }
 
@@ -93,11 +103,18 @@
             .then(response => response.text())
             .then(data => {
                 if (data === 'SUCCESS') {
-                    alert('인증번호가 발송되었습니다.');
+                    showAlert('인증번호가 발송되었습니다. 이메일을 확인해주세요.', '✉️');
+                    document.getElementById('codeGroup').style.display = 'block';
+                    startTimer();
+                } else if (data.startsWith('TEST_CODE:')) {
+                    // 테스트 모드: 인증번호 자동 입력
+                    const testCode = data.substring(10);
+                    showAlert('테스트 모드 - 인증번호: ' + testCode, '🧪');
+                    document.getElementById('code').value = testCode;
                     document.getElementById('codeGroup').style.display = 'block';
                     startTimer();
                 } else {
-                    alert(data);
+                    showAlert(data, '❌');
                 }
             });
         });
@@ -107,7 +124,7 @@
             const code = document.getElementById('code').value;
 
             if (!code) {
-                alert('인증번호를 입력해주세요.');
+                showAlert('인증번호를 입력해주세요.', '🔢');
                 return;
             }
 
@@ -119,11 +136,13 @@
             .then(response => response.text())
             .then(data => {
                 if (data === 'SUCCESS') {
-                    alert('이메일 인증이 완료되었습니다.');
+                    showSuccess('이메일 인증이 완료되었습니다.', '✅');
                     clearInterval(timerInterval);
-                    window.location.href = '/signup/register';
+                    setTimeout(() => {
+                        window.location.href = '/signup/register';
+                    }, 1500);
                 } else {
-                    alert(data);
+                    showAlert(data, '❌');
                 }
             });
         });

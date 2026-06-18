@@ -6,6 +6,8 @@
     <title>BIDLIFE | 경매 둘러보기</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/items.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <script src="/js/modal.js"></script>
     <script src="/js/items.js" defer></script>
 </head>
 <body>
@@ -70,8 +72,8 @@
             </div>
 
             <div class="status-tabs" th:if="${items != null && !items.isEmpty()}">
-                <button class="status-tab active" data-status="all">전체 <span class="count" th:text="${items.size()}">0</span></button>
-                <button class="status-tab" data-status="bidding">진행 중 <span class="count" th:text="${items.?[status == 'bidding'].size()}">0</span></button>
+                <button class="status-tab" data-status="all">전체 <span class="count" th:text="${items.size()}">0</span></button>
+                <button class="status-tab active" data-status="bidding">진행 중 <span class="count" th:text="${items.?[status == 'bidding'].size()}">0</span></button>
                 <button class="status-tab" data-status="upcoming">시작 예정 <span class="count" th:text="${items.?[status == 'upcoming'].size()}">0</span></button>
                 <button class="status-tab" data-status="ended">종료 <span class="count" th:text="${items.?[status == 'ended'].size()}">0</span></button>
             </div>

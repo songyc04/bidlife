@@ -27,7 +27,13 @@ public class SignupController {
     @ResponseBody
     public String sendVerificationCode(@RequestParam String email, Model model) {
         try {
-            emailService.sendVerificationEmail(email);
+            String testCode = emailService.sendVerificationEmail(email);
+            
+            // test.com인 경우 인증번호를 응답에 포함
+            if (email.endsWith("@test.com")) {
+                return "TEST_CODE:" + testCode;
+            }
+            
             return "SUCCESS";
         } catch (Exception e) {
             return "이메일 발송에 실패했습니다: " + e.getMessage();

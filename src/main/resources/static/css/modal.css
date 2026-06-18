@@ -1,0 +1,128 @@
+/* 커스텀 모달 스타일 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    background-color: #121212;
+    border: 1px solid #333333;
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.modal-overlay.active .modal-container {
+    transform: scale(1);
+}
+
+.modal-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+}
+
+.modal-message {
+    font-size: 14px;
+    color: #888888;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    min-width: 100px;
+}
+
+.modal-btn-primary {
+    background-color: #ff5a00;
+    color: #000000;
+}
+
+.modal-btn-primary:hover {
+    background-color: #ff7c33;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 90, 0, 0.4);
+}
+
+.modal-btn-secondary {
+    background-color: #333333;
+    color: #ffffff;
+}
+
+.modal-btn-secondary:hover {
+    background-color: #444444;
+}
+
+.modal-btn-cancel {
+    background-color: transparent;
+    border: 1px solid #333333;
+    color: #888888;
+}
+
+.modal-btn-cancel:hover {
+    border-color: #ff5a00;
+    color: #ff5a00;
+}
+
+/* 환영 모달 특별 스타일 */
+.modal-welcome .modal-icon {
+    font-size: 64px;
+    animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-20px);
+    }
+    60% {
+        transform: translateY(-10px);
+    }
+}
+
+.modal-welcome .modal-title {
+    color: #ff5a00;
+    font-size: 24px;
+}

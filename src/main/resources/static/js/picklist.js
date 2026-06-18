@@ -13,48 +13,49 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemId = btn.dataset.itemId;
             if (!itemId) return;
 
-            if (!confirm('찜 목록에서 제거하시겠습니까?')) return;
+            showConfirm('찜 목록에서 제거하시겠습니까?', async () => {
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('itemId', itemId);
 
-            try {
-                const formData = new URLSearchParams();
-                formData.append('itemId', itemId);
+                    const response = await fetch('/account/favorites/toggle', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: formData.toString()
+                    });
 
-                const response = await fetch('/account/favorites/toggle', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: formData.toString()
-                });
-
-                if (response.status === 401) {
-                    window.location.href = '/login?redirect=/account/picklist';
-                    return;
-                }
-
-                const data = await response.json();
-
-                if (data.success && !data.isFavorite) {
-                    const card = btn.closest('.pick-card');
-                    if (card) {
-                        card.style.transition = 'opacity 0.3s';
-                        card.style.opacity = '0';
-                        setTimeout(() => {
-                            card.remove();
-                            const remaining = document.querySelectorAll('.pick-card');
-                            if (remaining.length === 0) {
-                                if (picklistGrid) picklistGrid.style.display = 'none';
-                                if (emptyState) emptyState.style.display = 'block';
-                            }
-                        }, 300);
+                    if (response.status === 401) {
+                        window.location.href = '/login?redirect=/account/picklist';
+                        return;
                     }
-                } else {
-                    alert(data.message || '처리 중 오류가 발생했습니다.');
+
+                    const data = await response.json();
+
+                    if (data.success && !data.isFavorite) {
+                        const card = btn.closest('.pick-card');
+                        if (card) {
+                            card.style.transition = 'opacity 0.3s';
+                            card.style.opacity = '0';
+                            setTimeout(() => {
+                                card.remove();
+                                const remaining = document.querySelectorAll('.pick-card');
+                                if (remaining.length === 0) {
+                                    if (picklistGrid) picklistGrid.style.display = 'none';
+                                    if (emptyState) emptyState.style.display = 'block';
+                                }
+                            }, 300);
+                        }
+                        showSuccess('찜 목록에서 제거되었습니다.', '⭐');
+                    } else {
+                        showAlert(data.message || '처리 중 오류가 발생했습니다.', '❌');
+                    }
+                } catch (error) {
+                    console.error('Favorite remove error:', error);
+                    showAlert('서버 연결에 실패했습니다.', '❌');
                 }
-            } catch (error) {
-                console.error('Favorite remove error:', error);
-                alert('서버 연결에 실패했습니다.');
-            }
+            });
         });
     });
 

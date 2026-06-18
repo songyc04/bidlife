@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFiles(files) {
         const remaining = 5 - uploadedFiles.length;
         if (remaining <= 0) {
-            alert('최대 5장까지 업로드 가능합니다.');
+            showAlert('최대 5장까지 업로드 가능합니다.', '🖼️');
             return;
         }
 
@@ -60,11 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fileArray.forEach(file => {
             if (!file.type.match('image/(jpeg|png)')) {
-                alert('JPG, PNG 파일만 업로드 가능합니다.');
+                showAlert('JPG, PNG 파일만 업로드 가능합니다.', '🖼️');
                 return;
             }
             if (file.size > 10 * 1024 * 1024) {
-                alert('파일당 10MB 이하만 업로드 가능합니다.');
+                showAlert('파일당 10MB 이하만 업로드 가능합니다.', '🖼️');
                 return;
             }
 
@@ -127,31 +127,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!startPrice || parseInt(startPrice) < 1000) {
                 e.preventDefault();
-                alert('시작가는 1,000원 이상이어야 합니다.');
+                showAlert('시작가는 1,000원 이상이어야 합니다.', '💰');
                 return;
             }
 
             if (buyNowPrice && parseInt(buyNowPrice) > 0 && parseInt(buyNowPrice) <= parseInt(startPrice)) {
                 e.preventDefault();
-                alert('즉시 구매가는 시작가보다 높아야 합니다.');
+                showAlert('즉시 구매가는 시작가보다 높아야 합니다.', '💰');
                 return;
             }
 
             if (!bidUnit || parseInt(bidUnit) < 1000) {
                 e.preventDefault();
-                alert('최소 입찰 단위는 1,000원 이상이어야 합니다.');
+                showAlert('최소 입찰 단위는 1,000원 이상이어야 합니다.', '💰');
                 return;
             }
 
             if (!startTime || !endTime) {
                 e.preventDefault();
-                alert('경매 시작 시간과 종료 시간을 모두 입력해주세요.');
+                showAlert('경매 시작 시간과 종료 시간을 모두 입력해주세요.', '🕐');
                 return;
             }
 
             if (new Date(endTime) <= new Date(startTime)) {
                 e.preventDefault();
-                alert('경매 종료 시간은 시작 시간 이후여야 합니다.');
+                showAlert('경매 종료 시간은 시작 시간 이후여야 합니다.', '🕐');
                 return;
             }
         });

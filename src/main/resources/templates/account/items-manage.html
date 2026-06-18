@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/account.css">
     <link rel="stylesheet" href="/css/items-manage.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <script src="/js/modal.js"></script>
     <script src="/js/account.js" defer></script>
 </head>
 <body>
@@ -141,14 +143,16 @@
                                 </a>
                                 <form th:action="'/account/items/' + ${item.id} + '/end'" method="post" 
                                       th:if="${item.status != 'ended'}"
-                                      onsubmit="return confirm('경매를 조기 종료하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+                                      class="confirm-form"
+                                      data-confirm-message="경매를 조기 종료하시겠습니까? 이 작업은 되돌릴 수 없습니다.">
                                     <button type="submit" class="btn-action btn-end">
                                         <span class="btn-icon">⏹️</span>
                                         <span>조기 종료</span>
                                     </button>
                                 </form>
                                 <form th:action="'/account/items/' + ${item.id} + '/delete'" method="post"
-                                      onsubmit="return confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+                                      class="confirm-form"
+                                      data-confirm-message="정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.">
                                     <button type="submit" class="btn-action btn-delete">
                                         <span class="btn-icon">🗑️</span>
                                         <span>삭제</span>
@@ -177,6 +181,19 @@
     </footer>
 
     <script>
+        // 확인 폼 처리
+        document.querySelectorAll('.confirm-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const message = this.dataset.confirmMessage;
+                const formToSubmit = this;
+                
+                showConfirm(message, function() {
+                    formToSubmit.submit();
+                });
+            });
+        });
+
         function updateCountdowns() {
             const countdowns = document.querySelectorAll('.countdown');
             countdowns.forEach(el => {

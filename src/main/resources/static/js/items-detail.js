@@ -67,16 +67,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (data.isFavorite) {
                         detailPickBtn.classList.add('active');
                         if (starSpan) starSpan.textContent = '★ 찜완료';
+                        showSuccess(data.message || '찜 목록에 추가되었습니다.', '⭐');
                     } else {
                         detailPickBtn.classList.remove('active');
                         if (starSpan) starSpan.textContent = '☆ 찜하기';
+                        showAlert(data.message || '찜 목록에서 제거되었습니다.', '⭐');
                     }
                 } else {
-                    alert(data.message || '처리 중 오류가 발생했습니다.');
+                    showAlert(data.message || '처리 중 오류가 발생했습니다.', '❌');
                 }
             } catch (error) {
                 console.error('Favorite toggle error:', error);
-                alert('서버 연결에 실패했습니다.');
+                showAlert('서버 연결에 실패했습니다.', '❌');
             }
         });
     }

@@ -34,7 +34,7 @@ function initFormValidation() {
             e.preventDefault();
             shakeInput(passwordConfirm);
             passwordConfirm.style.borderColor = '#ff3333';
-            alert('비밀번호가 일치하지 않습니다.');
+            showAlert('비밀번호가 일치하지 않습니다.', '🔒');
             passwordConfirm.focus();
             return;
         }
