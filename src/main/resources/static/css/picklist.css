@@ -125,6 +125,28 @@
     background-color: rgba(255, 90, 0, 0.3);
 }
 
+.btn-pick .star-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    color: #ffffff;
+}
+
+.btn-pick.active .star-icon {
+    color: #ff5a00;
+}
+
+.btn-pick .star-icon .star-path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.btn-pick.active .star-icon .star-path {
+    fill: currentColor;
+}
+
 .pick-body {
     padding: 20px;
 }

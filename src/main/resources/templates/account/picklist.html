@@ -35,7 +35,9 @@
                                   th:classappend="${detail.item.status == 'bidding'} ? 'bidding' : ((detail.item.status == 'upcoming') ? 'upcoming' : 'ended')"
                                   th:text="${detail.item.status == 'bidding'} ? 'LIVE' : ((detail.item.status == 'upcoming') ? 'UPCOMING' : 'ENDED')">LIVE</span>
                             <button class="btn-pick active" th:attr="data-item-id=${detail.item.id}" title="찜 취소">
-                                <span>★</span>
+                                <svg class="star-icon" viewBox="0 0 24 24" width="20" height="20">
+                                    <path class="star-path" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
                             </button>
                             <div th:if="${detail.item.imagePaths != null and !detail.item.imagePaths.isEmpty()}" class="card-image">
                                 <img th:src="${detail.item.imagePaths.split(',')[0].startsWith('/') ? detail.item.imagePaths.split(',')[0] : '/' + detail.item.imagePaths.split(',')[0]}" th:alt="${detail.item.title}">

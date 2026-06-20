@@ -27,7 +27,7 @@
 
                 <div class="bid-list" th:if="${bidDetails != null and !bidDetails.isEmpty()}">
                     <div class="bid-card" th:each="detail : ${bidDetails}"
-                         th:attr="data-status=${detail.bid.status == 'active' ? 'bidding' : (detail.bid.status == 'outbid' ? 'lost' : 'won')}">
+                         th:attr="data-status=${detail.bid.status == 'active' ? 'bidding' : (detail.bid.status == 'won' ? 'won' : 'lost')}">
                         <div class="bid-thumb">
                             <span class="status-badge" 
                                   th:classappend="${detail.item.status == 'bidding'} ? 'bidding' : ((detail.item.status == 'upcoming') ? 'upcoming' : 'ended')"
@@ -55,9 +55,9 @@
                             </div>
                         </div>
                         <div class="bid-action">
-                            <span class="bid-status" 
-                                  th:classappend="${detail.bid.status == 'active' ? 'bidding' : 'lost'}"
-                                  th:text="${detail.bid.status == 'active' ? '입찰 중' : '낙찰 실패'}">입찰 중</span>
+                            <span class="bid-status"
+                                  th:classappend="${detail.bid.status == 'active'} ? 'bidding' : (${detail.bid.status == 'won'} ? 'won' : 'lost')"
+                                  th:text="${detail.bid.status == 'active'} ? '입찰 중' : (${detail.bid.status == 'won'} ? '🎉 낙찰 성공' : '낙찰 실패')">입찰 중</span>
                             <a th:href="'/items/' + ${detail.item.id}" class="btn-detail">상세보기</a>
                         </div>
                     </div>

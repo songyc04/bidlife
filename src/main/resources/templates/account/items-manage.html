@@ -94,6 +94,10 @@
                                     <span class="btn-icon">👁️</span>
                                     <span>상세보기</span>
                                 </a>
+                                <button type="button" class="btn-action btn-photo" id="openPhotoModal">
+                                    <span class="btn-icon">📷</span>
+                                    <span>사진 변경</span>
+                                </button>
                                 <form th:action="'/account/items/' + ${item.id} + '/end'" method="post" 
                                       th:if="${item.status != 'ended'}"
                                       class="confirm-form"
@@ -116,8 +120,33 @@
 
                         <div class="action-card" th:if="${item.status == 'ended'}">
                             <h4>경매 결과</h4>
-                            <p class="info-text">이 경매는 종료되었습니다.</p>
-                            <a th:href="'/items/' + ${item.id}" class="btn-action btn-view">
+
+                            <div th:if="${item.winnerId != null}">
+                                <p class="info-text">
+                                    <span th:if="${item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">💳 즉시 구매로 종료되었습니다</span>
+                                    <span th:unless="${item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">🏆 낙찰되었습니다</span>
+                                </p>
+                                <div class="transaction-info">
+                                    <div class="info-row">
+                                        <span class="info-label">낙찰자</span>
+                                        <span class="info-value" th:text="${winnerNickname}">-</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">거래 금액</span>
+                                        <span class="info-value highlight" th:text="${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">0원</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">결제 상태</span>
+                                        <span class="info-value status-pending">대기 중</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div th:if="${item.winnerId == null}">
+                                <p class="info-text">📭 입찰자가 없어 유찰되었습니다</p>
+                            </div>
+
+                            <a th:href="'/items/' + ${item.id}" class="btn-action btn-view" style="margin-top: 16px;">
                                 <span class="btn-icon">📊</span>
                                 <span>결과 확인하기</span>
                             </a>
@@ -131,6 +160,41 @@
 
     <div th:replace="~{fragments/footer :: footer}"></div>
 
+    <div class="photo-modal-overlay" id="photoModal" style="display: none;">
+        <div class="photo-modal">
+            <div class="photo-modal-header">
+                <h3>사진 변경</h3>
+                <button type="button" class="photo-modal-close" id="closePhotoModal">✕</button>
+            </div>
+            <div class="photo-modal-body">
+                <p class="photo-modal-info">사진의 ✕ 버튼을 누르면 즉시 삭제됩니다.</p>
+                <div class="image-gallery-modal" id="imageGalleryModal"
+                     th:attr="data-item-id=${item.id}">
+                    <div class="gallery-item" th:each="imgPath : ${item.imagePaths.split(',')}"
+                         th:if="${item.imagePaths != null and !item.imagePaths.isEmpty()}">
+                        <img th:src="${imgPath.startsWith('/') ? imgPath : '/' + imgPath}" alt="">
+                        <button type="button" class="gallery-remove-btn"
+                                th:attr="data-image-path=${imgPath}">✕</button>
+                    </div>
+                    <p class="info-text" th:if="${item.imagePaths == null or item.imagePaths.isEmpty()}">
+                        등록된 사진이 없습니다.
+                    </p>
+                </div>
+                <form id="photoUploadForm" th:action="'/account/items/' + ${item.id} + '/images'" method="post" enctype="multipart/form-data">
+                    <div class="image-upload-area">
+                        <label class="upload-label">
+                            <span class="upload-icon">📁</span>
+                            <span>새 이미지 추가 (JPEG, PNG)</span>
+                            <input type="file" name="newImages" multiple accept="image/jpeg, image/png">
+                        </label>
+                    </div>
+                    <div class="photo-error" id="photoError" style="display: none;">최소 1장 이상의 사진이 필요합니다.</div>
+                    <button type="submit" class="btn-action btn-view" id="photoSubmitBtn">수정 완료</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 확인 폼 처리
         document.querySelectorAll('.confirm-form').forEach(form => {
@@ -138,11 +202,79 @@
                 e.preventDefault();
                 const message = this.dataset.confirmMessage;
                 const formToSubmit = this;
-                
+
                 showConfirm(message, function() {
                     formToSubmit.submit();
                 });
             });
+        });
+
+        // 사진 변경 모달
+        const photoModal = document.getElementById('photoModal');
+        const openPhotoModal = document.getElementById('openPhotoModal');
+        const closePhotoModal = document.getElementById('closePhotoModal');
+        const photoUploadForm = document.getElementById('photoUploadForm');
+        const photoError = document.getElementById('photoError');
+        const imageGalleryModal = document.getElementById('imageGalleryModal');
+
+        openPhotoModal.addEventListener('click', () => {
+            photoError.style.display = 'none';
+            photoModal.style.display = 'flex';
+        });
+
+        closePhotoModal.addEventListener('click', () => {
+            photoModal.style.display = 'none';
+        });
+
+        photoModal.addEventListener('click', (e) => {
+            if (e.target === photoModal) {
+                photoModal.style.display = 'none';
+            }
+        });
+
+        // 사진 X 버튼 즉시 삭제
+        document.querySelectorAll('.gallery-remove-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const imagePath = btn.dataset.imagePath;
+                const itemId = imageGalleryModal.dataset.itemId;
+                const galleryItem = btn.closest('.gallery-item');
+
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('imagePath', imagePath);
+
+                    const response = await fetch(`/account/items/${itemId}/images/delete`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData.toString()
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        galleryItem.remove();
+                    } else {
+                        showAlert(data.message || '삭제에 실패했습니다.', '❌');
+                    }
+                } catch (error) {
+                    console.error('Image delete error:', error);
+                    showAlert('서버 연결에 실패했습니다.', '❌');
+                }
+            });
+        });
+
+        // 수정 완료 시 최소 1장 검증
+        photoUploadForm.addEventListener('submit', (e) => {
+            const remaining = document.querySelectorAll('#imageGalleryModal .gallery-item').length;
+            const newFiles = photoUploadForm.querySelector('input[type="file"]').files.length;
+
+            if (remaining + newFiles === 0) {
+                e.preventDefault();
+                photoError.style.display = 'block';
+            } else {
+                photoError.style.display = 'none';
+            }
         });
 
         function updateCountdowns() {

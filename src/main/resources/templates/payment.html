@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 결제</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/account.css">
+    <link rel="stylesheet" href="/css/transactions.css">
+    <style>
+        .payment-container { max-width: 720px; margin: 0 auto; }
+        .payment-card {
+            background: #121212; border: 1px solid #222; border-radius: 8px;
+            padding: 32px; margin-bottom: 24px;
+        }
+        .payment-card h3 { font-size: 18px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #222; }
+        .payment-row { display: flex; justify-content: space-between; padding: 12px 0; }
+        .payment-row .label { color: #888; font-size: 14px; font-weight: 600; }
+        .payment-row .value { color: #fff; font-size: 15px; font-weight: 700; }
+        .payment-amount {
+            font-size: 28px; color: #ff5a00; font-weight: 900; text-align: center;
+            padding: 20px; background: rgba(255, 90, 0, 0.08); border-radius: 6px; margin: 16px 0;
+        }
+        .payment-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+        .btn-toss-pay {
+            background: #3182f6; color: #fff; border: none; padding: 16px;
+            border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-toss-pay:hover { background: #1b6dd1; }
+        .btn-test-pay {
+            background: transparent; color: #888; border: 1px dashed #444;
+            padding: 14px; border-radius: 6px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-test-pay:hover { border-color: #ff5a00; color: #ff5a00; }
+        .test-mode-badge {
+            display: inline-block; background: #ff5a00; color: #000;
+            font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 10px;
+            margin-left: 8px;
+        }
+        .info-box {
+            background: rgba(74, 158, 255, 0.08); border: 1px solid rgba(74, 158, 255, 0.3);
+            border-radius: 6px; padding: 16px; font-size: 13px; color: #9ec5fe; line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="account-section">
+    <div class="payment-container">
+
+        <div class="content-header">
+            <h2>결제하기 <span class="test-mode-badge" th:if="${@environment.getProperty('toss.test-mode') == 'true'}">TEST MODE</span></h2>
+            <p>낙찰/구매가 확정되었습니다. 결제를 진행해주세요.</p>
+        </div>
+
+        <div class="alert-success" th:if="${successMessage != null}" th:text="${successMessage}">성공</div>
+        <div class="alert-error" th:if="${errorMessage != null}" th:text="${errorMessage}">오류</div>
+
+        <div class="payment-card">
+            <h3>주문 정보</h3>
+            <div class="payment-row">
+                <span class="label">상품명</span>
+                <span class="value" th:text="${item.title}">-</span>
+            </div>
+            <div class="payment-row">
+                <span class="label">판매자</span>
+                <span class="value" th:text="${sellerNickname}">-</span>
+            </div>
+            <div class="payment-row">
+                <span class="label">주문 번호</span>
+                <span class="value" th:text="${item.orderId != null ? item.orderId : '아직 생성되지 않음'}">-</span>
+            </div>
+            <div class="payment-amount" th:text="${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">0원</div>
+        </div>
+
+        <div class="payment-card">
+            <h3>결제 수단 선택</h3>
+
+            <form th:action="'/payment/' + ${item.id} + '/request'" method="post" style="margin-bottom: 12px;">
+                <button type="submit" class="btn-toss-pay">💳 토스페이먼츠로 결제하기</button>
+            </form>
+
+            <form th:action="'/payment/' + ${item.id} + '/test-pay'" method="post">
+                <button type="submit" class="btn-test-pay">🧪 테스트 결제 (개발용, 실제 결제 X)</button>
+            </form>
+
+            <div class="info-box" style="margin-top: 20px;">
+                <strong>ℹ️ 안내</strong><br>
+                • <strong>토스페이먼츠</strong>: 실제 토스 결제창으로 이동하여 테스트 카드로 결제<br>
+                &nbsp;&nbsp;(테스트 카드: 4000-0000-0000-0000 / 유효기간: 미래 / CVC: 아무 숫자)<br>
+                • <strong>테스트 결제</strong>: 토스 API 호출 없이 결제 완료 처리 (개발/테스트용)
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

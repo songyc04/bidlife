@@ -64,6 +64,33 @@
         .notification-icon.bid {
             background: rgba(255, 90, 0, 0.15);
         }
+        .notification-icon.auction_won {
+            background: rgba(76, 175, 80, 0.15);
+        }
+        .notification-icon.auction_lost {
+            background: rgba(120, 120, 120, 0.15);
+        }
+        .notification-icon.auction_seller_won {
+            background: rgba(74, 158, 255, 0.15);
+        }
+        .notification-icon.auction_failed {
+            background: rgba(120, 120, 120, 0.15);
+        }
+        .notification-icon.buy_now_complete {
+            background: rgba(171, 71, 188, 0.15);
+        }
+        .notification-icon.buy_now_ended {
+            background: rgba(255, 193, 7, 0.15);
+        }
+        .notification-icon.payment_buyer_paid {
+            background: rgba(49, 130, 246, 0.15);
+        }
+        .notification-icon.payment_pending_seller {
+            background: rgba(74, 158, 255, 0.15);
+        }
+        .notification-icon.transaction_completed {
+            background: rgba(76, 175, 80, 0.15);
+        }
         .notification-body {
             flex: 1;
             min-width: 0;
@@ -134,15 +161,6 @@
             font-size: 14px;
             color: #555;
         }
-        .unread-badge {
-            background: #ff5a00;
-            color: #000;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 8px;
-        }
     </style>
 </head>
 <body>
@@ -176,18 +194,30 @@
                     <div class="notification-item" 
                          th:each="notification : ${notifications}"
                          th:classappend="${!notification.isRead} ? 'unread'">
-                        <div class="notification-icon bid">
-                            <span th:if="${notification.type == 'new_bid'}">💰</span>
-                            <span th:if="${notification.type != 'new_bid'}">🔔</span>
+                        <div class="notification-icon" th:classappend="${notification.type}">
+                            <span th:switch="${notification.type}">
+                                <span th:case="'new_bid'">💰</span>
+                                <span th:case="'auction_won'">🎉</span>
+                                <span th:case="'auction_lost'">😢</span>
+                                <span th:case="'auction_seller_won'">📦</span>
+                                <span th:case="'auction_failed'">📭</span>
+                                <span th:case="'buy_now_complete'">💳</span>
+                                <span th:case="'buy_now_ended'">⚡</span>
+                                <span th:case="'payment_buyer_paid'">💰</span>
+                                <span th:case="'payment_pending_seller'">⏳</span>
+                                <span th:case="'transaction_completed'">🎉</span>
+                                <span th:case="*">🔔</span>
+                            </span>
                         </div>
                         <div class="notification-body">
                             <p class="notification-message" th:text="${notification.message}">알림 메시지</p>
                             <div class="notification-meta">
                                 <span class="notification-time" 
                                       th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd HH:mm')}">2026-01-01 12:00</span>
-                                <a th:if="${notification.itemId != null}" 
-                                   th:href="'/items/' + ${notification.itemId}" 
-                                   class="notification-link">경매 보기</a>
+                                <a th:if="${notification.itemId != null}"
+                                   th:href="${notificationLinks != null and notificationLinks.containsKey(notification.id)} ? ${notificationLinks.get(notification.id)} : '/items/' + ${notification.itemId}"
+                                   class="notification-link"
+                                   th:text="${notification.type == 'auction_seller_won' or notification.type == 'auction_failed' or notification.type == 'new_bid' or notification.type == 'payment_buyer_paid'} ? '관리 페이지로' : (${notification.type == 'auction_won' or notification.type == 'buy_now_complete' or notification.type == 'payment_pending_seller'} ? '결제하러 가기' : (${notification.type == 'transaction_completed'} ? '거래 내역 보기' : '경매 보기'))">경매 보기</a>
                             </div>
                         </div>
                         <div class="notification-actions" th:if="${!notification.isRead}">

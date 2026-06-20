@@ -27,6 +27,8 @@
                     <span class="step active">2</span>
                 </div>
 
+                <div class="error-message" th:if="${error}" th:text="${error}"></div>
+
                 <input type="hidden" name="email" th:value="${email}">
 
                 <div class="input-group">

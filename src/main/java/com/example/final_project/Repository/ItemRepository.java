@@ -2,14 +2,16 @@ package com.example.final_project.Repository;
 
 import com.example.final_project.Entity.ItemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
-@Repository
 public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     List<ItemEntity> findAllByOrderByCreatedAtDesc();
     List<ItemEntity> findAllBySellerIdNotOrderByCreatedAtDesc(Long sellerId);
     List<ItemEntity> findBySellerIdOrderByCreatedAtDesc(Long sellerId);
+    List<ItemEntity> findByWinnerIdOrderByTransactionDateDesc(Long winnerId);
+    List<ItemEntity> findBySellerIdAndStatusOrderByTransactionDateDesc(Long sellerId, String status);
     long countByStatus(String status);
+    Optional<ItemEntity> findByOrderId(String orderId);
 }

@@ -160,14 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (data.success) {
-                    const starSpan = btn.querySelector('span');
                     if (data.isFavorite) {
                         btn.classList.add('active');
-                        if (starSpan) starSpan.textContent = '★';
                         showSuccess(data.message || '찜 목록에 추가되었습니다.', '⭐');
                     } else {
                         btn.classList.remove('active');
-                        if (starSpan) starSpan.textContent = '☆';
                         showAlert(data.message || '찜 목록에서 제거되었습니다.', '⭐');
                     }
                 } else {

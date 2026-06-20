@@ -22,6 +22,10 @@
             <span>알림</span>
             <span class="unread-badge" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}">0</span>
         </a>
+        <a href="/account/transactions" class="menu-item" th:classappend="${activeMenu == 'transactions'} ? 'active'">
+            <span class="menu-icon">💼</span>
+            <span>거래 내역</span>
+        </a>
         <a href="/account/bids" class="menu-item" th:classappend="${activeMenu == 'bids'} ? 'active'">
             <span class="menu-icon">💰</span>
             <span>내 입찰 내역</span>

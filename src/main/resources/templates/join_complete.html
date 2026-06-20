@@ -8,41 +8,22 @@
     <link rel="stylesheet" href="/css/join_complete.css">
     <link rel="stylesheet" href="/css/modal.css">
     <script src="/js/modal.js"></script>
-    <script src="/js/join_complete.js" defer></script>
 </head>
 <body>
 
     <div th:replace="~{fragments/navbar :: navbar}"></div>
 
     <main class="complete-section">
-        <div class="complete-container">
-            <div class="complete-header">
-                <div class="success-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                </div>
-                <h1>회원가입 완료</h1>
-                <p>BIDLIFE 회원이 되신 것을 환영합니다!</p>
-            </div>
-
-            <div class="button-group">
-                <a href="/login" class="btn-primary">로그인하기</a>
-                <a href="/" class="btn-secondary">홈으로 이동</a>
-            </div>
-        </div>
-
         <div class="glow-sphere"></div>
     </main>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
 
     <script>
-        // 페이지 로드 시 환영 모달 표시
         window.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
-                showWelcome('BIDLIFE 회원이 되신 것을 환영합니다!<br>이제 다양한 경매에 참여하실 수 있습니다.', '🎉');
-            }, 500);
+                showSignupComplete();
+            }, 300);
         });
     </script>
 </body>

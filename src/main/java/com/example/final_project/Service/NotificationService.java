@@ -20,7 +20,7 @@ public class NotificationService {
         notification.setMessage(message);
         notification.setItemId(itemId);
         notification.setType(type);
-        notification.setIsRead(false);
+        notification.setRead(false);
         notificationRepository.save(notification);
     }
 
@@ -33,22 +33,21 @@ public class NotificationService {
     }
 
     public long getUnreadCount(Long userId) {
-        return notificationRepository.countByUserIdAndIsReadFalse(userId);
+        return notificationRepository.countUnreadByUserId(userId);
     }
 
     @Transactional
     public void markAsRead(Long notificationId) {
-        NotificationEntity notification = notificationRepository.findById(notificationId).orElse(null);
-        if (notification != null) {
-            notification.setIsRead(true);
-        }
+        notificationRepository.markAsReadById(notificationId);
     }
 
     @Transactional
     public void markAllAsRead(Long userId) {
-        List<NotificationEntity> unreadNotifications = notificationRepository.findByUserIdAndIsReadFalseOrderByCreatedAtDesc(userId);
-        for (NotificationEntity notification : unreadNotifications) {
-            notification.setIsRead(true);
-        }
+        notificationRepository.markAllAsReadByUserId(userId);
+    }
+
+    @Transactional
+    public void deleteByItemId(Long itemId) {
+        notificationRepository.deleteByItemId(itemId);
     }
 }

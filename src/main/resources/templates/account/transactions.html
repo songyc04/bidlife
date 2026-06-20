@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 거래 내역</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/account.css">
+    <link rel="stylesheet" href="/css/transactions.css">
+    <script src="/js/account.js" defer></script>
+    <script src="/js/transactions.js" defer></script>
+    <style>
+        .payment-status-badge {
+            display: inline-block; padding: 4px 10px; border-radius: 4px;
+            font-size: 12px; font-weight: 700; margin-bottom: 8px;
+        }
+        .payment-status-badge.pending { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+        .payment-status-badge.buyer_paid { background: rgba(74, 158, 255, 0.15); color: #4a9eff; }
+        .payment-status-badge.completed { background: rgba(76, 175, 80, 0.15); color: #4caf50; }
+        .payment-status-badge.cancelled { background: rgba(244, 67, 54, 0.15); color: #f44336; }
+        .btn-action {
+            display: block; width: 100%; padding: 10px 16px; margin-top: 6px;
+            border: none; border-radius: 4px; font-size: 13px; font-weight: 700;
+            cursor: pointer; text-align: center; text-decoration: none; transition: all 0.2s;
+        }
+        .btn-pay { background: #3182f6; color: #fff; }
+        .btn-pay:hover { background: #1b6dd1; }
+        .btn-confirm { background: #4caf50; color: #fff; }
+        .btn-confirm:hover { background: #43a047; }
+        .btn-detail { background: transparent; color: #888; border: 1px solid #333; }
+        .btn-detail:hover { border-color: #ff5a00; color: #ff5a00; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="account-section">
+    <div class="account-container">
+
+        <div th:replace="~{fragments/account-sidebar :: accountSidebar('transactions')}"></div>
+
+        <section class="account-content">
+            <div class="content-header">
+                <h2>거래 내역</h2>
+                <p>구매와 판매 거래를 한 곳에서 확인하세요</p>
+            </div>
+
+            <div class="alert-success" th:if="${successMessage != null}" th:text="${successMessage}">성공</div>
+            <div class="alert-error" th:if="${errorMessage != null}" th:text="${errorMessage}">오류</div>
+
+            <div class="transaction-tabs">
+                <button type="button" class="tab-btn active" data-tab="purchases">
+                    💳 구매 내역 <span class="tab-count" th:text="${purchases != null ? purchases.size() : 0}">0</span>
+                </button>
+                <button type="button" class="tab-btn" data-tab="sales">
+                    📦 판매 내역 <span class="tab-count" th:text="${sales != null ? sales.size() : 0}">0</span>
+                </button>
+            </div>
+
+            <div class="tab-panel active" id="panel-purchases">
+                <div class="transaction-list" th:if="${purchases != null and !purchases.isEmpty()}">
+                    <div class="transaction-card" th:each="item : ${purchases}">
+                        <div class="card-thumb">
+                            <div th:if="${item.imagePaths != null and !item.imagePaths.isEmpty()}" class="card-image">
+                                <img th:src="${item.imagePaths.split(',')[0].startsWith('/') ? item.imagePaths.split(',')[0] : '/' + item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                            </div>
+                            <div th:unless="${item.imagePaths != null and !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
+                        </div>
+                        <div class="card-info">
+                            <h3 th:text="${item.title}">상품 제목</h3>
+                            <div class="info-row">
+                                <span class="info-label">판매자</span>
+                                <span class="info-value" th:text="${sellerNicknames[item.sellerId]}">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">거래 금액</span>
+                                <span class="info-value highlight" th:text="${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">0원</span>
+                            </div>
+                            <div class="info-row" th:if="${item.transactionDate != null}">
+                                <span class="info-label">거래 일시</span>
+                                <span class="info-value" th:text="${#temporals.format(item.transactionDate, 'yyyy.MM.dd HH:mm')}">-</span>
+                            </div>
+                            <div class="info-row" th:if="${item.buyerPaidAt != null}">
+                                <span class="info-label">결제 일시</span>
+                                <span class="info-value" th:text="${#temporals.format(item.buyerPaidAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                            </div>
+                            <div class="info-row" th:if="${item.sellerConfirmedAt != null}">
+                                <span class="info-label">거래 확정</span>
+                                <span class="info-value" th:text="${#temporals.format(item.sellerConfirmedAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <span class="transaction-badge"
+                                  th:classappend="${item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)} ? 'buy-now' : 'auction-won'">
+                                <span th:if="${item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">💳 즉시 구매</span>
+                                <span th:unless="${item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">🏆 낙찰</span>
+                            </span>
+                            <span class="payment-status-badge"
+                                  th:classappend="${item.paymentStatus}"
+                                  th:text="${item.paymentStatus == 'pending' ? '결제 대기' : (item.paymentStatus == 'buyer_paid' ? '판매자 확인 대기' : (item.paymentStatus == 'completed' ? '✅ 거래 완료' : (item.paymentStatus == 'cancelled' ? '취소됨' : item.paymentStatus)))}">결제 대기</span>
+                            <a th:if="${item.paymentStatus == 'pending'}" th:href="'/payment/' + ${item.id}" class="btn-action btn-pay">💳 결제하기</a>
+                            <a th:href="'/items/' + ${item.id}" class="btn-action btn-detail">상세보기</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-state" th:if="${purchases == null or purchases.isEmpty()}">
+                    <div class="empty-icon">💳</div>
+                    <h3>아직 구매한 내역이 없습니다</h3>
+                    <p>낙찰받거나 즉시 구매한 물품이 여기에 표시됩니다</p>
+                    <a href="/items" class="btn-go-items">경매 둘러보기</a>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panel-sales">
+                <div class="transaction-list" th:if="${sales != null and !sales.isEmpty()}">
+                    <div class="transaction-card" th:each="item : ${sales}">
+                        <div class="card-thumb">
+                            <div th:if="${item.imagePaths != null and !item.imagePaths.isEmpty()}" class="card-image">
+                                <img th:src="${item.imagePaths.split(',')[0].startsWith('/') ? item.imagePaths.split(',')[0] : '/' + item.imagePaths.split(',')[0]}" th:alt="${item.title}">
+                            </div>
+                            <div th:unless="${item.imagePaths != null and !item.imagePaths.isEmpty()}" class="dummy-img">📦</div>
+                        </div>
+                        <div class="card-info">
+                            <h3 th:text="${item.title}">상품 제목</h3>
+                            <div class="info-row" th:if="${item.winnerId != null}">
+                                <span class="info-label">낙찰자</span>
+                                <span class="info-value" th:text="${buyerNicknames[item.winnerId]}">-</span>
+                            </div>
+                            <div class="info-row" th:if="${item.winnerId == null}">
+                                <span class="info-label">낙찰자</span>
+                                <span class="info-value">없음 (유찰)</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">거래 금액</span>
+                                <span class="info-value highlight"
+                                      th:text="${item.finalPrice != null} ? ${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원' : '—'">—</span>
+                            </div>
+                            <div class="info-row" th:if="${item.transactionDate != null}">
+                                <span class="info-label">거래 일시</span>
+                                <span class="info-value" th:text="${#temporals.format(item.transactionDate, 'yyyy.MM.dd HH:mm')}">-</span>
+                            </div>
+                            <div class="info-row" th:if="${item.buyerPaidAt != null}">
+                                <span class="info-label">결제 일시</span>
+                                <span class="info-value" th:text="${#temporals.format(item.buyerPaidAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                            </div>
+                            <div class="info-row" th:if="${item.sellerConfirmedAt != null}">
+                                <span class="info-label">거래 확정</span>
+                                <span class="info-value" th:text="${#temporals.format(item.sellerConfirmedAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                            </div>
+                        </div>
+                        <div class="card-action">
+                            <span class="transaction-badge"
+                                  th:if="${item.winnerId == null}">📭 유찰</span>
+                            <span class="transaction-badge buy-now"
+                                  th:if="${item.winnerId != null and item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">💳 즉시 구매</span>
+                            <span class="transaction-badge auction-won"
+                                  th:if="${item.winnerId != null and (item.buyNowPrice == null or item.finalPrice == null or !item.finalPrice.equals(item.buyNowPrice))}">🏆 낙찰</span>
+                            <span th:if="${item.winnerId != null}" class="payment-status-badge"
+                                  th:classappend="${item.paymentStatus}"
+                                  th:text="${item.paymentStatus == 'pending' ? '결제 대기' : (item.paymentStatus == 'buyer_paid' ? '💰 입금 확인 필요' : (item.paymentStatus == 'completed' ? '✅ 거래 완료' : (item.paymentStatus == 'cancelled' ? '취소됨' : item.paymentStatus)))}">결제 대기</span>
+                            <form th:if="${item.winnerId != null and item.paymentStatus == 'buyer_paid'}"
+                                  th:action="'/account/items/' + ${item.id} + '/seller-confirm'" method="post">
+                                <button type="submit" class="btn-action btn-confirm">✅ 입금 확인 / 거래 확정</button>
+                            </form>
+                            <a th:href="'/account/items/' + ${item.id} + '/manage'" class="btn-action btn-detail">관리하기</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-state" th:if="${sales == null or sales.isEmpty()}">
+                    <div class="empty-icon">📦</div>
+                    <h3>아직 판매 완료된 내역이 없습니다</h3>
+                    <p>등록한 경매가 낙찰/유찰/즉시구매되면 여기에 표시됩니다</p>
+                    <a href="/account/items" class="btn-go-items">등록한 경매 보기</a>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

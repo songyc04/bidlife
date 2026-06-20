@@ -73,6 +73,7 @@ public class ItemsController {
             model.addAttribute("sellerNicknames", sellerNicknames);
             model.addAttribute("favoriteItemIds", favoriteItemIds);
             model.addAttribute("bidderCounts", bidderCounts);
+            model.addAttribute("categoryNames", getCategoryNames());
 
             return "items";
         } catch (Exception e) {
@@ -94,8 +95,10 @@ public class ItemsController {
             if (userId != null) {
                 model.addAttribute("isLoggedIn", true);
                 model.addAttribute("nickname", nickname);
+                model.addAttribute("userId", userId);
             } else {
                 model.addAttribute("isLoggedIn", false);
+                model.addAttribute("userId", null);
             }
 
             ItemEntity item = itemService.getItemById(id);
@@ -108,6 +111,9 @@ public class ItemsController {
             boolean isOwner = userId != null && userId.equals(item.getSellerId());
             model.addAttribute("isOwner", isOwner);
 
+            boolean isWinner = userId != null && item.getWinnerId() != null && userId.equals(item.getWinnerId());
+            model.addAttribute("isWinner", isWinner);
+
             boolean isFavorite = userId != null && favoriteService.isFavorite(userId, id);
             model.addAttribute("isFavorite", isFavorite);
 
@@ -116,6 +122,14 @@ public class ItemsController {
 
             SignupEntity seller = signupRepository.findById(item.getSellerId()).orElse(null);
             model.addAttribute("sellerNickname", seller != null ? seller.getNickname() : "알 수 없음");
+            model.addAttribute("categoryNames", getCategoryNames());
+
+            if (item.getStatus().equals("ended") && item.getWinnerId() != null) {
+                SignupEntity winner = signupRepository.findById(item.getWinnerId()).orElse(null);
+                model.addAttribute("winnerNickname", winner != null ? winner.getNickname() : "알 수 없음");
+            } else {
+                model.addAttribute("winnerNickname", null);
+            }
 
             return "items-detail";
         } catch (Exception e) {
@@ -173,5 +187,22 @@ public class ItemsController {
         }
 
         return "redirect:/items/" + id;
+    }
+
+    private Map<String, String> getCategoryNames() {
+        Map<String, String> categoryNames = new HashMap<>();
+        categoryNames.put("digital", "디지털/가전");
+        categoryNames.put("computer", "컴퓨터/주변기기");
+        categoryNames.put("fashion", "패션의류/잡화");
+        categoryNames.put("beauty", "뷰티/미용");
+        categoryNames.put("furniture", "가구/인테리어");
+        categoryNames.put("living", "주방/생활용품");
+        categoryNames.put("sports", "스포츠/레저");
+        categoryNames.put("books", "도서/티켓/굿즈");
+        categoryNames.put("collectibles", "컬렉터블/수집품");
+        categoryNames.put("hobby", "악기/취미");
+        categoryNames.put("vehicle", "차량/오토바이 용품");
+        categoryNames.put("etc", "기타/반려동물");
+        return categoryNames;
     }
 }

@@ -125,6 +125,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const startTime = document.getElementById('startTime').value;
             const endTime = document.getElementById('endTime').value;
 
+            if (uploadedFiles.length === 0) {
+                e.preventDefault();
+                showAlert('최소 1장 이상의 이미지를 업로드해야 합니다.', '🖼️');
+                return;
+            }
+
             if (!startPrice || parseInt(startPrice) < 1000) {
                 e.preventDefault();
                 showAlert('시작가는 1,000원 이상이어야 합니다.', '💰');

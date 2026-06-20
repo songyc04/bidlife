@@ -27,6 +27,8 @@
                     <span class="step">2</span>
                 </div>
 
+                <div class="error-message" th:if="${error}" th:text="${error}"></div>
+
                 <div class="input-group">
                     <label for="email">이메일</label>
                     <div class="input-with-btn">

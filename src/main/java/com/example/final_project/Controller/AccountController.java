@@ -72,6 +72,8 @@ public class AccountController {
             return "redirect:/login?redirect=/account";
         }
 
+        model.addAttribute("isLoggedIn", true);
+
         Optional<SignupEntity> user = signupRepository.findById(userId);
 
         if (user.isPresent()) {
@@ -94,6 +96,8 @@ public class AccountController {
         if (userId == null) {
             return "redirect:/login?redirect=/account/bids";
         }
+
+        model.addAttribute("isLoggedIn", true);
 
         Optional<SignupEntity> user = signupRepository.findById(userId);
 
@@ -142,6 +146,8 @@ public class AccountController {
                 return "redirect:/login?redirect=/account/items";
             }
 
+            model.addAttribute("isLoggedIn", true);
+
             Optional<SignupEntity> user = signupRepository.findById(userId);
 
             if (user.isPresent()) {
@@ -171,6 +177,8 @@ public class AccountController {
         if (userId == null) {
             return "redirect:/login?redirect=/account/picklist";
         }
+
+        model.addAttribute("isLoggedIn", true);
 
         Optional<SignupEntity> user = signupRepository.findById(userId);
 
@@ -218,6 +226,8 @@ public class AccountController {
             return "redirect:/login?redirect=/account/items/new";
         }
 
+        model.addAttribute("isLoggedIn", true);
+
         Optional<SignupEntity> user = signupRepository.findById(userId);
 
         if (user.isPresent()) {
@@ -249,6 +259,12 @@ public class AccountController {
 
         if (userId == null) {
             return "redirect:/login?redirect=/account/items/new";
+        }
+
+        // 이미지 검증: 최소 1장 이상 필수
+        if (images == null || images.length == 0) {
+            redirectAttributes.addFlashAttribute("errorMessage", "최소 1장 이상의 이미지를 업로드해야 합니다.");
+            return "redirect:/account/items/new";
         }
 
         try {
@@ -297,6 +313,8 @@ public class AccountController {
             return "redirect:/login?redirect=/account/items/" + id + "/manage";
         }
 
+        model.addAttribute("isLoggedIn", true);
+
         try {
             Optional<SignupEntity> user = signupRepository.findById(userId);
             if (user.isPresent()) {
@@ -320,6 +338,14 @@ public class AccountController {
             }
 
             model.addAttribute("item", item);
+
+            if (item.getStatus().equals("ended") && item.getWinnerId() != null) {
+                SignupEntity winner = signupRepository.findById(item.getWinnerId()).orElse(null);
+                model.addAttribute("winnerNickname", winner != null ? winner.getNickname() : "알 수 없음");
+            } else {
+                model.addAttribute("winnerNickname", null);
+            }
+
             return "account/items-manage";
         } catch (Exception e) {
             log.error("Error loading manage page", e);
@@ -348,6 +374,31 @@ public class AccountController {
         } catch (Exception e) {
             log.error("Error ending item", e);
             redirectAttributes.addFlashAttribute("errorMessage", "경매 종료 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/account/items/" + id + "/manage";
+    }
+
+    @PostMapping("/items/{id}/seller-confirm")
+    public String confirmPaymentBySeller(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/items";
+        }
+
+        try {
+            itemService.confirmPaymentBySeller(id, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "입금 확인이 완료되어 거래가 성사되었습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            log.error("Error confirming payment", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "입금 확인 처리 중 오류가 발생했습니다.");
         }
 
         return "redirect:/account/items/" + id + "/manage";
@@ -501,6 +552,8 @@ public class AccountController {
             return "redirect:/login?redirect=/account/notifications";
         }
 
+        model.addAttribute("isLoggedIn", true);
+
         Optional<SignupEntity> user = signupRepository.findById(userId);
 
         if (user.isPresent()) {
@@ -515,7 +568,82 @@ public class AccountController {
         List<NotificationEntity> notifications = notificationService.getNotificationsByUserId(userId);
         model.addAttribute("notifications", notifications);
 
+        // 알림별 linkUrl 계산
+        Map<Long, String> notificationLinks = new HashMap<>();
+        for (NotificationEntity n : notifications) {
+            if (n.getItemId() == null) {
+                notificationLinks.put(n.getId(), "/account/notifications");
+                continue;
+            }
+            String type = n.getType();
+            // 판매자 확인/관리 알림 → 관리 페이지
+            if ("auction_seller_won".equals(type) || "auction_failed".equals(type)
+                    || "new_bid".equals(type) || "payment_buyer_paid".equals(type)) {
+                notificationLinks.put(n.getId(), "/account/items/" + n.getItemId() + "/manage");
+            }
+            // 구매자 결제 알림 → 결제 페이지
+            else if ("auction_won".equals(type) || "buy_now_complete".equals(type)
+                    || "payment_pending_seller".equals(type)) {
+                notificationLinks.put(n.getId(), "/payment/" + n.getItemId());
+            }
+            // 거래 완료 → 거래 내역
+            else if ("transaction_completed".equals(type)) {
+                notificationLinks.put(n.getId(), "/account/transactions");
+            }
+            // 기본: 경매 상세
+            else {
+                notificationLinks.put(n.getId(), "/items/" + n.getItemId());
+            }
+        }
+        model.addAttribute("notificationLinks", notificationLinks);
+
         return "account/notifications";
+    }
+
+    @GetMapping("/transactions")
+    public String transactions(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/transactions";
+        }
+
+        model.addAttribute("isLoggedIn", true);
+
+        Optional<SignupEntity> user = signupRepository.findById(userId);
+        if (user.isPresent()) {
+            model.addAttribute("nickname", user.get().getNickname());
+            model.addAttribute("profileImage", user.get().getProfileImage());
+        }
+
+        long unreadCount = notificationService.getUnreadCount(userId);
+        model.addAttribute("unreadCount", unreadCount);
+
+        List<ItemEntity> purchases = itemService.getPurchasesByUser(userId);
+        List<ItemEntity> sales = itemService.getSalesByUser(userId);
+
+        Map<Long, String> sellerNicknames = new HashMap<>();
+        Map<Long, String> buyerNicknames = new HashMap<>();
+
+        for (ItemEntity item : purchases) {
+            if (!sellerNicknames.containsKey(item.getSellerId())) {
+                SignupEntity seller = signupRepository.findById(item.getSellerId()).orElse(null);
+                sellerNicknames.put(item.getSellerId(), seller != null ? seller.getNickname() : "알 수 없음");
+            }
+        }
+        for (ItemEntity item : sales) {
+            if (item.getWinnerId() != null && !buyerNicknames.containsKey(item.getWinnerId())) {
+                SignupEntity buyer = signupRepository.findById(item.getWinnerId()).orElse(null);
+                buyerNicknames.put(item.getWinnerId(), buyer != null ? buyer.getNickname() : "알 수 없음");
+            }
+        }
+
+        model.addAttribute("purchases", purchases != null ? purchases : new ArrayList<>());
+        model.addAttribute("sales", sales != null ? sales : new ArrayList<>());
+        model.addAttribute("sellerNicknames", sellerNicknames);
+        model.addAttribute("buyerNicknames", buyerNicknames);
+
+        return "account/transactions";
     }
 
     @PostMapping("/notifications/{id}/read")
@@ -564,6 +692,67 @@ public class AccountController {
             log.error("Error toggling favorite", e);
             response.put("success", false);
             response.put("message", "처리 중 오류가 발생했습니다.");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @PostMapping("/items/{id}/images")
+    public String updateImages(@PathVariable Long id,
+                               HttpSession session,
+                               @RequestParam(required = false) MultipartFile[] newImages,
+                               @RequestParam(required = false) String[] removeImages,
+                               RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/items/" + id + "/manage";
+        }
+
+        try {
+            itemService.updateImages(id, userId, newImages, removeImages);
+            redirectAttributes.addFlashAttribute("successMessage", "사진이 업데이트되었습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            log.error("Error updating images", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "사진 업데이트 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/account/items/" + id + "/manage";
+    }
+
+    @PostMapping("/items/{id}/images/delete")
+    public ResponseEntity<Map<String, Object>> deleteSingleImage(@PathVariable Long id,
+                                                                  @RequestParam String imagePath,
+                                                                  HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        Map<String, Object> response = new HashMap<>();
+
+        if (userId == null) {
+            response.put("success", false);
+            response.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(401).body(response);
+        }
+
+        try {
+            itemService.updateImages(id, userId, null, new String[]{imagePath});
+            response.put("success", true);
+            response.put("message", "사진이 삭제되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (SecurityException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(403).body(response);
+        } catch (Exception e) {
+            log.error("Error deleting image", e);
+            response.put("success", false);
+            response.put("message", "사진 삭제 중 오류가 발생했습니다.");
             return ResponseEntity.status(500).body(response);
         }
     }

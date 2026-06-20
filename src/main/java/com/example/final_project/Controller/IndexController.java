@@ -67,6 +67,7 @@ public class IndexController {
         model.addAttribute("sellerNicknames", sellerNicknames);
         model.addAttribute("bidderCounts", bidderCounts);
         model.addAttribute("favoriteItemIds", favoriteItemIds);
+        model.addAttribute("categoryNames", getCategoryNames());
 
         // 통계 데이터
         long totalMembers = signupRepository.count();
@@ -86,5 +87,22 @@ public class IndexController {
         model.addAttribute("highestBid", highestBid);
 
         return "index";
+    }
+
+    private Map<String, String> getCategoryNames() {
+        Map<String, String> categoryNames = new HashMap<>();
+        categoryNames.put("digital", "디지털/가전");
+        categoryNames.put("computer", "컴퓨터/주변기기");
+        categoryNames.put("fashion", "패션의류/잡화");
+        categoryNames.put("beauty", "뷰티/미용");
+        categoryNames.put("furniture", "가구/인테리어");
+        categoryNames.put("living", "주방/생활용품");
+        categoryNames.put("sports", "스포츠/레저");
+        categoryNames.put("books", "도서/티켓/굿즈");
+        categoryNames.put("collectibles", "컬렉터블/수집품");
+        categoryNames.put("hobby", "악기/취미");
+        categoryNames.put("vehicle", "차량/오토바이 용품");
+        categoryNames.put("etc", "기타/반려동물");
+        return categoryNames;
     }
 }

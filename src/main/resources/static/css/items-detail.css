@@ -549,8 +549,14 @@ a {
 
 .bid-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
+}
+
+.bid-actions form,
+.bid-actions .btn-bid,
+.bid-actions .btn-buy-now {
+    flex: 1;
 }
 
 .btn-bid {
@@ -606,6 +612,22 @@ a {
 .panel-submessage {
     font-size: 14px;
     color: #888888;
+}
+
+.ended-panel.seller-result {
+    border-color: #4a9eff;
+}
+
+.ended-panel.seller-result .panel-message {
+    color: #4a9eff;
+}
+
+.ended-panel.no-bid {
+    border-color: #555555;
+}
+
+.ended-panel.no-bid .panel-message {
+    color: #999999;
 }
 
 .bid-locked {

@@ -53,14 +53,7 @@
                 <div class="detail-info">
                     <div class="info-header">
                         <div class="info-tags">
-                            <span class="category-tag" th:text="${
-                                item.category == 'electronics'} ? '전자기기' : (${
-                                item.category == 'fashion'} ? '패션/의류' : (${
-                                item.category == 'sneakers'} ? '스니커즈' : (${
-                                item.category == 'watches'} ? '시계/주얼리' : (${
-                                item.category == 'art'} ? '예술품/컬렉션' : (${
-                                item.category == 'sports'} ? '스포츠/레저' : (${
-                                item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
+                            <span class="category-tag" th:text="${categoryNames[item.category]}">카테고리</span>
                         </div>
                         <h1 th:text="${item.title}">상품 제목</h1>
                         <div class="seller-info">
@@ -115,7 +108,7 @@
                             오류가 발생했습니다.
                         </div>
                         <div th:if="${isLoggedIn}">
-                            <form th:action="'/items/' + ${item.id} + '/bid'" method="post">
+                            <form th:action="'/items/' + ${item.id} + '/bid'" method="post" class="bid-confirm-form">
                                 <div class="bid-input-group">
                                     <label for="bidAmount">최소 입찰 금액</label>
                                     <div class="input-wrapper">
@@ -132,12 +125,11 @@
                                 </div>
                                 <div class="bid-actions">
                                     <button type="submit" class="btn-bid">비딩하기</button>
+                                    <button type="submit" class="btn-buy-now"
+                                            th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}"
+                                            th:attr="formaction='/items/' + ${item.id} + '/buy-now', data-buy-now-price=${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')}"
+                                            th:text="'즉시 구매 (' + ${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')} + '원)'">즉시 구매</button>
                                 </div>
-                            </form>
-                            <form th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}" 
-                                  th:action="'/items/' + ${item.id} + '/buy-now'" method="post" style="margin-top: 12px;">
-                                <button type="submit" class="btn-buy-now"
-                                        th:text="'즉시 구매 (' + ${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')} + '원)'">즉시 구매</button>
                             </form>
                         </div>
                         <div th:unless="${isLoggedIn}" class="bid-locked">
@@ -159,8 +151,29 @@
                         <p class="panel-submessage">시작되면 알림을 받아보세요</p>
                     </div>
 
-                    <div class="bid-panel ended-panel" th:if="${item.status == 'ended'}">
+                    <div class="bid-panel ended-panel" th:if="${item.status == 'ended' and isWinner}">
+                        <p class="panel-message">🎉 축하합니다! 낙찰받으셨습니다</p>
+                        <p class="panel-submessage" th:text="'최종 낙찰가: ' + ${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">최종 낙찰가: 0원</p>
+                    </div>
+
+                    <div class="bid-panel ended-panel seller-result" th:if="${item.status == 'ended' and isOwner and item.winnerId != null}">
+                        <p class="panel-message">
+                            <span th:if="${item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">💳 즉시 구매가 완료되었습니다</span>
+                            <span th:unless="${item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">🏆 경매가 낙찰되었습니다</span>
+                        </p>
+                        <p class="panel-submessage" th:text="'낙찰자: ' + ${winnerNickname}">낙찰자: -</p>
+                        <p class="panel-submessage" th:text="'거래 금액: ' + ${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">거래 금액: 0원</p>
+                    </div>
+
+                    <div class="bid-panel ended-panel no-bid" th:if="${item.status == 'ended' and isOwner and item.winnerId == null}">
+                        <p class="panel-message">📭 유찰되었습니다</p>
+                        <p class="panel-submessage">입찰자가 없어 거래가 성사되지 않았습니다</p>
+                    </div>
+
+                    <div class="bid-panel ended-panel" th:if="${item.status == 'ended' and !isOwner and !isWinner}">
                         <p class="panel-message">경매가 종료되었습니다</p>
+                        <p class="panel-submessage" th:if="${item.winnerId != null and item.finalPrice != null}" th:text="'최종 낙찰가: ' + ${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">최종 낙찰가: 0원</p>
+                        <p class="panel-submessage" th:unless="${item.winnerId != null and item.finalPrice != null}">입찰자가 없어 유찰되었습니다</p>
                     </div>
 
                     <div class="action-buttons">

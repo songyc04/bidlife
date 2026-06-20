@@ -52,6 +52,33 @@ public class ItemEntity {
     @Column(name = "image_paths", columnDefinition = "TEXT")
     private String imagePaths;
 
+    @Column(name = "winner_id")
+    private Long winnerId;
+
+    @Column(name = "final_price")
+    private Integer finalPrice;
+
+    @Column(name = "payment_status", length = 20)
+    private String paymentStatus;
+
+    @Column(name = "shipping_status", length = 20)
+    private String shippingStatus;
+
+    @Column(name = "transaction_date")
+    private LocalDateTime transactionDate;
+
+    @Column(name = "buyer_paid_at")
+    private LocalDateTime buyerPaidAt;
+
+    @Column(name = "seller_confirmed_at")
+    private LocalDateTime sellerConfirmedAt;
+
+    @Column(name = "payment_key", length = 200)
+    private String paymentKey;
+
+    @Column(name = "order_id", length = 100)
+    private String orderId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -64,6 +91,12 @@ public class ItemEntity {
         updatedAt = LocalDateTime.now();
         if (currentPrice == null) {
             currentPrice = startPrice;
+        }
+        if (paymentStatus == null) {
+            paymentStatus = "pending";
+        }
+        if (shippingStatus == null) {
+            shippingStatus = "pending";
         }
         if (startTime != null && endTime != null) {
             updateTimeBasedStatus();

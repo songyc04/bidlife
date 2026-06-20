@@ -146,14 +146,7 @@
                                     </div>
                                 </div>
                                 <div class="card-meta">
-                                    <span class="category-tag" th:text="${
-                                        item.category == 'electronics'} ? '전자기기' : (${
-                                        item.category == 'fashion'} ? '패션/의류' : (${
-                                        item.category == 'sneakers'} ? '스니커즈' : (${
-                                        item.category == 'watches'} ? '시계/주얼리' : (${
-                                        item.category == 'art'} ? '예술품/컬렉션' : (${
-                                        item.category == 'sports'} ? '스포츠/레저' : (${
-                                        item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
+                                    <span class="category-tag" th:text="${categoryNames[item.category]}">카테고리</span>
                                 </div>
                                 <a th:href="${isLoggedIn} ? '/items/' + ${item.id} : '/login?redirect=/items/' + ${item.id}"
                                    class="btn-bid-now"
@@ -189,14 +182,7 @@
                                 </div>
                                 </div>
                                 <div class="card-meta">
-                                    <span class="category-tag" th:text="${
-                                        item.category == 'electronics'} ? '전자기기' : (${
-                                        item.category == 'fashion'} ? '패션/의류' : (${
-                                        item.category == 'sneakers'} ? '스니커즈' : (${
-                                        item.category == 'watches'} ? '시계/주얼리' : (${
-                                        item.category == 'art'} ? '예술품/컬렉션' : (${
-                                        item.category == 'sports'} ? '스포츠/레저' : (${
-                                        item.category == 'games'} ? '게임/취미' : '기타'))))))">카테고리</span>
+                                    <span class="category-tag" th:text="${categoryNames[item.category]}">카테고리</span>
                                     <span class="meta-tag ended-tag">종료</span>
                                 </div>
                                 <a th:href="${isLoggedIn} ? '/items/' + ${item.id} : '/login?redirect=/items/' + ${item.id}"

@@ -409,6 +409,23 @@ a {
     color: #ff5a00;
 }
 
+.btn-pick .star-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.btn-pick .star-icon .star-path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.btn-pick.active .star-icon .star-path {
+    fill: currentColor;
+}
+
 .card-body {
     padding: 24px;
 }

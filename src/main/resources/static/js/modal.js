@@ -8,7 +8,8 @@ function showModal(options) {
         onConfirm = null,
         onCancel = null,
         confirmText = '확인',
-        cancelText = '취소'
+        cancelText = '취소',
+        showCancelButton = type === 'confirm'
     } = options;
 
     // 기존 모달 제거
@@ -25,7 +26,7 @@ function showModal(options) {
                 ${title ? `<div class="modal-title">${title}</div>` : ''}
                 ${message ? `<div class="modal-message">${message}</div>` : ''}
                 <div class="modal-buttons">
-                    ${type === 'confirm' ? `<button class="modal-btn modal-btn-cancel" id="modalCancelBtn">${cancelText}</button>` : ''}
+                    ${showCancelButton ? `<button class="modal-btn modal-btn-cancel" id="modalCancelBtn">${cancelText}</button>` : ''}
                     <button class="modal-btn modal-btn-primary" id="modalConfirmBtn">${confirmText}</button>
                 </div>
             </div>
@@ -64,7 +65,7 @@ function showModal(options) {
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             closeModal();
-            if (type === 'confirm' && onCancel) onCancel();
+            if (showCancelButton && onCancel) onCancel();
         }
     });
 }
@@ -120,5 +121,20 @@ function showError(message, icon = '❌') {
         icon: icon,
         title: '오류',
         message: message
+    });
+}
+
+// 회원가입 완료 모달
+function showSignupComplete() {
+    showModal({
+        type: 'welcome',
+        icon: '🎉',
+        title: '회원가입 완료!',
+        message: 'BIDLIFE 회원이 되신 것을 환영합니다.<br>이제 다양한 경매에 참여하실 수 있습니다.',
+        showCancelButton: true,
+        confirmText: '홈으로',
+        cancelText: '로그인하기',
+        onConfirm: () => { window.location.href = '/'; },
+        onCancel: () => { window.location.href = '/login'; }
     });
 }

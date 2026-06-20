@@ -83,6 +83,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 비딩하기/즉시 구매 확인 팝업
+    const bidForm = document.querySelector('.bid-confirm-form');
+    if (bidForm) {
+        const bidInput = document.getElementById('bidAmount');
+
+        bidForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const submitter = e.submitter;
+            let message = '';
+
+            if (submitter && submitter.classList.contains('btn-buy-now')) {
+                const formattedPrice = submitter.dataset.buyNowPrice || '0';
+                message = `⚡ 즉시 구매를 진행하시겠습니까?<br><br>` +
+                          `<span style="color:#ff5a00;font-weight:700;font-size:18px;">${formattedPrice}원</span>에 구매하며,<br>` +
+                          `구매 후에는 취소할 수 없습니다.`;
+            } else {
+                const bidAmount = bidInput ? (parseInt(bidInput.value) || 0) : 0;
+                const formattedAmount = bidAmount.toLocaleString('ko-KR');
+                message = `💰 입찰을 진행하시겠습니까?<br><br>` +
+                          `입찰 금액: <span style="color:#ff5a00;font-weight:700;font-size:18px;">${formattedAmount}원</span><br>` +
+                          `입찰 후에는 취소할 수 없습니다.`;
+            }
+
+            const formToSubmit = this;
+            showConfirm(message, function() {
+                formToSubmit.submit();
+            });
+        });
+    }
+
     function updateCountdowns() {
         const countdowns = document.querySelectorAll('.countdown');
         countdowns.forEach(el => {
