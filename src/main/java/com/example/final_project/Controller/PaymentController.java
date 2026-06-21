@@ -6,6 +6,7 @@ import com.example.final_project.Repository.ItemRepository;
 import com.example.final_project.Repository.SignupRepository;
 import com.example.final_project.Service.NotificationService;
 import com.example.final_project.Service.TossPaymentService;
+import com.example.final_project.Service.TradeService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class PaymentController {
     private final SignupRepository signupRepository;
     private final TossPaymentService tossPaymentService;
     private final NotificationService notificationService;
+    private final TradeService tradeService;
 
     @GetMapping("/payment/{itemId}")
     public String paymentPage(@PathVariable Long itemId, HttpSession session, Model model,
@@ -97,6 +99,7 @@ public class PaymentController {
             return "redirect:/payment/" + itemId;
         }
 
+        tradeService.markPaid(itemId);
         notifySellerForConfirmation(item);
 
         redirectAttributes.addFlashAttribute("successMessage", "테스트 결제가 완료되었습니다. 판매자의 확인을 기다립니다.");
@@ -161,6 +164,7 @@ public class PaymentController {
             item.setPaymentKey(paymentKey);
             itemRepository.save(item);
 
+            tradeService.markPaid(item.getId());
             notifySellerForConfirmation(item);
 
             redirectAttributes.addFlashAttribute("successMessage", "결제가 완료되었습니다. 판매자의 확인을 기다립니다.");

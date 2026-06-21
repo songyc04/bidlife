@@ -65,33 +65,32 @@
 @media (max-width: 768px) {
     /* --- Navbar (1줄 압축) --- */
     .nav-container {
-        height: 50px;
-        padding: 0 10px;
+        height: 56px;
+        padding: 0 12px;
         flex-wrap: nowrap;
-        gap: 6px;
+        gap: 8px;
     }
 
     .logo {
-        font-size: 16px;
+        font-size: 18px;
         flex-shrink: 0;
+        margin-left: 4px;
     }
 
     .nav-menu {
-        gap: 6px;
-        flex: 1;
-        justify-content: center;
-        flex-wrap: nowrap;
+        display: none;
     }
 
-    .nav-link {
-        font-size: 11px;
-        padding: 4px 6px;
-        white-space: nowrap;
+    .nav-toggle {
+        display: flex;
+        flex-shrink: 0;
+        order: 0;
     }
 
     .nav-auth {
         gap: 4px;
         flex-shrink: 0;
+        margin-left: auto;
     }
 
     .nav-user {
@@ -99,8 +98,8 @@
     }
 
     .btn-nav-icon {
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
     }
 
     .btn-nav-icon svg {
@@ -116,36 +115,35 @@
     }
 
     .profile-circle {
-        width: 32px;
-        height: 32px;
-        font-size: 13px;
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
     }
 
     .btn-logout {
-        padding: 6px 14px;
+        padding: 6px 12px;
         font-size: 12px;
     }
 
     .btn-login,
     .btn-signup {
-        font-size: 13px;
-        padding: 6px 14px;
+        font-size: 12px;
+        padding: 6px 12px;
     }
 
     /* --- Account layout --- */
     .account-section {
-        padding: 130px 12px 60px;
+        padding: 80px 12px 60px;
     }
 
     .account-container {
         flex-direction: column;
-        gap: 20px;
+        gap: 16px;
     }
 
+    /* 사이드바는 모바일에서 전역 드로어로 대체되어 숨김 */
     .account-sidebar {
-        width: 100%;
-        position: static;
-        padding: 20px 16px;
+        display: none;
     }
 
     .sidebar-header {
@@ -188,6 +186,9 @@
     }
 
     /* --- Content header --- */
+    .content-header {
+        margin-bottom: 24px;
+    }
     .content-header h2 {
         font-size: 22px;
     }
@@ -231,6 +232,7 @@
 
     .info-value {
         font-size: 15px;
+        word-break: break-all;
     }
 
     /* --- Forms --- */
@@ -249,7 +251,11 @@
     .btn-edit {
         padding: 12px 24px;
         font-size: 14px;
+        width: 100%;
     }
+
+    .action-buttons { flex-direction: column; }
+    .action-buttons > * { width: 100%; }
 
     /* --- Profile upload --- */
     .profile-upload-area {
@@ -280,7 +286,10 @@
 
     /* --- Image / form overflow prevention --- */
     img { max-width: 100%; height: auto; }
-    .form-section, .info-card, .payment-card, .notice-content, .seller-header, .login-container, .signup-container, .join-container {
+    .form-section, .info-card, .payment-card, .notice-content, .seller-header,
+    .login-container, .signup-container, .join-container,
+    .trade-section, .trade-card, .trade-summary, .inquiry-section,
+    .faq-section, .notice-section {
         max-width: 100%;
         box-sizing: border-box;
     }
@@ -290,7 +299,7 @@
 
     /* --- Hero section (가장 뜨거운 경매, 멈추지 않는 LIFE) --- */
     .hero-section {
-        padding: 100px 12px 40px;
+        padding: 80px 16px 40px;
         gap: 24px;
     }
     .hero-content { max-width: 100%; }
@@ -344,15 +353,14 @@
         -webkit-overflow-scrolling: touch;
         padding-bottom: 4px;
         gap: 6px !important;
+        margin-right: -12px;
+        padding-right: 12px;
     }
     .category-tab {
         flex-shrink: 0 !important;
-        padding: 6px 14px !important;
-        font-size: 12px !important;
+        padding: 8px 16px !important;
+        font-size: 13px !important;
         white-space: nowrap;
-    }
-    .faq-section {
-        padding: 70px 12px 40px !important;
     }
 
     .item-card {
@@ -447,15 +455,21 @@
     }
 
     .card-action {
-        flex-direction: row;
+        flex-direction: column;
         flex-wrap: wrap;
         gap: 8px;
+        align-items: stretch;
     }
 
     .btn-action {
-        width: auto;
-        flex: 1;
-        min-width: 120px;
+        width: 100%;
+        flex: none;
+        min-width: 0;
+    }
+
+    .trade-summary {
+        grid-template-columns: 1fr;
+        gap: 8px;
     }
 
     /* --- Notifications --- */
@@ -468,7 +482,11 @@
     .notification-actions-top {
         width: 100%;
         flex-wrap: wrap;
+        gap: 6px;
     }
+
+    .notification-actions-top form { width: 100%; }
+    .notification-actions-top button { width: 100%; }
 
     .notification-item {
         flex-direction: column;
@@ -523,17 +541,18 @@
 
     /* --- Notice --- */
     .notice-section {
-        padding: 130px 12px 60px;
+        padding: 80px 12px 60px;
     }
 
     .page-title {
-        font-size: 26px;
+        font-size: 24px;
     }
 
     .notice-item {
         flex-direction: column;
         gap: 8px;
         padding: 16px;
+        align-items: flex-start;
     }
 
     .notice-meta {
@@ -553,8 +572,10 @@
     }
 
     /* --- FAQ --- */
-    .faq-section {
-        padding: 130px 12px 60px;
+    .faq-section,
+    .inquiry-section,
+    .trade-section {
+        padding: 80px 12px 60px;
     }
 
     .category-tabs {
@@ -583,7 +604,7 @@
     .login-section,
     .signup-section,
     .join-section {
-        padding: 130px 16px 60px;
+        padding: 100px 16px 60px;
     }
 
     .login-container,
@@ -629,6 +650,24 @@
         width: 100%;
     }
 
+    /* --- Trade (escrow/inspection) --- */
+    .trade-summary { grid-template-columns: 1fr; }
+    .trade-card { padding: 20px 16px; }
+    .trade-card .info-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .trade-card .info-row .value { text-align: left; }
+    .admin-stats { grid-template-columns: repeat(2, 1fr); }
+    .admin-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .admin-item-action { width: 100%; flex-wrap: wrap; }
+    .admin-banner { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .admin-banner .btn-admin-link { width: 100%; text-align: center; }
+    .form-actions { flex-direction: column-reverse; }
+    .form-actions .btn-submit, .form-actions .btn-cancel { width: 100%; }
+    .decision-options { flex-direction: column; gap: 8px; }
+    .radio-option { width: 100%; }
+    .timeline-item { padding-left: 28px; }
+    .timeline::before { left: 7px; }
+    .tl-dot { left: 0; }
+
     /* --- Footer --- */
     .footer {
         padding: 30px 16px;
@@ -644,7 +683,7 @@
 
     /* --- Seller profile --- */
     .seller-profile-section {
-        padding: 90px 12px 60px;
+        padding: 80px 12px 60px;
     }
 
     .seller-header {

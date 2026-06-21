@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE 관리자 | 검수 현황</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/trade.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="trade-section">
+    <div class="admin-banner">
+        <div class="admin-icon">🛠️</div>
+        <div>
+            <h1 class="page-title" style="margin: 0;">검수 관리</h1>
+            <p class="page-desc" style="margin: 4px 0 0;">본 페이지는 관리자 전용입니다. 검수 대기/진행 중인 물품을 확인하고 검수를 처리하세요.</p>
+        </div>
+        <a href="/trade/admin/disputes" class="btn-admin-link">⚠️ 분쟁 관리</a>
+    </div>
+
+    <div class="admin-stats">
+        <div class="admin-stat">
+            <div class="admin-stat-num" th:text="${inspections != null ? inspections.size() : 0}">0</div>
+            <div class="admin-stat-label">전체 검수</div>
+        </div>
+        <div class="admin-stat">
+            <div class="admin-stat-num" th:text="${inspections != null ? inspections.stream().filter(i -> i.status == 'IN_PROGRESS').count() : 0}">0</div>
+            <div class="admin-stat-label">진행 중</div>
+        </div>
+        <div class="admin-stat">
+            <div class="admin-stat-num" th:text="${inspections != null ? inspections.stream().filter(i -> i.result == 'PASS').count() : 0}">0</div>
+            <div class="admin-stat-label">합격</div>
+        </div>
+        <div class="admin-stat fail">
+            <div class="admin-stat-num" th:text="${inspections != null ? inspections.stream().filter(i -> i.result == 'FAIL').count() : 0}">0</div>
+            <div class="admin-stat-label">불합격</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">📋 검수 대기 물품 (판매자가 검수소로 발송한 물품)</h2>
+    <div class="admin-list" th:if="${itemMap != null}">
+        <div class="admin-item" th:each="entry : ${itemMap}" th:if="${entry.value.tradeStatus == 'SELLER_SHIPPED' or entry.value.tradeStatus == 'INSPECTION'}">
+            <div class="admin-item-info">
+                <h3 th:text="${entry.value.title}">상품명</h3>
+                <div class="admin-item-meta">
+                    <span>거래 ID: <strong th:text="${entry.value.id}">-</strong></span>
+                    <span>금액: <strong th:text="${#numbers.formatInteger(entry.value.finalPrice, 3, 'COMMA')} + '원'">-</strong></span>
+                    <span>판매자: <strong th:text="${userMap.containsKey(entry.value.sellerId) ? userMap.get(entry.value.sellerId).nickname : '-'}">-</strong></span>
+                </div>
+                <div class="admin-item-meta" th:if="${entry.value.toInspectionTracking != null}">
+                    <span>송장: <strong th:text="${entry.value.toInspectionCarrier + ' / ' + entry.value.toInspectionTracking}">-</strong></span>
+                    <span th:if="${entry.value.toInspectionShippedAt != null}">발송: <strong th:text="${#temporals.format(entry.value.toInspectionShippedAt, 'MM.dd HH:mm')}">-</strong></span>
+                </div>
+            </div>
+            <div class="admin-item-action">
+                <span class="trade-status-badge" th:classappend="${'ts-' + (entry.value.tradeStatus != null ? entry.value.tradeStatus.toLowerCase() : 'default')}" th:text="${entry.value.tradeStatus}">-</span>
+                <a th:href="'/trade/admin/inspection/' + ${entry.value.id}" class="btn-action btn-primary">검수 처리 →</a>
+            </div>
+        </div>
+        <div class="empty-state" th:if="${itemMap == null or itemMap.values().stream().noneMatch(i -> i.tradeStatus == 'SELLER_SHIPPED' or i.tradeStatus == 'INSPECTION')}">
+            <div class="empty-state-icon">📦</div>
+            <h3>검수 대기 물품이 없습니다</h3>
+            <p>판매자가 검수소로 발송하면 여기에 표시됩니다.</p>
+        </div>
+    </div>
+
+    <h2 class="section-title">🗂️ 검수 이력</h2>
+    <div class="admin-list">
+        <div class="admin-item" th:each="insp : ${inspections}" th:if="${insp.status == 'COMPLETED'}">
+            <div class="admin-item-info">
+                <h3 th:text="${itemMap.containsKey(insp.itemId) ? itemMap.get(insp.itemId).title : '거래 #' + insp.itemId}">상품명</h3>
+                <div class="admin-item-meta">
+                    <span>담당: <strong th:text="${insp.inspector != null ? insp.inspector : '-'}">-</strong></span>
+                    <span th:if="${insp.completedAt != null}">완료: <strong th:text="${#temporals.format(insp.completedAt, 'yyyy.MM.dd HH:mm')}">-</strong></span>
+                </div>
+            </div>
+            <div class="admin-item-action">
+                <span class="badge" th:classappend="${insp.result == 'PASS'} ? 'badge-pass' : 'badge-fail'"
+                      th:text="${insp.result == 'PASS'} ? '✅ 합격' : '❌ 불합격'">-</span>
+                <a th:href="'/trade/admin/inspection/' + ${insp.itemId}" class="btn-action btn-detail">상세</a>
+            </div>
+        </div>
+        <div class="empty-state" th:if="${inspections == null or inspections.stream().noneMatch(i -> i.status == 'COMPLETED')}">
+            <p>아직 완료된 검수가 없습니다.</p>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

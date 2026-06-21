@@ -2,6 +2,11 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <header th:fragment="navbar" class="navbar">
     <div class="nav-container">
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="사이드 메뉴 열기" title="사이드 메뉴">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
         <a href="/" class="logo">BID<span>LIFE</span></a>
         <nav class="nav-menu">
             <a href="/notices" class="nav-link">공지사항</a>
@@ -29,5 +34,133 @@
             <a href="/login/logout" class="btn-logout">로그아웃</a>
         </div>
     </div>
+
+    <div class="nav-backdrop" id="navBackdrop"></div>
+
+    <aside class="nav-drawer" id="navDrawer" aria-hidden="true">
+        <div class="drawer-header">
+            <a href="/" class="drawer-logo">BID<span>LIFE</span></a>
+            <button type="button" class="drawer-close" id="navClose" aria-label="메뉴 닫기" title="닫기">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="drawer-profile" th:if="${isLoggedIn != null and isLoggedIn}">
+            <a href="/account" class="drawer-profile-link">
+                <span class="drawer-profile-circle"
+                      th:style="'background: ' + (${profileGradientCss} != null ? ${profileGradientCss} : 'linear-gradient(135deg, #ff5a00, #ff7c33)') + ';'"
+                      th:attr="data-seed=${nickname != null ? nickname : 'U'}"
+                      th:text="${nickname != null ? nickname.substring(0,1) : '?'}">U</span>
+                <div class="drawer-profile-info">
+                    <strong th:text="${nickname != null ? nickname : '사용자'}">닉네임</strong>
+                    <span>마이페이지로 이동 →</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="drawer-profile guest" th:if="${isLoggedIn == null or !isLoggedIn}">
+            <div class="drawer-guest-icon">👋</div>
+            <div class="drawer-profile-info">
+                <strong>로그인이 필요합니다</strong>
+                <span>서비스를 이용하려면 로그인해주세요.</span>
+            </div>
+        </div>
+
+        <div class="drawer-section" th:if="${isLoggedIn != null and isLoggedIn}">
+            <div class="drawer-section-title">마이페이지</div>
+            <nav class="drawer-menu">
+                <a href="/account" class="drawer-item">
+                    <span class="drawer-icon">👤</span>
+                    <span>내 정보</span>
+                </a>
+                <a href="/account/notifications" class="drawer-item">
+                    <span class="drawer-icon">🔔</span>
+                    <span>알림</span>
+                    <span class="drawer-badge" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}">0</span>
+                </a>
+                <a href="/account/transactions" class="drawer-item">
+                    <span class="drawer-icon">💼</span>
+                    <span>거래 내역</span>
+                </a>
+                <a href="/account/bids" class="drawer-item">
+                    <span class="drawer-icon">💰</span>
+                    <span>내 입찰 내역</span>
+                </a>
+                <a href="/account/items" class="drawer-item">
+                    <span class="drawer-icon">📦</span>
+                    <span>등록한 경매</span>
+                </a>
+                <a href="/account/picklist" class="drawer-item">
+                    <span class="drawer-icon">⭐</span>
+                    <span>찜한 경매</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="drawer-section">
+            <div class="drawer-section-title">고객지원</div>
+            <nav class="drawer-menu">
+                <a href="/notices" class="drawer-item">
+                    <span class="drawer-icon">📢</span>
+                    <span>공지사항</span>
+                </a>
+                <a href="/FAQ" class="drawer-item">
+                    <span class="drawer-icon">❓</span>
+                    <span>FAQ</span>
+                </a>
+                <a href="/inquiry" class="drawer-item">
+                    <span class="drawer-icon">💬</span>
+                    <span>문의하기</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="drawer-footer">
+            <a th:if="${isLoggedIn == null or !isLoggedIn}" href="/login" class="drawer-action drawer-action-login">로그인</a>
+            <a th:if="${isLoggedIn == null or !isLoggedIn}" href="/signup" class="drawer-action drawer-action-signup">회원가입</a>
+            <a th:if="${isLoggedIn != null and isLoggedIn}" href="/login/logout" class="drawer-action drawer-action-logout">로그아웃</a>
+        </div>
+    </aside>
 </header>
+
+<script>
+    (function() {
+        const toggle = document.getElementById('navToggle');
+        const drawer = document.getElementById('navDrawer');
+        const backdrop = document.getElementById('navBackdrop');
+        const closeBtn = document.getElementById('navClose');
+
+        if (!toggle || !drawer || !backdrop) return;
+
+        const openDrawer = () => {
+            drawer.classList.add('open');
+            backdrop.classList.add('open');
+            document.body.classList.add('drawer-open');
+        };
+        const closeDrawer = () => {
+            drawer.classList.remove('open');
+            backdrop.classList.remove('open');
+            document.body.classList.remove('drawer-open');
+        };
+
+        toggle.addEventListener('click', openDrawer);
+        closeBtn && closeBtn.addEventListener('click', closeDrawer);
+        backdrop.addEventListener('click', closeDrawer);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && drawer.classList.contains('open')) {
+                closeDrawer();
+            }
+        });
+
+        drawer.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', () => {
+                closeDrawer();
+            });
+        });
+    })();
+</script>
 </html>

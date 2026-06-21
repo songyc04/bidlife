@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE 관리자 | 검수 처리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/trade.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="trade-section">
+    <div class="admin-banner">
+        <div class="admin-icon">🔍</div>
+        <div>
+            <h1 class="page-title" style="margin: 0;">검수 처리</h1>
+            <p class="page-desc" style="margin: 4px 0 0;">물품의 정품 여부와 상태를 확인한 후 합격/불합격 처리하세요.</p>
+        </div>
+        <a href="/trade/admin/inspection" class="btn-admin-link">← 목록으로</a>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <div class="trade-layout">
+        <section class="trade-card">
+            <h2 class="card-title">📦 물품 정보</h2>
+            <div class="info-row">
+                <span class="label">상품명</span>
+                <span class="value" th:text="${item.title}">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">거래 금액</span>
+                <span class="value highlight" th:text="${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">현재 상태</span>
+                <span class="value">
+                    <span class="trade-status-badge" th:classappend="${'ts-' + (item.tradeStatus != null ? item.tradeStatus.toLowerCase() : 'default')}" th:text="${item.tradeStatus}">-</span>
+                </span>
+            </div>
+            <div class="info-row" th:if="${seller != null}">
+                <span class="label">판매자</span>
+                <span class="value" th:text="${seller.nickname + ' (' + seller.email + ')'}">-</span>
+            </div>
+            <div class="info-row" th:if="${buyer != null}">
+                <span class="label">구매자</span>
+                <span class="value" th:text="${buyer.nickname + ' (' + buyer.email + ')'}">-</span>
+            </div>
+            <div class="info-row" th:if="${item.toInspectionCarrier != null}">
+                <span class="label">검수소 도착 송장</span>
+                <span class="value" th:text="${item.toInspectionCarrier + ' / ' + item.toInspectionTracking}">-</span>
+            </div>
+        </section>
+
+        <section class="trade-card" th:if="${item.tradeStatus == 'SELLER_SHIPPED'}">
+            <h2 class="card-title">1️⃣ 검수 시작</h2>
+            <p class="card-desc">물품이 검수센터에 도착했습니다. 검수를 시작하시겠습니까?</p>
+            <form th:action="'/trade/admin/inspection/' + ${item.id} + '/start'" method="post">
+                <button type="submit" class="btn-submit">검수 시작</button>
+            </form>
+        </section>
+
+        <section class="trade-card" th:if="${item.tradeStatus == 'INSPECTION'}">
+            <h2 class="card-title">2️⃣ 검수 결과 입력</h2>
+
+            <form th:action="'/trade/admin/inspection/' + ${item.id} + '/pass'" method="post" class="trade-form" id="passForm">
+                <h3 class="form-section-title">✅ 합격 처리</h3>
+                <div class="form-row">
+                    <label for="grade">등급</label>
+                    <select id="grade" name="grade">
+                        <option value="">선택 안 함</option>
+                        <option value="S">S (최상)</option>
+                        <option value="A">A (상)</option>
+                        <option value="B">B (중)</option>
+                        <option value="C">C (하)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="inspector_pass">담당 검수사</label>
+                    <input type="text" id="inspector_pass" name="inspector" maxlength="50" required placeholder="예: BIDLIFE 검수팀 김○○">
+                </div>
+                <div class="form-row">
+                    <label for="memo_pass">검수 메모</label>
+                    <textarea id="memo_pass" name="memo" rows="3" maxlength="500" placeholder="검수 시 확인한 사항을 메모하세요."></textarea>
+                </div>
+                <div class="form-divider"><span>↓ 합격 시 구매자에게 발송 ↓</span></div>
+                <div class="form-row">
+                    <label for="toBuyerCarrier_pass">구매자 발송 택배사</label>
+                    <select id="toBuyerCarrier_pass" name="toBuyerCarrier" required>
+                        <option value="">택배사 선택</option>
+                        <option value="CJ대한통운">CJ대한통운</option>
+                        <option value="로젠택배">로젠택배</option>
+                        <option value="한진택배">한진택배</option>
+                        <option value="롯데택배">롯데택배</option>
+                        <option value="우체국택배">우체국택배</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="toBuyerTracking_pass">구매자 발송 송장</label>
+                    <input type="text" id="toBuyerTracking_pass" name="toBuyerTracking" maxlength="100" required placeholder="예: 9876-5432-1098">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit btn-pass">합격 처리 및 구매자 발송</button>
+                </div>
+            </form>
+
+            <div class="form-divider"><span>또는</span></div>
+
+            <form th:action="'/trade/admin/inspection/' + ${item.id} + '/fail'" method="post" class="trade-form" id="failForm">
+                <h3 class="form-section-title fail">❌ 불합격 처리</h3>
+                <div class="form-row">
+                    <label for="inspector_fail">담당 검수사</label>
+                    <input type="text" id="inspector_fail" name="inspector" maxlength="50" required placeholder="예: BIDLIFE 검수팀 김○○">
+                </div>
+                <div class="form-row">
+                    <label for="failureReason">실패 사유 (필수)</label>
+                    <textarea id="failureReason" name="failureReason" rows="3" maxlength="500" required placeholder="위조품 / 상태 미달 / 구성품 누락 등 구체적으로 작성"></textarea>
+                </div>
+                <div class="form-row">
+                    <label for="memo_fail">검수 메모 (선택)</label>
+                    <textarea id="memo_fail" name="memo" rows="2" maxlength="500" placeholder="추가 메모"></textarea>
+                </div>
+                <div class="callout fail">
+                    <strong>⚠️ 불합격 처리 시</strong>
+                    <ul>
+                        <li>결제는 자동으로 취소(구매자 환불)됩니다.</li>
+                        <li>물품은 판매자에게 반송됩니다.</li>
+                        <li>구매자와 판매자에게 알림이 전송됩니다.</li>
+                    </ul>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit btn-fail">불합격 처리</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="trade-card" th:if="${inspection != null}">
+            <h2 class="card-title">📋 검수 기록</h2>
+            <div class="info-row">
+                <span class="label">검수 시작</span>
+                <span class="value" th:text="${#temporals.format(inspection.startedAt, 'yyyy.MM.dd HH:mm')}">-</span>
+            </div>
+            <div class="info-row" th:if="${inspection.completedAt != null}">
+                <span class="label">검수 완료</span>
+                <span class="value" th:text="${#temporals.format(inspection.completedAt, 'yyyy.MM.dd HH:mm')}">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">상태</span>
+                <span class="value">
+                    <span class="badge" th:classappend="${inspection.status == 'COMPLETED'} ? (inspection.result == 'PASS' ? 'badge-pass' : 'badge-fail') : 'badge-progress'"
+                          th:text="${inspection.status == 'COMPLETED'} ? (inspection.result == 'PASS' ? '✅ 합격' : '❌ 불합격') : '진행 중'">-</span>
+                </span>
+            </div>
+            <div class="info-row" th:if="${inspection.grade != null}">
+                <span class="label">등급</span>
+                <span class="value" th:text="${inspection.grade}">-</span>
+            </div>
+            <div class="info-row" th:if="${inspection.inspector != null}">
+                <span class="label">담당 검수사</span>
+                <span class="value" th:text="${inspection.inspector}">-</span>
+            </div>
+            <div class="info-row" th:if="${inspection.memo != null}">
+                <span class="label">메모</span>
+                <span class="value" th:text="${inspection.memo}">-</span>
+            </div>
+            <div class="info-row" th:if="${inspection.failureReason != null}">
+                <span class="label">실패 사유</span>
+                <span class="value" th:text="${inspection.failureReason}">-</span>
+            </div>
+        </section>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(el => {
+            el.style.transition = 'opacity 0.4s';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 400);
+        });
+    }, 4000);
+</script>
+
+</body>
+</html>

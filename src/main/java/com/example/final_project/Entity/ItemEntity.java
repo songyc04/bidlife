@@ -64,6 +64,30 @@ public class ItemEntity {
     @Column(name = "shipping_status", length = 20)
     private String shippingStatus;
 
+    @Column(name = "trade_status", length = 30)
+    private String tradeStatus;
+
+    @Column(name = "to_inspection_tracking", length = 100)
+    private String toInspectionTracking;
+
+    @Column(name = "to_inspection_carrier", length = 50)
+    private String toInspectionCarrier;
+
+    @Column(name = "to_inspection_shipped_at")
+    private LocalDateTime toInspectionShippedAt;
+
+    @Column(name = "to_buyer_tracking", length = 100)
+    private String toBuyerTracking;
+
+    @Column(name = "to_buyer_carrier", length = 50)
+    private String toBuyerCarrier;
+
+    @Column(name = "to_buyer_shipped_at")
+    private LocalDateTime toBuyerShippedAt;
+
+    @Column(name = "buyer_received_at")
+    private LocalDateTime buyerReceivedAt;
+
     @Column(name = "transaction_date")
     private LocalDateTime transactionDate;
 
@@ -97,6 +121,9 @@ public class ItemEntity {
         }
         if (shippingStatus == null) {
             shippingStatus = "pending";
+        }
+        if (tradeStatus == null) {
+            tradeStatus = "SOLD";
         }
         if (startTime != null && endTime != null) {
             updateTimeBasedStatus();

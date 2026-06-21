@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE 관리자 | 분쟁 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/trade.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="trade-section">
+    <div class="admin-banner">
+        <div class="admin-icon">⚖️</div>
+        <div>
+            <h1 class="page-title" style="margin: 0;">분쟁 관리</h1>
+            <p class="page-desc" style="margin: 4px 0 0;">구매자/판매자가 신청한 분쟁을 검토하고 처리하세요.</p>
+        </div>
+        <a href="/trade/admin/inspection" class="btn-admin-link">🔍 검수 관리</a>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <div class="dispute-list" th:if="${disputes != null and !disputes.isEmpty()}">
+        <div class="dispute-item admin" th:each="d : ${disputes}"
+             th:classappend="${d.status == 'RESOLVED'} ? 'resolved' : 'open'">
+            <div class="dispute-head">
+                <div>
+                    <span class="dispute-type" th:text="${d.type}">유형</span>
+                    <span class="dispute-role"
+                          th:classappend="${d.reporterRole == 'BUYER'} ? 'role-buyer' : 'role-seller'"
+                          th:text="${d.reporterRole == 'BUYER'} ? '구매자' : '판매자'">-</span>
+                    <span class="dispute-reporter" th:text="${d.reporterNickname != null ? d.reporterNickname : '사용자'}">-</span>
+                </div>
+                <div>
+                    <span class="dispute-status"
+                          th:classappend="${d.status == 'RESOLVED'} ? 'status-resolved' : 'status-open'"
+                          th:text="${d.status == 'RESOLVED'} ? '처리 완료' : '검토 중'">-</span>
+                    <span class="dispute-time" th:text="${#temporals.format(d.createdAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                </div>
+            </div>
+
+            <div class="dispute-body">
+                <p class="dispute-content" th:text="${d.content}">내용</p>
+                <div class="info-row" th:if="${itemMap.containsKey(d.itemId)}">
+                    <span class="label">관련 거래</span>
+                    <span class="value">
+                        <a th:href="'/items/' + ${d.itemId}" th:text="${itemMap.get(d.itemId).title}">상품</a>
+                        ·
+                        <span th:text="${#numbers.formatInteger(itemMap.get(d.itemId).finalPrice, 3, 'COMMA')} + '원'">-</span>
+                        ·
+                        현재 상태: <span th:text="${itemMap.get(d.itemId).tradeStatus}">-</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="dispute-response" th:if="${d.adminResponse != null}">
+                <strong>📋 처리 결과</strong>
+                <p th:text="${d.adminResponse}">-</p>
+                <small th:if="${d.resolvedAt != null}" th:text="${#temporals.format(d.resolvedAt, 'yyyy.MM.dd HH:mm')}">-</small>
+            </div>
+
+            <form th:if="${d.status != 'RESOLVED'}"
+                  th:action="'/trade/admin/disputes/' + ${d.id} + '/resolve'" method="post" class="dispute-resolve-form">
+                <div class="form-row">
+                    <label th:for="'adminResponse_' + ${d.id}">관리자 답변</label>
+                    <textarea th:id="'adminResponse_' + ${d.id}" name="adminResponse" rows="3" maxlength="1000" required placeholder="처리 결과를 구체적으로 작성해주세요."></textarea>
+                </div>
+                <div class="form-row">
+                    <label>처리 결정</label>
+                    <div class="decision-options">
+                        <label class="radio-option">
+                            <input type="radio" th:name="'decision'" th:value="'RELEASE_SELLER'" required>
+                            <span>판매자 정산 (거래 정상 완료)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" th:name="'decision'" th:value="'REFUND_BUYER'">
+                            <span>구매자 환불 (거래 취소)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">처리 완료</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="empty-state" th:if="${disputes == null or disputes.isEmpty()}">
+        <div class="empty-state-icon">📭</div>
+        <h3>접수된 분쟁이 없습니다</h3>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(el => {
+            el.style.transition = 'opacity 0.4s';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 400);
+        });
+    }, 4000);
+</script>
+
+</body>
+</html>

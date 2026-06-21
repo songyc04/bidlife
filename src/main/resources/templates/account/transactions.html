@@ -8,11 +8,12 @@
     <link rel="stylesheet" href="/css/account.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/transactions.css">
-    <script src="/js/account.js" defer></script>
-    <script src="/js/transactions.js" defer></script>
-    
+    <link rel="stylesheet" href="/css/trade.css">
     <link rel="stylesheet" href="/css/responsive.css">
 
+    <script src="/js/account.js" defer></script>
+    <script src="/js/transactions.js" defer></script>
+</head>
 <body>
 
 <div th:replace="~{fragments/navbar :: navbar}"></div>
@@ -60,16 +61,24 @@
                                 <span class="info-value highlight" th:text="${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">0원</span>
                             </div>
                             <div class="info-row" th:if="${item.transactionDate != null}">
-                                <span class="info-label">거래 일시</span>
+                                <span class="info-label">낙찰 일시</span>
                                 <span class="info-value" th:text="${#temporals.format(item.transactionDate, 'yyyy.MM.dd HH:mm')}">-</span>
                             </div>
                             <div class="info-row" th:if="${item.buyerPaidAt != null}">
                                 <span class="info-label">결제 일시</span>
                                 <span class="info-value" th:text="${#temporals.format(item.buyerPaidAt, 'yyyy.MM.dd HH:mm')}">-</span>
                             </div>
-                            <div class="info-row" th:if="${item.sellerConfirmedAt != null}">
-                                <span class="info-label">거래 확정</span>
-                                <span class="info-value" th:text="${#temporals.format(item.sellerConfirmedAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                            <div class="info-row" th:if="${item.toInspectionTracking != null}">
+                                <span class="info-label">검수소 송장</span>
+                                <span class="info-value" th:text="${item.toInspectionCarrier + ' / ' + item.toInspectionTracking}">-</span>
+                            </div>
+                            <div class="info-row" th:if="${item.toBuyerTracking != null}">
+                                <span class="info-label">배송 송장</span>
+                                <span class="info-value" th:text="${item.toBuyerCarrier + ' / ' + item.toBuyerTracking}">-</span>
+                            </div>
+                            <div class="info-row" th:if="${item.buyerReceivedAt != null}">
+                                <span class="info-label">수령 완료</span>
+                                <span class="info-value" th:text="${#temporals.format(item.buyerReceivedAt, 'yyyy.MM.dd HH:mm')}">-</span>
                             </div>
                         </div>
                         <div class="card-action">
@@ -78,11 +87,23 @@
                                 <span th:if="${item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">💳 즉시 구매</span>
                                 <span th:unless="${item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">🏆 낙찰</span>
                             </span>
-                            <span class="payment-status-badge"
-                                  th:classappend="${item.paymentStatus}"
-                                  th:text="${item.paymentStatus == 'pending' ? '결제 대기' : (item.paymentStatus == 'buyer_paid' ? '판매자 확인 대기' : (item.paymentStatus == 'completed' ? '✅ 거래 완료' : (item.paymentStatus == 'cancelled' ? '취소됨' : item.paymentStatus)))}">결제 대기</span>
-                            <a th:if="${item.paymentStatus == 'pending'}" th:href="'/payment/' + ${item.id}" class="btn-action btn-pay">💳 결제하기</a>
-                            <a th:href="'/items/' + ${item.id}" class="btn-action btn-detail">상세보기</a>
+                            <span class="trade-status-badge"
+                                  th:classappend="${'ts-' + (item.tradeStatus != null ? item.tradeStatus.toLowerCase() : 'sold')}"
+                                  th:text="${@tradeLabelHelper != null ? @tradeLabelHelper.label(item.tradeStatus) : (item.tradeStatus != null ? item.tradeStatus : '결제 대기')}">-</span>
+
+                            <a th:if="${item.paymentStatus == 'pending'}"
+                               th:href="'/payment/' + ${item.id}" class="btn-action btn-pay">💳 결제하기</a>
+
+                            <form th:if="${item.tradeStatus == 'SHIPPING' or item.tradeStatus == 'INSPECTION_PASSED'}"
+                                  th:action="'/trade/' + ${item.id} + '/receive'" method="post" style="display: inline;">
+                                <button type="submit" class="btn-action btn-receive">📦 수령 확인</button>
+                            </form>
+
+                            <a th:if="${item.tradeStatus != null and item.tradeStatus != 'COMPLETED' and item.tradeStatus != 'CANCELLED' and item.tradeStatus != 'INSPECTION_FAILED' and item.paymentStatus != 'pending'}"
+                               th:href="'/trade/' + ${item.id} + '/dispute'" class="btn-action btn-dispute">⚠️ 분쟁 신고</a>
+
+                            <a th:href="'/trade/' + ${item.id} + '/detail'" class="btn-action btn-detail">📋 거래 상세</a>
+                            <a th:href="'/items/' + ${item.id}" class="btn-action btn-detail-sub">상품 보기</a>
                         </div>
                     </div>
                 </div>
@@ -120,12 +141,20 @@
                                       th:text="${item.finalPrice != null} ? ${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원' : '—'">—</span>
                             </div>
                             <div class="info-row" th:if="${item.transactionDate != null}">
-                                <span class="info-label">거래 일시</span>
+                                <span class="info-label">낙찰 일시</span>
                                 <span class="info-value" th:text="${#temporals.format(item.transactionDate, 'yyyy.MM.dd HH:mm')}">-</span>
                             </div>
                             <div class="info-row" th:if="${item.buyerPaidAt != null}">
                                 <span class="info-label">결제 일시</span>
                                 <span class="info-value" th:text="${#temporals.format(item.buyerPaidAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                            </div>
+                            <div class="info-row" th:if="${item.toInspectionShippedAt != null}">
+                                <span class="info-label">검수소 발송</span>
+                                <span class="info-value" th:text="${#temporals.format(item.toInspectionShippedAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                            </div>
+                            <div class="info-row" th:if="${item.toBuyerShippedAt != null}">
+                                <span class="info-label">구매자 발송</span>
+                                <span class="info-value" th:text="${#temporals.format(item.toBuyerShippedAt, 'yyyy.MM.dd HH:mm')}">-</span>
                             </div>
                             <div class="info-row" th:if="${item.sellerConfirmedAt != null}">
                                 <span class="info-label">거래 확정</span>
@@ -139,14 +168,20 @@
                                   th:if="${item.winnerId != null and item.buyNowPrice != null and item.finalPrice != null and item.finalPrice.equals(item.buyNowPrice)}">💳 즉시 구매</span>
                             <span class="transaction-badge auction-won"
                                   th:if="${item.winnerId != null and (item.buyNowPrice == null or item.finalPrice == null or !item.finalPrice.equals(item.buyNowPrice))}">🏆 낙찰</span>
-                            <span th:if="${item.winnerId != null}" class="payment-status-badge"
-                                  th:classappend="${item.paymentStatus}"
-                                  th:text="${item.paymentStatus == 'pending' ? '결제 대기' : (item.paymentStatus == 'buyer_paid' ? '💰 입금 확인 필요' : (item.paymentStatus == 'completed' ? '✅ 거래 완료' : (item.paymentStatus == 'cancelled' ? '취소됨' : item.paymentStatus)))}">결제 대기</span>
-                            <form th:if="${item.winnerId != null and item.paymentStatus == 'buyer_paid'}"
-                                  th:action="'/account/items/' + ${item.id} + '/seller-confirm'" method="post">
-                                <button type="submit" class="btn-action btn-confirm">✅ 입금 확인 / 거래 확정</button>
-                            </form>
-                            <a th:href="'/account/items/' + ${item.id} + '/manage'" class="btn-action btn-detail">관리하기</a>
+                            <span class="trade-status-badge"
+                                  th:if="${item.winnerId != null}"
+                                  th:classappend="${'ts-' + (item.tradeStatus != null ? item.tradeStatus.toLowerCase() : 'sold')}"
+                                  th:text="${item.tradeStatus != null ? item.tradeStatus : '결제 대기'}">-</span>
+
+                            <a th:if="${item.winnerId != null and item.tradeStatus == 'PAID'}"
+                               th:href="'/trade/' + ${item.id} + '/ship'" class="btn-action btn-ship">📤 검수소로 발송</a>
+
+                            <a th:if="${item.winnerId != null and item.tradeStatus != null and item.tradeStatus != 'COMPLETED' and item.tradeStatus != 'CANCELLED' and item.tradeStatus != 'SOLD' and item.tradeStatus != 'INSPECTION_FAILED'}"
+                               th:href="'/trade/' + ${item.id} + '/dispute'" class="btn-action btn-dispute">⚠️ 분쟁 신고</a>
+
+                            <a th:if="${item.winnerId != null}"
+                               th:href="'/trade/' + ${item.id} + '/detail'" class="btn-action btn-detail">📋 거래 상세</a>
+                            <a th:href="'/account/items/' + ${item.id} + '/manage'" class="btn-action btn-detail-sub">관리하기</a>
                         </div>
                     </div>
                 </div>

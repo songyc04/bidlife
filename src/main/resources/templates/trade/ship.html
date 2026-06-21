@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 검수소로 발송</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/trade.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="trade-section">
+    <h1 class="page-title">📦 검수소로 발송</h1>
+    <p class="page-desc">결제가 완료되었습니다. 물건을 검수센터로 안전하게 발송해주세요.</p>
+
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <div class="trade-layout">
+        <section class="trade-card">
+            <h2 class="card-title">주문 정보</h2>
+            <div class="info-row">
+                <span class="label">상품명</span>
+                <span class="value" th:text="${item.title}">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">거래 금액</span>
+                <span class="value highlight" th:text="${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">낙찰자</span>
+                <span class="value">낙찰자 정보 (거래 상세에서 확인)</span>
+            </div>
+        </section>
+
+        <section class="trade-card inspection-card">
+            <h2 class="card-title">🚚 발송지 정보 (검수센터)</h2>
+            <div class="inspection-info">
+                <div class="info-row">
+                    <span class="label">수령처명</span>
+                    <span class="value" th:text="${inspectionCenter.name}">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">주소</span>
+                    <span class="value" th:text="${inspectionCenter.address}">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">연락처</span>
+                    <span class="value" th:text="${inspectionCenter.tel}">-</span>
+                </div>
+            </div>
+            <div class="callout">
+                <strong>ℹ️ 발송 시 유의사항</strong>
+                <ul>
+                    <li>물품은 <strong>원래 등록 상태 그대로</strong> 포장해 주세요.</li>
+                    <li>고가 물품은 <strong>가치 선포 + 보험</strong>을 권장합니다.</li>
+                    <li>송장번호를 입력하면 검수센터 도착과 동시에 검수가 시작됩니다.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="trade-card">
+            <h2 class="card-title">발송 정보 입력</h2>
+            <form action="/trade/{id}/ship" method="post" th:action="'/trade/' + ${item.id} + '/ship'" class="trade-form" id="shipForm">
+                <div class="form-row">
+                    <label for="carrier">택배사</label>
+                    <select id="carrier" name="carrier" required>
+                        <option value="">택배사를 선택하세요</option>
+                        <option value="CJ대한통운">CJ대한통운</option>
+                        <option value="로젠택배">로젠택배</option>
+                        <option value="한진택배">한진택배</option>
+                        <option value="롯데택배">롯데택배</option>
+                        <option value="우체국택배">우체국택배</option>
+                        <option value="경동택배">경동택배</option>
+                        <option value="대신택배">대신택배</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="tracking">송장번호</label>
+                    <input type="text" id="tracking" name="tracking" maxlength="100" required placeholder="예: 1234-5678-9012">
+                </div>
+                <div class="form-actions">
+                    <a href="/account/transactions" class="btn-cancel">취소</a>
+                    <button type="submit" class="btn-submit">발송 등록</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+    setTimeout(() => {
+        const alert = document.querySelector('.alert-error');
+        if (alert) {
+            alert.style.transition = 'opacity 0.4s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 400);
+        }
+    }, 4000);
+</script>
+
+</body>
+</html>

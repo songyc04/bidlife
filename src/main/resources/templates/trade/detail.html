@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 거래 상세</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/trade.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="trade-section">
+    <h1 class="page-title">📋 거래 상세</h1>
+    <p class="page-desc" th:text="${item.title}">상품명</p>
+
+    <div class="trade-summary">
+        <div class="summary-item">
+            <span class="summary-label">거래 금액</span>
+            <span class="summary-value highlight" th:text="${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">-</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">결제 상태</span>
+            <span class="summary-value" th:text="${item.paymentStatus}">-</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">거래 상태</span>
+            <span class="trade-status-badge"
+                  th:classappend="${'ts-' + (item.tradeStatus != null ? item.tradeStatus.toLowerCase() : 'default')}"
+                  th:text="${item.tradeStatus}">-</span>
+        </div>
+    </div>
+
+    <div class="trade-layout">
+        <section class="trade-card">
+            <h2 class="card-title">거래 타임라인</h2>
+            <ol class="timeline" th:if="${timeline != null and !timeline.isEmpty()}">
+                <li class="timeline-item" th:each="ev : ${timeline}" th:classappend="'tl-' + ${ev.type}">
+                    <div class="tl-dot"></div>
+                    <div class="tl-body">
+                        <div class="tl-head">
+                            <strong th:text="${ev.title}">이벤트</strong>
+                            <span class="tl-time" th:text="${#temporals.format(ev.at, 'yyyy.MM.dd HH:mm')}">-</span>
+                        </div>
+                        <p class="tl-desc" th:text="${ev.desc}">설명</p>
+                    </div>
+                </li>
+            </ol>
+            <div class="empty-state" th:if="${timeline == null or timeline.isEmpty()}">
+                <p>아직 진행된 단계가 없습니다.</p>
+            </div>
+        </section>
+
+        <section class="trade-card">
+            <h2 class="card-title">배송 정보</h2>
+            <div class="info-block" th:if="${item.toInspectionTracking != null}">
+                <h3>📤 판매자 → 검수소</h3>
+                <div class="info-row">
+                    <span class="label">택배사</span>
+                    <span class="value" th:text="${item.toInspectionCarrier}">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">송장번호</span>
+                    <span class="value" th:text="${item.toInspectionTracking}">-</span>
+                </div>
+                <div class="info-row" th:if="${item.toInspectionShippedAt != null}">
+                    <span class="label">발송 일시</span>
+                    <span class="value" th:text="${#temporals.format(item.toInspectionShippedAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                </div>
+            </div>
+            <div class="info-block" th:if="${item.toBuyerTracking != null}">
+                <h3>📦 검수소 → 구매자</h3>
+                <div class="info-row">
+                    <span class="label">택배사</span>
+                    <span class="value" th:text="${item.toBuyerCarrier}">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">송장번호</span>
+                    <span class="value" th:text="${item.toBuyerTracking}">-</span>
+                </div>
+                <div class="info-row" th:if="${item.toBuyerShippedAt != null}">
+                    <span class="label">발송 일시</span>
+                    <span class="value" th:text="${#temporals.format(item.toBuyerShippedAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                </div>
+            </div>
+            <div class="empty-state" th:if="${item.toInspectionTracking == null and item.toBuyerTracking == null}">
+                <p>아직 배송 정보가 등록되지 않았습니다.</p>
+            </div>
+        </section>
+
+        <section class="trade-card" th:if="${inspection != null}">
+            <h2 class="card-title">🔍 검수 결과</h2>
+            <div class="info-row">
+                <span class="label">검수 결과</span>
+                <span class="value">
+                    <span th:if="${inspection.result == 'PASS'}" class="badge badge-pass">✅ 합격</span>
+                    <span th:if="${inspection.result == 'FAIL'}" class="badge badge-fail">❌ 불합격</span>
+                    <span th:unless="${inspection.result == 'PASS' or inspection.result == 'FAIL'}" th:text="${inspection.result}">-</span>
+                </span>
+            </div>
+            <div class="info-row" th:if="${inspection.grade != null}">
+                <span class="label">등급</span>
+                <span class="value" th:text="${inspection.grade}">-</span>
+            </div>
+            <div class="info-row" th:if="${inspection.inspector != null}">
+                <span class="label">담당 검수사</span>
+                <span class="value" th:text="${inspection.inspector}">-</span>
+            </div>
+            <div class="info-row" th:if="${inspection.memo != null}">
+                <span class="label">검수 메모</span>
+                <span class="value" th:text="${inspection.memo}">-</span>
+            </div>
+            <div class="info-row" th:if="${inspection.failureReason != null}">
+                <span class="label">실패 사유</span>
+                <span class="value" th:text="${inspection.failureReason}">-</span>
+            </div>
+            <div class="info-row" th:if="${inspection.completedAt != null}">
+                <span class="label">완료 일시</span>
+                <span class="value" th:text="${#temporals.format(inspection.completedAt, 'yyyy.MM.dd HH:mm')}">-</span>
+            </div>
+        </section>
+
+        <section class="trade-card" th:if="${disputes != null and !disputes.isEmpty()}">
+            <h2 class="card-title">⚠️ 분쟁 내역</h2>
+            <div class="dispute-list">
+                <div class="dispute-item" th:each="d : ${disputes}"
+                     th:classappend="${d.status == 'RESOLVED'} ? 'resolved' : 'open'">
+                    <div class="dispute-head">
+                        <span class="dispute-type" th:text="${d.type}">유형</span>
+                        <span class="dispute-status"
+                              th:classappend="${d.status == 'RESOLVED'} ? 'status-resolved' : 'status-open'"
+                              th:text="${d.status == 'RESOLVED'} ? '처리 완료' : '검토 중'">상태</span>
+                    </div>
+                    <p class="dispute-content" th:text="${d.content}">내용</p>
+                    <div class="dispute-meta">
+                        <span th:text="${d.reporterRole + ' / ' + (d.reporterNickname != null ? d.reporterNickname : '-')}">신고자</span>
+                        <span th:text="${#temporals.format(d.createdAt, 'yyyy.MM.dd HH:mm')}">-</span>
+                    </div>
+                    <div class="dispute-response" th:if="${d.adminResponse != null}">
+                        <strong>관리자 답변:</strong>
+                        <p th:text="${d.adminResponse}">-</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="back-link-wrap">
+            <a href="/account/transactions" class="back-link">← 거래 내역으로</a>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

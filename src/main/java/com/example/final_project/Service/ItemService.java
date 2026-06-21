@@ -414,12 +414,14 @@ public class ItemService {
             item.setFinalPrice(null);
             item.setPaymentStatus("cancelled");
             item.setShippingStatus("cancelled");
+            item.setTradeStatus("CANCELLED");
         } else {
             item.setWinnerId(winnerId);
             item.setFinalPrice(finalPrice);
             item.setCurrentPrice(finalPrice);
             item.setPaymentStatus("pending");
             item.setShippingStatus("pending");
+            item.setTradeStatus("SOLD");
         }
 
         itemRepository.save(item);

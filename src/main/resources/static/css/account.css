@@ -131,6 +131,7 @@ a {
 
 .account-content {
     flex: 1;
+    min-width: 0;
 }
 
 .content-header {
@@ -418,18 +419,9 @@ a {
         flex-direction: column;
     }
 
+    /* 사이드바는 모바일에서 전역 드로어로 대체되어 숨김 */
     .account-sidebar {
-        width: 100%;
-        position: static;
-    }
-
-    .sidebar-menu {
-        flex-direction: row;
-        overflow-x: auto;
-    }
-
-    .menu-item {
-        white-space: nowrap;
+        display: none;
     }
 
     .info-row {
