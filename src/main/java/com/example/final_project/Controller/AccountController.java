@@ -426,7 +426,7 @@ public class AccountController {
 
         try {
             itemService.confirmPaymentBySeller(id, userId);
-            redirectAttributes.addFlashAttribute("successMessage", "입금 확인이 완료되어 거래가 확정되었습니다.");
+            redirectAttributes.addFlashAttribute("successMessage", "✅ 입금이 확인되었습니다. 검수센터로 물품을 발송해 주세요.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (SecurityException e) {
@@ -435,7 +435,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
             log.error("입금 확인 처리 중 오류", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "입금 확인 처리 중 오류가 발생했습니다.");
+            redirectAttributes.addFlashAttribute("errorMessage", "입금 확인 처리 중 오류가 발생했습니다: " + e.getMessage());
         }
 
         return "redirect:/account/items/" + id + "/manage";

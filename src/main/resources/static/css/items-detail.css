@@ -305,6 +305,10 @@ a {
     font-size: 18px;
     font-weight: 700;
     color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .price-value.buy-now {
@@ -314,6 +318,10 @@ a {
 .price-value.highlight {
     color: #ff5a00;
 }
+
+.price-value.price-md { font-size: 16px; }
+.price-value.price-sm { font-size: 14px; }
+.price-value.price-xs { font-size: 12px; }
 
 .time-panel {
     background-color: #121212;
@@ -714,6 +722,10 @@ a {
     .price-value {
         font-size: 16px;
     }
+
+    .price-value.price-md { font-size: 14px; }
+    .price-value.price-sm { font-size: 13px; }
+    .price-value.price-xs { font-size: 12px; }
 
     .time-value {
         font-size: 18px;

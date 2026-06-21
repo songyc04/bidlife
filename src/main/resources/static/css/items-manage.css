@@ -263,6 +263,71 @@
     font-size: 16px;
 }
 
+.transaction-info .status-pending { color: #ffc107; font-weight: 700; }
+.transaction-info .status-paid { color: #4a9eff; font-weight: 700; }
+.transaction-info .status-completed { color: #2d8a4e; font-weight: 700; }
+.transaction-info .status-cancelled { color: #ff4747; font-weight: 700; }
+
+.payment-action {
+    margin-top: 18px;
+    padding: 18px;
+    background: linear-gradient(135deg, rgba(74, 158, 255, 0.08), rgba(255, 90, 0, 0.04));
+    border: 1px solid rgba(74, 158, 255, 0.3);
+    border-radius: 10px;
+    text-align: center;
+}
+.payment-alert {
+    color: #ccc;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+}
+.btn-confirm-payment {
+    background: #2d8a4e;
+    color: #fff;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    max-width: 320px;
+}
+.btn-confirm-payment:hover {
+    background: #34a05a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(45, 138, 78, 0.4);
+}
+.payment-completed {
+    margin-top: 18px;
+    padding: 14px 18px;
+    background: rgba(45, 138, 78, 0.1);
+    border: 1px solid rgba(45, 138, 78, 0.4);
+    border-radius: 8px;
+    text-align: center;
+}
+.payment-progress {
+    margin-top: 18px;
+    padding: 16px 18px;
+    background: rgba(74, 158, 255, 0.08);
+    border: 1px solid rgba(74, 158, 255, 0.3);
+    border-radius: 8px;
+    text-align: center;
+}
+.payment-progress .payment-alert { margin: 0 0 14px; }
+.payment-progress .btn-confirm-payment { background: #262626; }
+.payment-progress .btn-confirm-payment:hover { background: #333; box-shadow: none; transform: none; }
+.payment-success {
+    color: #2d8a4e;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.6;
+    margin: 0;
+}
+.payment-success span { color: #888; font-weight: 500; font-size: 12px; display: block; margin-top: 4px; }
+
 .payment-status-badge {
     display: inline-block;
     padding: 4px 12px;

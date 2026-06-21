@@ -444,6 +444,9 @@ public class ItemService {
         if (!"buyer_paid".equals(item.getPaymentStatus())) {
             throw new IllegalStateException("구매자 결제가 완료되지 않았습니다. (현재 상태: " + item.getPaymentStatus() + ")");
         }
+        if (!TradeService.STATUS_PAID.equals(item.getTradeStatus())) {
+            throw new IllegalStateException("결제 완료 상태에서만 입금 확인이 가능합니다. (현재: " + item.getTradeStatus() + ")");
+        }
 
         item.setPaymentStatus("completed");
         item.setSellerConfirmedAt(LocalDateTime.now());
@@ -451,16 +454,16 @@ public class ItemService {
 
         notificationService.createNotification(
                 item.getWinnerId(),
-                "🎉 \"" + item.getTitle() + "\" 거래가 최종 완료되었습니다. 판매자가 입금을 확인했습니다.",
+                "✅ \"" + item.getTitle() + "\" 판매자가 입금을 확인했습니다. 검수 후 곧 발송됩니다.",
                 item.getId(),
-                "transaction_completed"
+                "payment_seller_confirmed"
         );
 
         notificationService.createNotification(
                 sellerId,
-                "✅ \"" + item.getTitle() + "\" 거래 확정이 완료되었습니다.",
+                "📤 \"" + item.getTitle() + "\" 결제가 확인되었습니다. 검수센터로 물품을 발송해 주세요.",
                 item.getId(),
-                "transaction_completed"
+                "inspection_ship_request"
         );
 
         return true;

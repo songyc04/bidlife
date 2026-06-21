@@ -109,29 +109,7 @@ public class PaymentController {
     @PostMapping("/payment/{itemId}/request")
     public String requestPayment(@PathVariable Long itemId, HttpSession session,
                                  RedirectAttributes redirectAttributes) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
-            return "redirect:/login";
-        }
-
-        ItemEntity item = itemRepository.findById(itemId).orElse(null);
-        if (item == null || !userId.equals(item.getWinnerId())) {
-            redirectAttributes.addFlashAttribute("errorMessage", "결제 권한이 없습니다.");
-            return "redirect:/items";
-        }
-
-        if (!"pending".equals(item.getPaymentStatus())) {
-            redirectAttributes.addFlashAttribute("errorMessage", "이미 처리된 결제입니다.");
-            return "redirect:/account/transactions";
-        }
-
-        String orderId = tossPaymentService.generateOrderId(itemId, userId);
-        tossPaymentService.saveOrderMetadata(itemId, orderId);
-
-        redirectAttributes.addFlashAttribute("paymentOrderId", orderId);
-        redirectAttributes.addFlashAttribute("paymentAmount", item.getFinalPrice());
-        redirectAttributes.addFlashAttribute("paymentItemTitle", item.getTitle());
-        return "redirect:/payment/" + itemId + "/toss";
+        return testPay(itemId, session, redirectAttributes);
     }
 
     @GetMapping("/payment/success")
@@ -187,14 +165,6 @@ public class PaymentController {
     private void notifySellerForConfirmation(ItemEntity item) {
         Optional<SignupEntity> buyerOpt = signupRepository.findById(item.getWinnerId());
         String buyerNickname = buyerOpt.map(SignupEntity::getNickname).orElse("구매자");
-
-        notificationService.createNotification(
-                item.getSellerId(),
-                "💰 " + buyerNickname + "님이 \"" + item.getTitle() + "\" 결제("
-                        + item.getFinalPrice() + "원)를 완료했습니다. 입금을 확인하고 거래를 확정해주세요.",
-                item.getId(),
-                "payment_buyer_paid"
-        );
 
         notificationService.createNotification(
                 item.getWinnerId(),

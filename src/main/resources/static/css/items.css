@@ -378,7 +378,15 @@ a {
     font-size: 16px;
     font-weight: 700;
     color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
+
+.price.price-md { font-size: 14px; }
+.price.price-sm { font-size: 13px; }
+.price.price-xs { font-size: 12px; }
 
 .time-countdown {
     font-size: 16px;

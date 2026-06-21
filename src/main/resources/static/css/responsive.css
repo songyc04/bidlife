@@ -385,8 +385,16 @@
     }
 
     .price-value {
-        font-size: 18px;
+        font-size: 16px;
     }
+
+    .price-value.price-md { font-size: 14px; }
+    .price-value.price-sm { font-size: 13px; }
+    .price-value.price-xs { font-size: 11px; }
+
+    .price.price-md { font-size: 14px; }
+    .price.price-sm { font-size: 13px; }
+    .price.price-xs { font-size: 11px; }
 
     .price-value.buy-now {
         font-size: 16px;
@@ -542,10 +550,11 @@
     /* --- Notice --- */
     .notice-section {
         padding: 80px 12px 60px;
+        max-width: 100%;
     }
 
-    .page-title {
-        font-size: 24px;
+    .notice-list {
+        width: 100%;
     }
 
     .notice-item {
@@ -553,10 +562,13 @@
         gap: 8px;
         padding: 16px;
         align-items: flex-start;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .notice-meta {
         font-size: 12px;
+        width: 100%;
     }
 
     .notice-content {
@@ -565,6 +577,7 @@
 
     .notice-title {
         font-size: 20px;
+        width: 100%;
     }
 
     .notice-body {

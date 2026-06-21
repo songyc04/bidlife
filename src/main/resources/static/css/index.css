@@ -195,11 +195,19 @@ a {
     font-weight: 900;
     color: #ffffff;
     letter-spacing: -0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 .stat-card.highlight .stat-number {
     color: #ff5a00;
 }
+
+.stat-number.price-md { font-size: 18px; }
+.stat-number.price-sm { font-size: 15px; }
+.stat-number.price-xs { font-size: 13px; }
 
 .stat-label {
     font-size: 12px;

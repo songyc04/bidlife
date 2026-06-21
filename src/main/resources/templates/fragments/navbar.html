@@ -7,6 +7,7 @@
         </button>
         <a href="/" class="logo">BID<span>LIFE</span></a>
         <nav class="nav-menu">
+            <a href="/items" class="nav-link">경매 둘러보기</a>
             <a href="/notices" class="nav-link">공지사항</a>
             <a href="/FAQ" class="nav-link">FAQ</a>
             <a href="/inquiry" class="nav-link">문의하기</a>
@@ -99,6 +100,16 @@
         </div>
 
         <div class="drawer-section">
+            <div class="drawer-section-title">둘러보기</div>
+            <nav class="drawer-menu">
+                <a href="/items" class="drawer-item">
+                    <span class="drawer-icon">🔎</span>
+                    <span>경매 둘러보기</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="drawer-section">
             <div class="drawer-section-title">고객지원</div>
             <nav class="drawer-menu">
                 <a href="/notices" class="drawer-item">
@@ -156,6 +167,31 @@
             drawer.querySelectorAll('a').forEach(function(a) {
                 a.addEventListener('click', closeDrawer);
             });
+        });
+
+        // 큰 가격 숫자가 들어와도 줄이 깨지지 않도록 폰트 크기 자동 조정
+        document.addEventListener('DOMContentLoaded', function() {
+            const PRICE_SELECTOR = '.price-value, .price, .stat-value, .stat-number, .info-value.highlight';
+            const sizeClass = function(len) {
+                if (len >= 16) return 'price-xs';
+                if (len >= 13) return 'price-sm';
+                if (len >= 10) return 'price-md';
+                return '';
+            };
+            const isPriceText = function(text) {
+                return /원|won|¥|￥|\$|￦/.test(text);
+            };
+            const applySizes = function() {
+                document.querySelectorAll(PRICE_SELECTOR).forEach(function(el) {
+                    const text = (el.textContent || '').trim();
+                    if (!isPriceText(text)) return;
+                    el.classList.remove('price-md', 'price-sm', 'price-xs');
+                    const cls = sizeClass(text.length);
+                    if (cls) el.classList.add(cls);
+                });
+            };
+            applySizes();
+            setTimeout(applySizes, 100);
         });
     </script>
 </header>

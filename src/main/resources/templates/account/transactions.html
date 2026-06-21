@@ -89,7 +89,7 @@
                             </span>
                             <span class="trade-status-badge"
                                   th:classappend="${'ts-' + (item.tradeStatus != null ? item.tradeStatus.toLowerCase() : 'sold')}"
-                                  th:text="${@tradeLabelHelper != null ? @tradeLabelHelper.label(item.tradeStatus) : (item.tradeStatus != null ? item.tradeStatus : '결제 대기')}">-</span>
+                                  th:text="${@tradeService.getTradeStatusLabel(item.tradeStatus)}">-</span>
 
                             <a th:if="${item.paymentStatus == 'pending'}"
                                th:href="'/payment/' + ${item.id}" class="btn-action btn-pay">💳 결제하기</a>
@@ -171,10 +171,16 @@
                             <span class="trade-status-badge"
                                   th:if="${item.winnerId != null}"
                                   th:classappend="${'ts-' + (item.tradeStatus != null ? item.tradeStatus.toLowerCase() : 'sold')}"
-                                  th:text="${item.tradeStatus != null ? item.tradeStatus : '결제 대기'}">-</span>
+                                  th:text="${@tradeService.getTradeStatusLabel(item.tradeStatus)}">-</span>
 
-                            <a th:if="${item.winnerId != null and item.tradeStatus == 'PAID'}"
-                               th:href="'/trade/' + ${item.id} + '/ship'" class="btn-action btn-ship">✅ 입금 확인 · 검수소로 발송</a>
+                            <a th:if="${item.winnerId != null and item.tradeStatus == 'PAID' and item.paymentStatus == 'buyer_paid'}"
+                               th:href="'/account/items/' + ${item.id} + '/manage'" class="btn-action btn-ship">💰 입금 확인</a>
+
+                            <a th:if="${item.winnerId != null and item.tradeStatus == 'PAID' and item.paymentStatus == 'completed' and item.toInspectionTracking == null}"
+                               th:href="'/trade/' + ${item.id} + '/ship'" class="btn-action btn-ship">📤 검수소로 발송</a>
+
+                            <a th:if="${item.winnerId != null and (item.tradeStatus == 'SELLER_SHIPPED' or item.tradeStatus == 'INSPECTION' or item.tradeStatus == 'INSPECTION_PASSED' or item.tradeStatus == 'SHIPPING')}"
+                               th:href="'/trade/' + ${item.id} + '/detail'" class="btn-action btn-detail">🔍 검수/배송 진행 중</a>
 
                             <a th:if="${item.winnerId != null and item.tradeStatus != null and item.tradeStatus != 'COMPLETED' and item.tradeStatus != 'CANCELLED' and item.tradeStatus != 'SOLD' and item.tradeStatus != 'INSPECTION_FAILED'}"
                                th:href="'/trade/' + ${item.id} + '/dispute'" class="btn-action btn-dispute">⚠️ 분쟁 신고</a>
