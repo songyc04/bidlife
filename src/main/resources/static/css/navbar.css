@@ -2,6 +2,19 @@ html, body {
     overflow-x: hidden;
 }
 
+html {
+    scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 .navbar {
     background-color: rgba(5, 5, 5, 0.85);
     backdrop-filter: blur(15px);
@@ -42,6 +55,9 @@ html, body {
 .nav-link {
     font-weight: 600;
     font-size: 15px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
     color: #888888;
     transition: color 0.2s;
 }

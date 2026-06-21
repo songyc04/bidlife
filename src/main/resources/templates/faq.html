@@ -5,48 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BIDLIFE | FAQ</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
     <link rel="stylesheet" href="/css/navbar.css">
-    <style>
-        .faq-section { padding: 120px 20px 80px; max-width: 900px; margin: 0 auto; }
-        .page-title { font-size: 36px; font-weight: 900; margin-bottom: 12px; letter-spacing: -0.5px; }
-        .page-desc { color: #888; font-size: 15px; margin-bottom: 32px; }
-        .category-tabs { display: flex; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; }
-        .category-tab {
-            padding: 10px 20px; border: 1px solid #333; border-radius: 999px;
-            color: #aaa; font-size: 14px; font-weight: 600; text-decoration: none;
-            transition: all 0.2s;
-        }
-        .category-tab:hover { color: #ff5a00; border-color: #ff5a00; }
-        .category-tab.active { background: #ff5a00; color: #000; border-color: #ff5a00; }
-        .faq-category { margin-bottom: 32px; }
-        .faq-category-title {
-            font-size: 20px; font-weight: 800; color: #ff5a00;
-            margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #222;
-        }
-        .faq-list { display: flex; flex-direction: column; gap: 8px; }
-        .faq-item {
-            background: #121212; border: 1px solid #222; border-radius: 8px;
-            overflow: hidden; transition: all 0.2s;
-        }
-        .faq-item:hover { border-color: #333; }
-        .faq-question {
-            padding: 20px 24px; cursor: pointer; display: flex;
-            justify-content: space-between; align-items: center;
-            font-size: 15px; font-weight: 600;
-        }
-        .faq-question::before { content: "Q."; color: #ff5a00; font-weight: 800; margin-right: 12px; }
-        .faq-toggle { color: #888; font-size: 20px; transition: transform 0.2s; }
-        .faq-item.open .faq-toggle { transform: rotate(45deg); }
-        .faq-answer {
-            padding: 0 24px; max-height: 0; overflow: hidden;
-            color: #ccc; line-height: 1.7; transition: all 0.3s;
-        }
-        .faq-item.open .faq-answer { padding: 0 24px 20px 56px; max-height: 500px; }
-        .faq-answer::before { content: "A."; color: #4a9eff; font-weight: 800; margin-right: 12px; }
-        .empty-state { text-align: center; padding: 80px 20px; color: #666; }
-        .empty-state-icon { font-size: 60px; margin-bottom: 16px; opacity: 0.5; }
-    </style>
-    <link rel="stylesheet" href="/css/responsive.css">`n</head>
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/faq.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
 <body>
 
 <div th:replace="~{fragments/navbar :: navbar}"></div>

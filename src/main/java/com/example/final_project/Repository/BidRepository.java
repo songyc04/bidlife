@@ -32,4 +32,6 @@ public interface BidRepository extends JpaRepository<BidEntity, Long> {
     @Query("UPDATE BidEntity b SET b.status = 'outbid' " +
            "WHERE b.itemId = :itemId AND b.status = 'active'")
     int markAllAsOutbid(@Param("itemId") Long itemId);
+
+    void deleteByBidderId(Long bidderId);
 }

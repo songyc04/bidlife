@@ -48,6 +48,10 @@ public class ItemService {
         }
     }
 
+    public String getAbsoluteUploadDir() {
+        return absoluteUploadDir;
+    }
+
     @Transactional
     public ItemEntity saveItem(String title, String category, String description,
                                Integer startPrice, Integer buyNowPrice, Integer bidUnit,

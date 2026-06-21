@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 문의하기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/items.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/inquiry.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="inquiry-section">
+    <h1 class="page-title">💬 문의하기</h1>
+    <p class="page-desc">궁금한 점이나 불편한 사항을 남겨주시면 빠르게 답변 드리겠습니다.</p>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div class="inquiry-layout">
+        <section class="inquiry-form-card">
+            <h2 class="card-title">새 문의 작성</h2>
+            <form action="/inquiry" method="post" class="inquiry-form" id="inquiryForm">
+                <div class="form-row">
+                    <label for="category">문의 유형</label>
+                    <select id="category" name="category" required>
+                        <option value="회원">회원</option>
+                        <option value="경매">경매</option>
+                        <option value="결제">결제</option>
+                        <option value="신고">신고</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="title">제목</label>
+                    <input type="text" id="title" name="title" maxlength="200" required placeholder="문의 제목을 입력해주세요">
+                </div>
+                <div class="form-row">
+                    <label for="content">내용</label>
+                    <textarea id="content" name="content" rows="8" maxlength="2000" required placeholder="문의 내용을 자세히 입력해주세요&#10;&#10;• 문의 관련 경매 번호나 상품명을 함께 기재하면 더 빠른 답변이 가능합니다.&#10;• 비방, 욕설, 광고성 글은 사전 고지 없이 삭제될 수 있습니다."></textarea>
+                    <div class="char-count"><span id="charCount">0</span> / 2000</div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">문의 등록</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="inquiry-list-card">
+            <div class="list-header">
+                <h2 class="card-title">내 문의 내역</h2>
+                <span class="list-count" th:text="'총 ' + ${inquiryCount != null ? inquiryCount : 0} + '건'">총 0건</span>
+            </div>
+
+            <div th:if="${myInquiries != null and !myInquiries.isEmpty()}" class="inquiry-list">
+                <div class="inquiry-item" th:each="inquiry : ${myInquiries}"
+                     th:classappend="${inquiry.status == 'ANSWERED'} ? 'answered' : 'waiting'">
+                    <div class="inquiry-head">
+                        <div class="inquiry-tags">
+                            <span class="inquiry-category" th:text="${inquiry.category}">카테고리</span>
+                            <span class="inquiry-status"
+                                  th:classappend="${inquiry.status == 'ANSWERED'} ? 'status-answered' : 'status-waiting'"
+                                  th:text="${inquiry.status == 'ANSWERED'} ? '답변완료' : '답변대기'">상태</span>
+                        </div>
+                        <span class="inquiry-date"
+                              th:text="${#temporals.format(inquiry.createdAt, 'yyyy.MM.dd HH:mm')}">2026.01.01 12:00</span>
+                    </div>
+                    <h3 class="inquiry-title" th:text="${inquiry.title}">문의 제목</h3>
+                    <p class="inquiry-content" th:text="${inquiry.content}">문의 내용</p>
+
+                    <div class="inquiry-answer" th:if="${inquiry.status == 'ANSWERED' and inquiry.answer != null}">
+                        <div class="answer-label">
+                            <span class="answer-icon">A</span>
+                            <span>관리자 답변</span>
+                            <span class="answer-meta"
+                                  th:if="${inquiry.answeredAt != null}"
+                                  th:text="${#temporals.format(inquiry.answeredAt, 'yyyy.MM.dd HH:mm')}">2026.01.01</span>
+                        </div>
+                        <p class="answer-text" th:text="${inquiry.answer}">답변 내용</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="empty-state" th:if="${myInquiries == null or myInquiries.isEmpty()}">
+                <div class="empty-state-icon">📭</div>
+                <h3>등록한 문의가 없습니다</h3>
+                <p>위 폼을 통해 문의 사항을 남겨주세요.</p>
+            </div>
+        </section>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+    const contentEl = document.getElementById('content');
+    const charCountEl = document.getElementById('charCount');
+    if (contentEl && charCountEl) {
+        const updateCount = () => {
+            charCountEl.textContent = contentEl.value.length;
+        };
+        contentEl.addEventListener('input', updateCount);
+        updateCount();
+    }
+
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(el => {
+            el.style.transition = 'opacity 0.4s';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 400);
+        });
+    }, 4000);
+</script>
+
+</body>
+</html>

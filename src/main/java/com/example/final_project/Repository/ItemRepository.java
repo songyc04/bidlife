@@ -15,4 +15,5 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     List<ItemEntity> findByPaymentStatusOrderByFinalPriceDesc(String paymentStatus);
     long countByStatus(String status);
     Optional<ItemEntity> findByOrderId(String orderId);
+    void deleteBySellerId(Long sellerId);
 }

@@ -35,6 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+.opencode/
 /src/main/resources/application.*
 project.txt
 /uploads

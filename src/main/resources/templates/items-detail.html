@@ -178,7 +178,7 @@
                     </div>
 
                     <div class="action-buttons">
-                        <button class="btn-pick" th:classappend="${isFavorite} ? 'active'"
+                        <button th:if="${isLoggedIn}" class="btn-pick" th:classappend="${isFavorite} ? 'active'"
                                 th:attr="data-item-id=${item.id}" id="detailPickBtn">
                             <span th:text="${isFavorite} ? '★ 찜완료' : '☆ 찜하기'">☆ 찜하기</span>
                         </button>

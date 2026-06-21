@@ -1,0 +1,78 @@
+.seller-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 140px 20px 60px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .seller-profile-card {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .seller-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
+        }
+        .seller-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .seller-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .seller-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e94560;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        .seller-section .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e94560;
+            display: inline-block;
+        }
+        .seller-section {
+            margin-bottom: 50px;
+        }
+        .empty-section {
+            text-align: center;
+            padding: 40px;
+            background: #121212;
+            border: 1px solid #222222;
+            border-radius: 12px;
+            color: #666;
+        }
+        .empty-section-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }

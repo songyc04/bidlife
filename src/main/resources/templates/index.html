@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="/css/index.css">
     <script src="/js/index.js" defer></script>
     <script src="/js/items.js" defer></script>
-    <link rel="stylesheet" href="/css/responsive.css">`n</head>
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
 <body>
 
     <div th:replace="~{fragments/navbar :: navbar}"></div>
@@ -21,7 +22,7 @@
             <h1>가장 뜨거운 경매,<br>멈추지 않는 <span>LIFE</span></h1>
             <p>지금 이 순간에도 가치는 상승하고 있습니다. <br>전 세계 트렌드 세터들과 함께 짜릿한 비딩에 참여하세요.</p>
             <div class="hero-btns">
-                <a th:href="${isLoggedIn} ? '/items' : '/login?redirect=/items'" class="btn-primary">지금 비딩 참여하기</a>
+                <a href="/items" class="btn-primary">지금 비딩 참여하기</a>
                 <a th:href="${isLoggedIn} ? '/account/items/new' : '/login?redirect=/account/items/new'" class="btn-secondary">내 물품 출품하기</a>
             </div>
         </div>

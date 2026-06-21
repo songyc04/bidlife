@@ -28,4 +28,5 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
     int deleteByUserIdAndIsReadTrue(@Param("userId") Long userId);
 
     void deleteByItemId(Long itemId);
+    void deleteByUserId(Long userId);
 }

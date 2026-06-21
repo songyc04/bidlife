@@ -323,9 +323,48 @@
     box-shadow: 0 6px 20px rgba(255, 90, 0, 0.4);
 }
 
+.btn-register-item {
+    display: inline-block;
+    background-color: #ff5a00;
+    color: #000000;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.btn-register-item:hover {
+    background-color: #ff7c33;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 90, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+    .btn-register-item {
+        padding: 10px 18px;
+        font-size: 13px;
+    }
+}
+
 @media (max-width: 768px) {
     .stats-summary {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .stat-card {
+        padding: 14px 8px;
+    }
+
+    .stat-card .stat-number {
+        font-size: 20px;
+    }
+
+    .stat-card .stat-desc {
+        font-size: 11px;
     }
 
     .items-grid {
@@ -333,13 +372,16 @@
     }
 
     .item-stats {
-        grid-template-columns: 1fr;
-        gap: 8px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 10px;
     }
 
-    .stat-box {
-        flex-direction: row;
-        justify-content: space-between;
-        text-align: left;
+    .stat-box .stat-label {
+        font-size: 9px;
+    }
+
+    .stat-box .stat-value {
+        font-size: 12px;
     }
 }

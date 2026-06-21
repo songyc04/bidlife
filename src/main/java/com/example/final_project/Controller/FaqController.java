@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/faq")
+@RequestMapping("/FAQ")
 public class FaqController {
 
     private final FaqRepository faqRepository;
