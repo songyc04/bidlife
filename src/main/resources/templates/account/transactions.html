@@ -174,7 +174,7 @@
                                   th:text="${item.tradeStatus != null ? item.tradeStatus : '결제 대기'}">-</span>
 
                             <a th:if="${item.winnerId != null and item.tradeStatus == 'PAID'}"
-                               th:href="'/trade/' + ${item.id} + '/ship'" class="btn-action btn-ship">📤 검수소로 발송</a>
+                               th:href="'/trade/' + ${item.id} + '/ship'" class="btn-action btn-ship">✅ 입금 확인 · 검수소로 발송</a>
 
                             <a th:if="${item.winnerId != null and item.tradeStatus != null and item.tradeStatus != 'COMPLETED' and item.tradeStatus != 'CANCELLED' and item.tradeStatus != 'SOLD' and item.tradeStatus != 'INSPECTION_FAILED'}"
                                th:href="'/trade/' + ${item.id} + '/dispute'" class="btn-action btn-dispute">⚠️ 분쟁 신고</a>

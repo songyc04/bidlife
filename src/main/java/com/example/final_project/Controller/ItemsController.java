@@ -176,7 +176,8 @@ public class ItemsController {
 
         try {
             itemService.buyNow(id, userId);
-            redirectAttributes.addFlashAttribute("bidSuccessMessage", "즉시 구매가 완료되었습니다.");
+            redirectAttributes.addFlashAttribute("successMessage", "즉시 구매가 완료되었습니다. 결제를 진행해주세요.");
+            return "redirect:/payment/" + id;
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("bidErrorMessage", e.getMessage());
         } catch (IllegalStateException e) {

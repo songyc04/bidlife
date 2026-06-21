@@ -109,7 +109,7 @@
                             오류가 발생했습니다.
                         </div>
                         <div th:if="${isLoggedIn}">
-                            <form th:action="'/items/' + ${item.id} + '/bid'" method="post" class="bid-confirm-form">
+                            <form th:action="'/items/' + ${item.id} + '/bid'" method="post" class="bid-confirm-form" id="bidForm">
                                 <div class="bid-input-group">
                                     <label for="bidAmount">최소 입찰 금액</label>
                                     <div class="input-wrapper">
@@ -124,14 +124,17 @@
                                     </div>
                                     <p class="bid-hint" th:text="'최소 ' + ${#numbers.formatInteger(item.bidUnit, 3, 'COMMA')} + '원 단위로 입찰 가능'">최소 10,000원 단위로 입찰 가능</p>
                                 </div>
-                                <div class="bid-actions">
-                                    <button type="submit" class="btn-bid">비딩하기</button>
-                                    <button type="submit" class="btn-buy-now"
-                                            th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}"
-                                            th:attr="formaction='/items/' + ${item.id} + '/buy-now', data-buy-now-price=${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')}"
-                                            th:text="'즉시 구매 (' + ${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')} + '원)'">즉시 구매</button>
-                                </div>
                             </form>
+                            <form th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}"
+                                  th:action="'/items/' + ${item.id} + '/buy-now'" method="post"
+                                  class="bid-confirm-form buy-now-form" id="buyNowForm"></form>
+                            <div class="bid-actions">
+                                <button type="submit" form="bidForm" class="btn-bid">비딩하기</button>
+                                <button type="submit" form="buyNowForm" class="btn-buy-now"
+                                        th:if="${item.buyNowPrice != null && item.buyNowPrice > 0}"
+                                        th:attr="data-buy-now-price=${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')}"
+                                        th:text="'즉시 구매 (' + ${#numbers.formatInteger(item.buyNowPrice, 3, 'COMMA')} + '원)'">즉시 구매</button>
+                            </div>
                         </div>
                         <div th:unless="${isLoggedIn}" class="bid-locked">
                             <div class="bid-locked-content">
@@ -155,6 +158,12 @@
                     <div class="bid-panel ended-panel" th:if="${item.status == 'ended' and isWinner}">
                         <p class="panel-message">🎉 축하합니다! 낙찰받으셨습니다</p>
                         <p class="panel-submessage" th:text="'최종 낙찰가: ' + ${#numbers.formatInteger(item.finalPrice, 3, 'COMMA')} + '원'">최종 낙찰가: 0원</p>
+                        <div class="panel-actions" th:if="${item.paymentStatus == 'pending'}">
+                            <a th:href="'/payment/' + ${item.id}" class="btn-bid">💳 결제하기</a>
+                            <a th:href="'/account/transactions'" class="btn-buy-now">거래 내역으로</a>
+                        </div>
+                        <p class="panel-submessage" th:if="${item.paymentStatus == 'buyer_paid'}" style="color:#4a9eff;">⏳ 판매자의 입금 확인을 기다리고 있습니다.</p>
+                        <p class="panel-submessage" th:if="${item.paymentStatus == 'completed'}" style="color:#2d8a4e;">✅ 거래가 완료되었습니다.</p>
                     </div>
 
                     <div class="bid-panel ended-panel seller-result" th:if="${item.status == 'ended' and isOwner and item.winnerId != null}">

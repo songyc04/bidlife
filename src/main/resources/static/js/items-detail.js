@@ -83,9 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 비딩하기/즉시 구매 확인 팝업
-    const bidForm = document.querySelector('.bid-confirm-form');
-    if (bidForm) {
+    // 비딩하기/즉시 구매 확인 팝업 (각 form마다 독립적으로 바인딩)
+    document.querySelectorAll('.bid-confirm-form').forEach(function(bidForm) {
         const bidInput = document.getElementById('bidAmount');
 
         bidForm.addEventListener('submit', function(e) {
@@ -112,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formToSubmit.submit();
             });
         });
-    }
+    });
 
     function updateCountdowns() {
         const countdowns = document.querySelectorAll('.countdown');

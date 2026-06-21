@@ -71,6 +71,17 @@
 .callout.warn strong { color: #ff5a00; }
 .callout.fail { background: rgba(255, 71, 71, 0.06); border-color: rgba(255, 71, 71, 0.3); }
 .callout.fail strong { color: #ff4747; }
+.callout.success { background: rgba(45, 138, 78, 0.08); border-color: rgba(45, 138, 78, 0.3); }
+.callout.success strong { color: #2d8a4e; }
+.callout.success-action {
+    background: linear-gradient(135deg, rgba(45, 138, 78, 0.12), rgba(74, 158, 255, 0.06));
+    border: 1px solid rgba(45, 138, 78, 0.4);
+}
+.callout.success-action strong { color: #2d8a4e; font-size: 16px; }
+
+.next-step-card { margin: 24px 0; }
+.next-step-card .callout { margin-top: 0; }
+.next-step-action { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* Forms */
 .trade-form { display: flex; flex-direction: column; gap: 16px; }

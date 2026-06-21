@@ -36,6 +36,86 @@
         </div>
     </div>
 
+    <section class="next-step-card" th:switch="${item.tradeStatus}">
+        <!-- SOLD: 낙찰 확정 -->
+        <div th:case="'SOLD'" class="callout" th:classappend="${isOwner} ? 'info' : 'warn'">
+            <strong th:if="${isOwner}">⏳ 구매자의 결제를 기다리고 있습니다</strong>
+            <strong th:if="${isBuyer}">🎉 낙찰을 축하합니다! 결제를 진행해주세요</strong>
+            <p th:if="${isOwner}">구매자가 결제하면 알림이 전송됩니다. 결제가 완료되면 검수소로 물품을 발송해 주세요.</p>
+            <p th:if="${isBuyer}">낙찰 후 7일 이내에 결제를 완료해주시면 검수·배송 절차가 진행됩니다.</p>
+            <div class="next-step-action" th:if="${isBuyer}">
+                <a th:href="'/payment/' + ${item.id}" class="btn-action btn-ship">💳 결제하기</a>
+            </div>
+        </div>
+
+        <!-- PAID: 결제 완료 (에스크로 보관) -->
+        <div th:case="'PAID'" class="callout" th:classappend="${isOwner} ? 'success-action' : 'info'">
+            <strong th:if="${isOwner}">✅ 결제가 확인되었습니다! 다음 단계: 검수소로 발송</strong>
+            <strong th:if="${isBuyer}">✅ 결제가 완료되어 에스크로에 안전하게 보관 중입니다</strong>
+            <p th:if="${isOwner}">구매자 결제는 BIDLIFE 에스크로에 보관되어 있으므로 안전합니다.<br>아래 버튼을 눌러 <strong>검수센터로 물품을 발송</strong>해 주세요. 검수 후 구매자에게 전달됩니다.</p>
+            <p th:if="${isBuyer}">판매자가 검수소로 물품을 발송하면 알림으로 알려드립니다. 검수 통과 후 검수소에서 안전하게 배송됩니다.</p>
+            <div class="next-step-action" th:if="${isOwner}">
+                <a th:href="'/trade/' + ${item.id} + '/ship'" class="btn-action btn-ship">📤 검수소로 발송하기</a>
+            </div>
+        </div>
+
+        <!-- SELLER_SHIPPED: 판매자 발송 완료 -->
+        <div th:case="'SELLER_SHIPPED'" class="callout info">
+            <strong>📤 검수소로 발송되었습니다</strong>
+            <p>검수센터 도착 후 검수가 진행됩니다. 보통 1~3일 이내에 검수가 완료됩니다.</p>
+        </div>
+
+        <!-- INSPECTION: 검수 중 -->
+        <div th:case="'INSPECTION'" class="callout info">
+            <strong>🔍 검수센터에서 검수 중입니다</strong>
+            <p>정품 여부와 상태를 꼼꼼히 확인하고 있습니다. 검수 완료 시 자동으로 다음 단계가 진행됩니다.</p>
+        </div>
+
+        <!-- INSPECTION_PASSED: 검수 통과 -->
+        <div th:case="'INSPECTION_PASSED'" class="callout info">
+            <strong>✅ 검수를 통과했습니다</strong>
+            <p>검수소에서 구매자에게 곧 발송합니다.</p>
+        </div>
+
+        <!-- SHIPPING: 검수소 → 구매자 배송 중 -->
+        <div th:case="'SHIPPING'" class="callout" th:classappend="${isBuyer} ? 'success-action' : 'info'">
+            <strong th:if="${isBuyer}">📦 검수소에서 배송 중입니다</strong>
+            <strong th:if="${!isBuyer}">📦 검수소 → 구매자 배송이 진행 중입니다</strong>
+            <p th:if="${isBuyer}">물품이 도착하면 아래 <strong>수령 확인</strong> 버튼을 눌러주세요. 확인 즉시 에스크로가 판매자에게 정산됩니다.</p>
+            <p th:if="${!isBuyer}">구매자가 수령 확인을 하면 거래가 최종 완료되고 에스크로가 정산됩니다.</p>
+            <div class="next-step-action" th:if="${isBuyer}">
+                <form th:action="'/trade/' + ${item.id} + '/receive'" method="post" style="display:inline;">
+                    <button type="submit" class="btn-action btn-receive">📦 수령 확인</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- INSPECTION_FAILED: 검수 실패 -->
+        <div th:case="'INSPECTION_FAILED'" class="callout fail">
+            <strong>❌ 검수가 실패하여 결제가 취소됩니다</strong>
+            <p th:if="${isBuyer}">결제하신 금액은 자동으로 환불됩니다. 물품은 판매자에게 반송됩니다.</p>
+            <p th:if="${!isBuyer}">물품이 판매자에게 반송됩니다. 자세한 사유는 검수 기록을 확인해 주세요.</p>
+        </div>
+
+        <!-- DISPUTED: 분쟁 중 -->
+        <div th:case="'DISPUTED'" class="callout warn">
+            <strong>⚠️ 분쟁이 접수되어 관리자 검토 중입니다</strong>
+            <p>관리자가 양측의 이야기를 확인 후 합리적인 결정을 내립니다. 추가 자료가 필요하면 문의하기로 전달해 주세요.</p>
+        </div>
+
+        <!-- COMPLETED: 거래 완료 -->
+        <div th:case="'COMPLETED'" class="callout success">
+            <strong>🎉 거래가 완료되었습니다</strong>
+            <p>구매자 수령 확인이 완료되어 에스크로가 판매자에게 정산되었습니다. 이용해 주셔서 감사합니다.</p>
+        </div>
+
+        <!-- CANCELLED: 취소 -->
+        <div th:case="'CANCELLED'" class="callout fail">
+            <strong>거래가 취소되었습니다</strong>
+            <p>유찰 또는 분쟁 처리에 의해 거래가 종료되었습니다.</p>
+        </div>
+    </section>
+
     <div class="trade-layout">
         <section class="trade-card">
             <h2 class="card-title">거래 타임라인</h2>

@@ -176,6 +176,9 @@ public class TradeController {
         model.addAttribute("inspection", inspection);
         model.addAttribute("disputes", disputes);
         model.addAttribute("seller", sellerOpt.orElse(null));
+        model.addAttribute("buyer", buyerOpt.orElse(null));
+        model.addAttribute("isOwner", item.getSellerId().equals(userId));
+        model.addAttribute("isBuyer", item.getWinnerId() != null && item.getWinnerId().equals(userId));
         model.addAttribute("inspectionCenter", Map.of(
                 "name", TradeService.INSPECTION_CENTER_NAME,
                 "address", TradeService.INSPECTION_CENTER_ADDRESS,
@@ -361,6 +364,7 @@ public class TradeController {
         Long userId = (Long) session.getAttribute("userId");
         if (userId != null) {
             model.addAttribute("isLoggedIn", true);
+            model.addAttribute("userId", userId);
             String nickname = (String) session.getAttribute("nickname");
             model.addAttribute("nickname", nickname != null ? nickname : "");
         } else {

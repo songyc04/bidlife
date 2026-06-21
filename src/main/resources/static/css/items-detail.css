@@ -537,6 +537,34 @@ a {
     color: #999999;
 }
 
+.panel-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+.panel-actions .btn-bid,
+.panel-actions .btn-buy-now {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1;
+    min-width: 120px;
+}
+.panel-actions .btn-bid { background: #ff5a00; color: #000; }
+.panel-actions .btn-bid:hover { background: #ff7c33; }
+.panel-actions .btn-buy-now { background: transparent; color: #ccc; border-color: #2a2a2a; }
+.panel-actions .btn-buy-now:hover { border-color: #ff5a00; color: #ff5a00; }
+
 .bid-locked {
     position: relative;
     background: linear-gradient(135deg, rgba(18, 18, 18, 0.95), rgba(30, 30, 30, 0.95));
