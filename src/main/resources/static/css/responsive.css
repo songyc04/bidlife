@@ -1,0 +1,659 @@
+/* ============================================
+   BIDLIFE Responsive Styles
+   Breakpoints:
+   - Tablet:  max-width: 968px
+   - Mobile:   max-width: 768px
+   - Small:    max-width: 480px
+   ============================================ */
+
+/* ===== TABLET (max-width: 968px) ===== */
+@media (max-width: 968px) {
+    .nav-container {
+        padding: 0 16px;
+    }
+
+    .nav-menu {
+        gap: 20px;
+    }
+
+    .account-container {
+        gap: 24px;
+    }
+
+    .manage-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .notice-detail-section .detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 100px 20px 60px;
+    }
+
+    .hero-content {
+        max-width: 100%;
+    }
+
+    .hero-btns {
+        justify-content: center;
+    }
+
+    .stats-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .stat-card {
+        min-width: 140px;
+    }
+}
+
+/* ===== MOBILE (max-width: 768px) ===== */
+@media (max-width: 768px) {
+    /* --- Navbar --- */
+    .nav-container {
+        height: 60px;
+        padding: 0 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    .nav-menu {
+        gap: 12px;
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        padding-top: 4px;
+    }
+
+    .nav-link {
+        font-size: 13px;
+    }
+
+    .nav-auth {
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    .nav-user {
+        gap: 6px;
+    }
+
+    .btn-nav-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .btn-nav-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .nav-badge {
+        min-width: 15px;
+        height: 15px;
+        font-size: 10px;
+        padding: 0 4px;
+    }
+
+    .profile-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .btn-logout {
+        padding: 6px 14px;
+        font-size: 12px;
+    }
+
+    .btn-login,
+    .btn-signup {
+        font-size: 13px;
+        padding: 6px 14px;
+    }
+
+    /* --- Account layout --- */
+    .account-section {
+        padding: 90px 12px 60px;
+    }
+
+    .account-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .account-sidebar {
+        width: 100%;
+        position: static;
+        padding: 20px 16px;
+    }
+
+    .sidebar-header {
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+    }
+
+    .profile-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    .sidebar-header h3 {
+        font-size: 16px;
+    }
+
+    .sidebar-menu {
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 6px;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .menu-item {
+        white-space: nowrap;
+        padding: 10px 14px;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    .menu-icon {
+        font-size: 16px;
+    }
+
+    .unread-badge {
+        margin-left: 4px;
+    }
+
+    /* --- Content header --- */
+    .content-header h2 {
+        font-size: 22px;
+    }
+
+    .content-header p {
+        font-size: 13px;
+    }
+
+    .content-header-top {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .btn-back {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    /* --- Info cards --- */
+    .info-card {
+        padding: 20px 16px;
+    }
+
+    .info-card-title {
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 14px 0;
+    }
+
+    .info-row label {
+        width: auto;
+        font-size: 13px;
+    }
+
+    .info-value {
+        font-size: 15px;
+    }
+
+    /* --- Forms --- */
+    .form-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 14px;
+        padding: 12px 14px;
+    }
+
+    .btn-edit {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+
+    /* --- Profile upload --- */
+    .profile-upload-area {
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .profile-preview {
+        width: 64px;
+        height: 64px;
+    }
+
+    .profile-preview .preview-placeholder {
+        font-size: 26px;
+    }
+
+    .upload-controls {
+        align-items: center;
+        text-align: center;
+    }
+
+    /* --- Items grid --- */
+    .card-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .item-card {
+        max-width: 100%;
+    }
+
+    /* --- Item detail --- */
+    .detail-layout {
+        gap: 20px;
+    }
+
+    .detail-gallery {
+        margin-bottom: 0;
+    }
+
+    .preview-image {
+        aspect-ratio: 4/3;
+    }
+
+    .detail-info h1 {
+        font-size: 20px;
+    }
+
+    .price-value {
+        font-size: 18px;
+    }
+
+    .price-value.buy-now {
+        font-size: 16px;
+    }
+
+    .bid-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-bid,
+    .btn-buy-now {
+        width: 100%;
+    }
+
+    /* --- Manage layout --- */
+    .manage-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .preview-image {
+        aspect-ratio: 4/3;
+    }
+
+    .preview-info h3 {
+        font-size: 17px;
+    }
+
+    .action-card {
+        padding: 18px 16px;
+    }
+
+    .action-card h4 {
+        font-size: 16px;
+    }
+
+    .btn-action {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+
+    /* --- Transactions --- */
+    .transaction-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 0;
+    }
+
+    .tab-btn {
+        white-space: nowrap;
+        padding: 10px 16px;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    .transaction-card {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .card-thumb {
+        width: 100%;
+        max-height: 200px;
+    }
+
+    .card-action {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .btn-action {
+        width: auto;
+        flex: 1;
+        min-width: 120px;
+    }
+
+    /* --- Notifications --- */
+    .notification-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .notification-actions-top {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .notification-item {
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+
+    .notification-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+
+    .notification-message {
+        font-size: 13px;
+    }
+
+    .notification-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .notification-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    /* --- Bids / Picklist --- */
+    .bid-detail,
+    .favorite-detail {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* --- Payment --- */
+    .payment-container {
+        max-width: 100%;
+    }
+
+    .payment-card {
+        padding: 20px 16px;
+    }
+
+    .payment-amount {
+        font-size: 24px;
+    }
+
+    .payment-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* --- Notice --- */
+    .notice-section {
+        padding: 90px 12px 60px;
+    }
+
+    .page-title {
+        font-size: 26px;
+    }
+
+    .notice-item {
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px;
+    }
+
+    .notice-meta {
+        font-size: 12px;
+    }
+
+    .notice-content {
+        padding: 20px 16px;
+    }
+
+    .notice-title {
+        font-size: 20px;
+    }
+
+    .notice-body {
+        font-size: 14px;
+    }
+
+    /* --- FAQ --- */
+    .faq-section {
+        padding: 90px 12px 60px;
+    }
+
+    .category-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+    }
+
+    .category-tab {
+        white-space: nowrap;
+        flex-shrink: 0;
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .faq-question {
+        font-size: 14px;
+        padding: 16px;
+    }
+
+    .faq-answer {
+        font-size: 13px;
+    }
+
+    /* --- Login / Signup --- */
+    .login-section,
+    .signup-section {
+        padding: 90px 16px 60px;
+    }
+
+    .login-container,
+    .signup-container {
+        max-width: 100%;
+        padding: 24px 20px;
+    }
+
+    .login-header h1,
+    .signup-header h1 {
+        font-size: 24px;
+    }
+
+    .btn-submit {
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    /* --- Items new (auction form) --- */
+    .auction-form {
+        max-width: 100%;
+    }
+
+    .form-section {
+        padding: 18px 14px;
+    }
+
+    .form-section-title {
+        font-size: 16px;
+    }
+
+    .image-upload-area {
+        padding: 20px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .form-actions .btn-cancel,
+    .form-actions .btn-submit {
+        width: 100%;
+    }
+
+    /* --- Footer --- */
+    .footer {
+        padding: 30px 16px;
+        font-size: 12px;
+    }
+
+    /* --- Alerts --- */
+    .alert-success,
+    .alert-error {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+
+    /* --- Seller profile --- */
+    .seller-profile-section {
+        padding: 90px 12px 60px;
+    }
+
+    .seller-header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    /* --- Empty states --- */
+    .empty-state {
+        padding: 50px 16px;
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+    }
+}
+
+/* ===== SMALL MOBILE (max-width: 480px) ===== */
+@media (max-width: 480px) {
+    .nav-menu {
+        gap: 8px;
+    }
+
+    .nav-link {
+        font-size: 12px;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .stats-container {
+        flex-direction: column;
+    }
+
+    .stat-card {
+        min-width: 100%;
+    }
+
+    .stat-number {
+        font-size: 20px;
+    }
+
+    .content-header h2 {
+        font-size: 20px;
+    }
+
+    .payment-amount {
+        font-size: 20px;
+    }
+
+    .page-title {
+        font-size: 22px;
+    }
+
+    .btn-action {
+        font-size: 12px;
+        padding: 10px 14px;
+    }
+
+    .notification-actions-top {
+        flex-direction: column;
+    }
+
+    .notification-actions-top form {
+        width: 100%;
+    }
+
+    .notification-actions-top button {
+        width: 100%;
+    }
+
+    .card-action {
+        flex-direction: column;
+    }
+
+    .btn-action {
+        width: 100%;
+    }
+}
+
+/* ===== Landscape orientation for mobile ===== */
+@media (max-width: 768px) and (orientation: landscape) {
+    .account-section {
+        padding-top: 70px;
+    }
+
+    .hero-section {
+        padding-top: 80px;
+    }
+}
