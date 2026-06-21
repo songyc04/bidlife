@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <header th:fragment="navbar" class="navbar">
     <div class="nav-container">
         <button type="button" class="nav-toggle" id="navToggle" aria-label="사이드 메뉴 열기" title="사이드 메뉴">
@@ -124,43 +122,40 @@
             <a th:if="${isLoggedIn != null and isLoggedIn}" href="/login/logout" class="drawer-action drawer-action-logout">로그아웃</a>
         </div>
     </aside>
-</header>
 
-<script>
-    (function() {
-        const toggle = document.getElementById('navToggle');
-        const drawer = document.getElementById('navDrawer');
-        const backdrop = document.getElementById('navBackdrop');
-        const closeBtn = document.getElementById('navClose');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('navToggle');
+            const drawer = document.getElementById('navDrawer');
+            const backdrop = document.getElementById('navBackdrop');
+            const closeBtn = document.getElementById('navClose');
 
-        if (!toggle || !drawer || !backdrop) return;
+            if (!toggle || !drawer || !backdrop) return;
 
-        const openDrawer = () => {
-            drawer.classList.add('open');
-            backdrop.classList.add('open');
-            document.body.classList.add('drawer-open');
-        };
-        const closeDrawer = () => {
-            drawer.classList.remove('open');
-            backdrop.classList.remove('open');
-            document.body.classList.remove('drawer-open');
-        };
+            const openDrawer = function() {
+                drawer.classList.add('open');
+                backdrop.classList.add('open');
+                document.body.classList.add('drawer-open');
+            };
+            const closeDrawer = function() {
+                drawer.classList.remove('open');
+                backdrop.classList.remove('open');
+                document.body.classList.remove('drawer-open');
+            };
 
-        toggle.addEventListener('click', openDrawer);
-        closeBtn && closeBtn.addEventListener('click', closeDrawer);
-        backdrop.addEventListener('click', closeDrawer);
+            toggle.addEventListener('click', openDrawer);
+            if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+            backdrop.addEventListener('click', closeDrawer);
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && drawer.classList.contains('open')) {
-                closeDrawer();
-            }
-        });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && drawer.classList.contains('open')) {
+                    closeDrawer();
+                }
+            });
 
-        drawer.querySelectorAll('a').forEach(a => {
-            a.addEventListener('click', () => {
-                closeDrawer();
+            drawer.querySelectorAll('a').forEach(function(a) {
+                a.addEventListener('click', closeDrawer);
             });
         });
-    })();
-</script>
-</html>
+    </script>
+</header>

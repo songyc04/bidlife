@@ -40,7 +40,8 @@ function initCountdowns() {
                 return;
             }
 
-            // 시, 분, 초 포맷팅
+            // 일, 시, 분, 초 포맷팅
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
             const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((difference % (1000 * 60)) / 1000);
@@ -49,7 +50,11 @@ function initCountdowns() {
             const formattedMinutes = String(minutes).padStart(2, '0');
             const formattedSeconds = String(seconds).padStart(2, '0');
 
-            el.textContent = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+            if (days > 0) {
+                el.textContent = `${days}일 ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+            } else {
+                el.textContent = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+            }
         });
     }, 1000);
 }

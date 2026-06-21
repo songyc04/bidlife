@@ -114,7 +114,7 @@ public class AccountController {
             return "account";
         } catch (Exception e) {
             log.error("Error loading account page for userId={}", userId, e);
-            redirectAttributes.addFlashAttribute("errorMessage", "?섏씠吏瑜?遺덈윭?ㅻ뒗 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎: " + e.getClass().getSimpleName());
+            redirectAttributes.addFlashAttribute("errorMessage", "페이지를 불러오는 중 오류가 발생했습니다: " + e.getClass().getSimpleName());
             return "redirect:/";
         }
     }
@@ -135,7 +135,7 @@ public class AccountController {
             model.addAttribute("nickname", user.get().getNickname());
         }
 
-        // ?쎌? ?딆? ?뚮┝ 媛쒖닔
+        // 읽지 않은 알림 개수
         long unreadCount = notificationService.getUnreadCount(userId);
         model.addAttribute("unreadCount", unreadCount);
 
@@ -159,7 +159,7 @@ public class AccountController {
 
             model.addAttribute("bidDetails", bidDetails);
         } catch (Exception e) {
-            log.error("Error loading bid history", e);
+            log.error("입찰 내역 로드 중 오류", e);
             model.addAttribute("bidDetails", new ArrayList<>());
         }
 
@@ -183,7 +183,7 @@ public class AccountController {
                 model.addAttribute("nickname", user.get().getNickname());
             }
 
-            // ?쎌? ?딆? ?뚮┝ 媛쒖닔
+            // 읽지 않은 알림 개수
             long unreadCount = notificationService.getUnreadCount(userId);
             model.addAttribute("unreadCount", unreadCount);
 
@@ -192,7 +192,7 @@ public class AccountController {
 
             return "account/items";
         } catch (Exception e) {
-            log.error("Error loading my items page", e);
+            log.error("내 등록 물품 페이지 로드 중 오류", e);
             model.addAttribute("myItems", new java.util.ArrayList<>());
             return "account/items";
         }
@@ -214,7 +214,7 @@ public class AccountController {
             model.addAttribute("nickname", user.get().getNickname());
         }
 
-        // ?쎌? ?딆? ?뚮┝ 媛쒖닔
+        // 읽지 않은 알림 개수
         long unreadCount = notificationService.getUnreadCount(userId);
         model.addAttribute("unreadCount", unreadCount);
 
@@ -238,7 +238,7 @@ public class AccountController {
 
             model.addAttribute("favoriteDetails", favoriteDetails);
         } catch (Exception e) {
-            log.error("Error loading favorites", e);
+            log.error("찜한 경매 로드 중 오류", e);
             model.addAttribute("favoriteDetails", new ArrayList<>());
         }
 
@@ -261,7 +261,7 @@ public class AccountController {
             model.addAttribute("nickname", user.get().getNickname());
         }
 
-        // ?쎌? ?딆? ?뚮┝ 媛쒖닔
+        // 읽지 않은 알림 개수
         long unreadCount = notificationService.getUnreadCount(userId);
         model.addAttribute("unreadCount", unreadCount);
 
@@ -287,18 +287,18 @@ public class AccountController {
             return "redirect:/login?redirect=/account/items/new";
         }
 
-        // ?대?吏 寃利? 理쒖냼 1???댁긽 ?꾩닔
+        // 이미지 갯수 최소 1장 이상 필수
         if (images == null || images.length == 0) {
-            redirectAttributes.addFlashAttribute("errorMessage", "理쒖냼 1???댁긽???대?吏瑜??낅줈?쒗빐???⑸땲??");
+            redirectAttributes.addFlashAttribute("errorMessage", "최소 1장 이상의 이미지를 업로드해야 합니다.");
             return "redirect:/account/items/new";
         }
 
-        // 利됱떆 援щℓ媛 ?뺢퇋?? 0 ?먮뒗 null?대㈃ null濡?泥섎━ (?쇰컲 寃쎈ℓ濡?吏꾪뻾)
+        // 즉시 구매가가 비어있거나 0 또는 null이면 null로 처리 (일반 경매로 진행)
         Integer normalizedBuyNowPrice = (buyNowPrice != null && buyNowPrice > 0) ? buyNowPrice : null;
 
-        // 利됱떆 援щℓ媛媛 ?쒖옉媛蹂대떎 ?묒쑝硫?臾댄슚
+        // 즉시 구매가가 시작가보다 낮으면 무효
         if (normalizedBuyNowPrice != null && normalizedBuyNowPrice <= startPrice) {
-            redirectAttributes.addFlashAttribute("errorMessage", "利됱떆 援щℓ媛???쒖옉媛蹂대떎 而ㅼ빞 ?⑸땲??");
+            redirectAttributes.addFlashAttribute("errorMessage", "즉시 구매가는 시작가보다 높아야 합니다.");
             return "redirect:/account/items/new";
         }
 
@@ -309,13 +309,13 @@ public class AccountController {
             itemService.saveItem(title, category, description, startPrice, normalizedBuyNowPrice, bidUnit, startDt, endDt, userId, images);
 
             String message = (normalizedBuyNowPrice != null)
-                    ? "寃쎈ℓ媛 ?깃났?곸쑝濡??깅줉?섏뿀?듬땲??"
-                    : "寃쎈ℓ媛 ?깃났?곸쑝濡??깅줉?섏뿀?듬땲?? (?쇰컲 寃쎈ℓ濡?吏꾪뻾?⑸땲??";
+                    ? "경매가 성공적으로 등록되었습니다."
+                    : "경매가 성공적으로 등록되었습니다. (일반 경매로 진행됩니다)";
             redirectAttributes.addFlashAttribute("successMessage", message);
             return "redirect:/account/items";
         } catch (Exception e) {
-            log.error("寃쎈ℓ ?깅줉 ?ㅽ뙣: {}", e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("errorMessage", "寃쎈ℓ ?깅줉 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎: " + e.getMessage());
+            log.error("경매 등록 실패: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("errorMessage", "경매 등록 중 오류가 발생했습니다: " + e.getMessage());
             return "redirect:/account/items/new";
         }
     }
@@ -330,14 +330,14 @@ public class AccountController {
 
         try {
             itemService.deleteItem(id, userId);
-            redirectAttributes.addFlashAttribute("successMessage", "寃쎈ℓ媛 ?깃났?곸쑝濡???젣?섏뿀?듬땲??");
+            redirectAttributes.addFlashAttribute("successMessage", "경매가 성공적으로 삭제되었습니다.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (SecurityException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            log.error("Error deleting item", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "寃쎈ℓ ??젣 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            log.error("경매 삭제 중 오류", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "경매 삭제 중 오류가 발생했습니다.");
         }
 
         return "redirect:/account/items";
@@ -359,18 +359,18 @@ public class AccountController {
                 model.addAttribute("nickname", user.get().getNickname());
             }
 
-            // ?쎌? ?딆? ?뚮┝ 媛쒖닔
+            // 읽지 않은 알림 개수
             long unreadCount = notificationService.getUnreadCount(userId);
             model.addAttribute("unreadCount", unreadCount);
 
             ItemEntity item = itemService.getItemById(id);
             if (item == null) {
-                redirectAttributes.addFlashAttribute("errorMessage", "議댁옱?섏? ?딅뒗 寃쎈ℓ?낅땲??");
+                redirectAttributes.addFlashAttribute("errorMessage", "존재하지 않는 경매입니다.");
                 return "redirect:/account/items";
             }
 
             if (!item.getSellerId().equals(userId)) {
-                redirectAttributes.addFlashAttribute("errorMessage", "愿由?沅뚰븳???놁뒿?덈떎.");
+                redirectAttributes.addFlashAttribute("errorMessage", "권한이 없습니다.");
                 return "redirect:/account/items";
             }
 
@@ -378,15 +378,15 @@ public class AccountController {
 
             if (item.getStatus().equals("ended") && item.getWinnerId() != null) {
                 SignupEntity winner = signupRepository.findById(item.getWinnerId()).orElse(null);
-                model.addAttribute("winnerNickname", winner != null ? winner.getNickname() : "?????놁쓬");
+                model.addAttribute("winnerNickname", winner != null ? winner.getNickname() : "알수없음");
             } else {
                 model.addAttribute("winnerNickname", null);
             }
 
             return "account/items-manage";
         } catch (Exception e) {
-            log.error("Error loading manage page", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "愿由??섏씠吏瑜?遺덈윭?ㅻ뒗 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            log.error("관리 페이지 로드 중 오류", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "관리 페이지를 불러오는 중 오류가 발생했습니다.");
             return "redirect:/account/items";
         }
     }
@@ -401,7 +401,7 @@ public class AccountController {
 
         try {
             itemService.endItemEarly(id, userId);
-            redirectAttributes.addFlashAttribute("successMessage", "寃쎈ℓ媛 議곌린 醫낅즺?섏뿀?듬땲??");
+            redirectAttributes.addFlashAttribute("successMessage", "경매가 조기 종료되었습니다.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (SecurityException e) {
@@ -409,8 +409,8 @@ public class AccountController {
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            log.error("Error ending item", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "寃쎈ℓ 醫낅즺 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            log.error("경매 종료 중 오류", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "경매 종료 중 오류가 발생했습니다.");
         }
 
         return "redirect:/account/items/" + id + "/manage";
@@ -426,7 +426,7 @@ public class AccountController {
 
         try {
             itemService.confirmPaymentBySeller(id, userId);
-            redirectAttributes.addFlashAttribute("successMessage", "?낃툑 ?뺤씤???꾨즺?섏뼱 嫄곕옒媛 ?깆궗?섏뿀?듬땲??");
+            redirectAttributes.addFlashAttribute("successMessage", "입금 확인이 완료되어 거래가 확정되었습니다.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (SecurityException e) {
@@ -434,8 +434,8 @@ public class AccountController {
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            log.error("Error confirming payment", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "?낃툑 ?뺤씤 泥섎━ 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            log.error("입금 확인 처리 중 오류", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "입금 확인 처리 중 오류가 발생했습니다.");
         }
 
         return "redirect:/account/items/" + id + "/manage";
@@ -450,41 +450,41 @@ public class AccountController {
         Long userId = (Long) session.getAttribute("userId");
 
         if (userId == null) {
-            if (isAjax(request)) return jsonError("濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+            if (isAjax(request)) return jsonError("로그인이 필요합니다.");
             return "redirect:/login?redirect=/account";
         }
 
         try {
             if (newNickname == null || newNickname.trim().isEmpty()) {
-                if (isAjax(request)) return jsonError("?됰꽕?꾩쓣 ?낅젰?댁＜?몄슂.");
-                redirectAttributes.addFlashAttribute("errorMessage", "?됰꽕?꾩쓣 ?낅젰?댁＜?몄슂.");
+                if (isAjax(request)) return jsonError("닉네임을 입력해주세요.");
+                redirectAttributes.addFlashAttribute("errorMessage", "닉네임을 입력해주세요.");
                 return "redirect:/account";
             }
 
             newNickname = newNickname.trim();
 
             if (newNickname.length() > 50) {
-                if (isAjax(request)) return jsonError("?됰꽕?꾩? 50???댄븯?ъ빞 ?⑸땲??");
-                redirectAttributes.addFlashAttribute("errorMessage", "?됰꽕?꾩? 50???댄븯?ъ빞 ?⑸땲??");
+                if (isAjax(request)) return jsonError("닉네임은 50자 이하여야 합니다.");
+                redirectAttributes.addFlashAttribute("errorMessage", "닉네임은 50자 이하여야 합니다.");
                 return "redirect:/account";
             }
 
             Optional<SignupEntity> currentUser = signupRepository.findById(userId);
             if (currentUser.isEmpty()) {
-                if (isAjax(request)) return jsonError("?ъ슜???뺣낫瑜?李얠쓣 ???놁뒿?덈떎.");
-                redirectAttributes.addFlashAttribute("errorMessage", "?ъ슜???뺣낫瑜?李얠쓣 ???놁뒿?덈떎.");
+                if (isAjax(request)) return jsonError("사용자 정보를 찾을 수 없습니다.");
+                redirectAttributes.addFlashAttribute("errorMessage", "사용자 정보를 찾을 수 없습니다.");
                 return "redirect:/login";
             }
 
             if (currentUser.get().getNickname().equals(newNickname)) {
-                if (isAjax(request)) return jsonError("?꾩옱 ?됰꽕?꾧낵 ?숈씪?⑸땲??");
-                redirectAttributes.addFlashAttribute("errorMessage", "?꾩옱 ?됰꽕?꾧낵 ?숈씪?⑸땲??");
+                if (isAjax(request)) return jsonError("현재 닉네임과 동일합니다.");
+                redirectAttributes.addFlashAttribute("errorMessage", "현재 닉네임과 동일합니다.");
                 return "redirect:/account";
             }
 
             if (signupRepository.existsByNickname(newNickname)) {
-                if (isAjax(request)) return jsonError("?대? ?ъ슜 以묒씤 ?됰꽕?꾩엯?덈떎.");
-                redirectAttributes.addFlashAttribute("errorMessage", "?대? ?ъ슜 以묒씤 ?됰꽕?꾩엯?덈떎.");
+                if (isAjax(request)) return jsonError("이미 사용 중인 닉네임입니다.");
+                redirectAttributes.addFlashAttribute("errorMessage", "이미 사용 중인 닉네임입니다.");
                 return "redirect:/account";
             }
 
@@ -492,14 +492,14 @@ public class AccountController {
             signupRepository.save(currentUser.get());
             session.setAttribute("nickname", newNickname);
             if (isAjax(request)) {
-                return "{\"success\": true, \"message\": \"?됰꽕?꾩씠 蹂寃쎈릺?덉뒿?덈떎.\", \"nickname\": \"" + newNickname + "\"}";
+                return "{\"success\": true, \"message\": \"닉네임이 변경되었습니다.\", \"nickname\": \"" + newNickname + "\"}";
             }
-            redirectAttributes.addFlashAttribute("successMessage", "?됰꽕?꾩씠 蹂寃쎈릺?덉뒿?덈떎.");
+            redirectAttributes.addFlashAttribute("successMessage", "닉네임이 변경되었습니다.");
             return "redirect:/account";
         } catch (Exception e) {
-            log.error("?됰꽕??蹂寃??ㅽ뙣: userId={}, newNickname={}", userId, newNickname, e);
-            if (isAjax(request)) return jsonError("?됰꽕??蹂寃?以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎: " + e.getClass().getSimpleName());
-            redirectAttributes.addFlashAttribute("errorMessage", "?됰꽕??蹂寃?以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎: " + e.getClass().getSimpleName());
+            log.error("닉네임 변경 실패: userId={}, newNickname={}", userId, newNickname, e);
+            if (isAjax(request)) return jsonError("닉네임 변경 중 오류가 발생했습니다: " + e.getClass().getSimpleName());
+            redirectAttributes.addFlashAttribute("errorMessage", "닉네임 변경 중 오류가 발생했습니다: " + e.getClass().getSimpleName());
             return "redirect:/account";
         }
     }
@@ -526,43 +526,43 @@ public class AccountController {
 
         try {
             if (currentPassword == null || currentPassword.isEmpty()) {
-                redirectAttributes.addFlashAttribute("passwordErrorMessage", "?꾩옱 鍮꾨?踰덊샇瑜??낅젰?댁＜?몄슂.");
+                redirectAttributes.addFlashAttribute("passwordErrorMessage", "현재 비밀번호를 입력해주세요.");
                 return "redirect:/account";
             }
 
             if (newPassword == null || newPassword.length() < 6) {
-                redirectAttributes.addFlashAttribute("passwordErrorMessage", "??鍮꾨?踰덊샇??6???댁긽?댁뼱???⑸땲??");
+                redirectAttributes.addFlashAttribute("passwordErrorMessage", "새 비밀번호는 6자 이상이어야 합니다.");
                 return "redirect:/account";
             }
 
             if (!newPassword.equals(confirmPassword)) {
-                redirectAttributes.addFlashAttribute("passwordErrorMessage", "??鍮꾨?踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎.");
+                redirectAttributes.addFlashAttribute("passwordErrorMessage", "새 비밀번호가 일치하지 않습니다.");
                 return "redirect:/account";
             }
 
             if (currentPassword.equals(newPassword)) {
-                redirectAttributes.addFlashAttribute("passwordErrorMessage", "??鍮꾨?踰덊샇???꾩옱 鍮꾨?踰덊샇? ?щ씪???⑸땲??");
+                redirectAttributes.addFlashAttribute("passwordErrorMessage", "새 비밀번호가 현재 비밀번호와 같습니다.");
                 return "redirect:/account";
             }
 
             Optional<SignupEntity> user = signupRepository.findById(userId);
             if (user.isEmpty()) {
-                redirectAttributes.addFlashAttribute("passwordErrorMessage", "?ъ슜???뺣낫瑜?李얠쓣 ???놁뒿?덈떎.");
+                redirectAttributes.addFlashAttribute("passwordErrorMessage", "사용자 정보를 찾을 수 없습니다.");
                 return "redirect:/login";
             }
 
             if (!user.get().getPassword().equals(currentPassword)) {
-                redirectAttributes.addFlashAttribute("passwordErrorMessage", "?꾩옱 鍮꾨?踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎.");
+                redirectAttributes.addFlashAttribute("passwordErrorMessage", "현재 비밀번호가 일치하지 않습니다.");
                 return "redirect:/account";
             }
 
             user.get().setPassword(newPassword);
             signupRepository.save(user.get());
-            redirectAttributes.addFlashAttribute("passwordSuccessMessage", "鍮꾨?踰덊샇媛 蹂寃쎈릺?덉뒿?덈떎.");
+            redirectAttributes.addFlashAttribute("passwordSuccessMessage", "비밀번호가 변경되었습니다.");
             return "redirect:/account";
         } catch (Exception e) {
-            log.error("鍮꾨?踰덊샇 蹂寃??ㅽ뙣: userId={}", userId, e);
-            redirectAttributes.addFlashAttribute("passwordErrorMessage", "鍮꾨?踰덊샇 蹂寃?以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎: " + e.getClass().getSimpleName());
+            log.error("비밀번호 변경 실패: userId={}", userId, e);
+            redirectAttributes.addFlashAttribute("passwordErrorMessage", "비밀번호 변경 중 오류가 발생했습니다: " + e.getClass().getSimpleName());
             return "redirect:/account";
         }
     }
@@ -579,7 +579,7 @@ public class AccountController {
 
         try {
             if (profileImage == null || profileImage.isEmpty()) {
-                redirectAttributes.addFlashAttribute("errorMessage", "?대?吏瑜??좏깮?댁＜?몄슂.");
+                redirectAttributes.addFlashAttribute("errorMessage", "이미지를 선택해주세요.");
                 return "redirect:/account";
             }
 
@@ -606,13 +606,13 @@ public class AccountController {
                 }
                 user.get().setProfileImage(imagePath);
                 signupRepository.save(user.get());
-                redirectAttributes.addFlashAttribute("successMessage", "?꾨줈???대?吏媛 蹂寃쎈릺?덉뒿?덈떎.");
+                redirectAttributes.addFlashAttribute("successMessage", "프로필 이미지가 변경되었습니다.");
             }
 
             return "redirect:/account";
         } catch (IOException e) {
-            log.error("?꾨줈???대?吏 ?낅줈???ㅽ뙣: {}", e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("errorMessage", "?꾨줈???대?吏 ?낅줈??以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            log.error("프로필 이미지 업로드 실패: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("errorMessage", "프로필 이미지 업로드 중 오류가 발생했습니다.");
             return "redirect:/account";
         }
     }
@@ -690,14 +690,14 @@ public class AccountController {
             model.addAttribute("nickname", user.get().getNickname());
         }
 
-        // ?쎌? ?딆? ?뚮┝ 媛쒖닔
+        // 읽지 않은 알림 개수
         long unreadCount = notificationService.getUnreadCount(userId);
         model.addAttribute("unreadCount", unreadCount);
 
         List<NotificationEntity> notifications = notificationService.getNotificationsByUserId(userId);
         model.addAttribute("notifications", notifications);
 
-        // ?뚮┝蹂?linkUrl 怨꾩궛
+        // 알림별 linkUrl 매핑
         Map<Long, String> notificationLinks = new HashMap<>();
         for (NotificationEntity n : notifications) {
             if (n.getItemId() == null) {
@@ -705,21 +705,21 @@ public class AccountController {
                 continue;
             }
             String type = n.getType();
-            // ?먮ℓ???뺤씤/愿由??뚮┝ ??愿由??섏씠吏
+            // 판매자용: 입금확인/관리알림 → 관리페이지
             if ("auction_seller_won".equals(type) || "auction_failed".equals(type)
                     || "new_bid".equals(type) || "payment_buyer_paid".equals(type)) {
                 notificationLinks.put(n.getId(), "/account/items/" + n.getItemId() + "/manage");
             }
-            // 援щℓ??寃곗젣 ?뚮┝ ??寃곗젣 ?섏씠吏
+            // 구매자용: 낙찰/즉시구매알림 → 결제페이지
             else if ("auction_won".equals(type) || "buy_now_complete".equals(type)
                     || "payment_pending_seller".equals(type)) {
                 notificationLinks.put(n.getId(), "/payment/" + n.getItemId());
             }
-            // 嫄곕옒 ?꾨즺 ??嫄곕옒 ?댁뿭
+            // 거래완료 → 거래 내역
             else if ("transaction_completed".equals(type)) {
                 notificationLinks.put(n.getId(), "/account/transactions");
             }
-            // 湲곕낯: 寃쎈ℓ ?곸꽭
+            // 기본: 경매 상세
             else {
                 notificationLinks.put(n.getId(), "/items/" + n.getItemId());
             }
@@ -756,13 +756,13 @@ public class AccountController {
         for (ItemEntity item : purchases) {
             if (!sellerNicknames.containsKey(item.getSellerId())) {
                 SignupEntity seller = signupRepository.findById(item.getSellerId()).orElse(null);
-                sellerNicknames.put(item.getSellerId(), seller != null ? seller.getNickname() : "?????놁쓬");
+                sellerNicknames.put(item.getSellerId(), seller != null ? seller.getNickname() : "알수없음");
             }
         }
         for (ItemEntity item : sales) {
             if (item.getWinnerId() != null && !buyerNicknames.containsKey(item.getWinnerId())) {
                 SignupEntity buyer = signupRepository.findById(item.getWinnerId()).orElse(null);
-                buyerNicknames.put(item.getWinnerId(), buyer != null ? buyer.getNickname() : "?????놁쓬");
+                buyerNicknames.put(item.getWinnerId(), buyer != null ? buyer.getNickname() : "알수없음");
             }
         }
 
@@ -785,8 +785,8 @@ public class AccountController {
         try {
             notificationService.markAsRead(id);
         } catch (Exception e) {
-            log.error("媛쒕퀎 ?뚮┝ ?쎌쓬 泥섎━ ?ㅽ뙣: notificationId={}, userId={}", id, userId, e);
-            redirectAttributes.addFlashAttribute("errorMessage", "?뚮┝ 泥섎━ 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            log.error("알림 읽음 처리 실패: notificationId={}, userId={}", id, userId, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "알림 처리 중 오류가 발생했습니다.");
         }
         return "redirect:/account/notifications";
     }
@@ -812,7 +812,7 @@ public class AccountController {
         }
 
         int deleted = notificationService.deleteReadByUserId(userId);
-        redirectAttributes.addFlashAttribute("successMessage", "?쎌? ?뚮┝ " + deleted + "媛쒕? ??젣?덉뒿?덈떎.");
+        redirectAttributes.addFlashAttribute("successMessage", "읽은 알림 " + deleted + "건을 삭제했습니다.");
         return "redirect:/account/notifications";
     }
 
@@ -826,10 +826,10 @@ public class AccountController {
 
         try {
             notificationService.deleteById(id);
-            redirectAttributes.addFlashAttribute("successMessage", "?뚮┝????젣?섏뿀?듬땲??");
+            redirectAttributes.addFlashAttribute("successMessage", "알림이 삭제되었습니다.");
         } catch (Exception e) {
-            log.error("媛쒕퀎 ?뚮┝ ??젣 ?ㅽ뙣: notificationId={}, userId={}", id, userId, e);
-            redirectAttributes.addFlashAttribute("errorMessage", "?뚮┝ ??젣 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            log.error("알림 삭제 실패: notificationId={}, userId={}", id, userId, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "알림 삭제 중 오류가 발생했습니다.");
         }
         return "redirect:/account/notifications";
     }
@@ -842,7 +842,7 @@ public class AccountController {
 
         if (userId == null) {
             response.put("success", false);
-            response.put("message", "濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+            response.put("message", "로그인이 필요합니다.");
             return ResponseEntity.status(401).body(response);
         }
 
@@ -850,12 +850,12 @@ public class AccountController {
             boolean isFavorite = favoriteService.toggleFavorite(userId, itemId);
             response.put("success", true);
             response.put("isFavorite", isFavorite);
-            response.put("message", isFavorite ? "李?紐⑸줉??異붽??섏뿀?듬땲??" : "李?紐⑸줉?먯꽌 ?쒓굅?섏뿀?듬땲??");
+            response.put("message", isFavorite ? "찜 목록에 추가되었습니다." : "찜 목록에서 제거되었습니다.");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("Error toggling favorite", e);
+            log.error("찜 토글 처리 중 오류", e);
             response.put("success", false);
-            response.put("message", "泥섎━ 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            response.put("message", "처리 중 오류가 발생했습니다.");
             return ResponseEntity.status(500).body(response);
         }
     }
@@ -874,14 +874,14 @@ public class AccountController {
 
         try {
             itemService.updateImages(id, userId, newImages, removeImages);
-            redirectAttributes.addFlashAttribute("successMessage", "?ъ쭊???낅뜲?댄듃?섏뿀?듬땲??");
+            redirectAttributes.addFlashAttribute("successMessage", "상품이 업데이트되었습니다.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (SecurityException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            log.error("Error updating images", e);
-            redirectAttributes.addFlashAttribute("errorMessage", "?ъ쭊 ?낅뜲?댄듃 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            log.error("상품 업데이트 중 오류", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "상품 업데이트 중 오류가 발생했습니다.");
         }
 
         return "redirect:/account/items/" + id + "/manage";
@@ -896,14 +896,14 @@ public class AccountController {
 
         if (userId == null) {
             response.put("success", false);
-            response.put("message", "濡쒓렇?몄씠 ?꾩슂?⑸땲??");
+            response.put("message", "로그인이 필요합니다.");
             return ResponseEntity.status(401).body(response);
         }
 
         try {
             itemService.updateImages(id, userId, null, new String[]{imagePath});
             response.put("success", true);
-            response.put("message", "?ъ쭊????젣?섏뿀?듬땲??");
+            response.put("message", "이미지가 삭제되었습니다.");
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             response.put("success", false);
@@ -914,9 +914,9 @@ public class AccountController {
             response.put("message", e.getMessage());
             return ResponseEntity.status(403).body(response);
         } catch (Exception e) {
-            log.error("Error deleting image", e);
+            log.error("이미지 삭제 중 오류", e);
             response.put("success", false);
-            response.put("message", "?ъ쭊 ??젣 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.");
+            response.put("message", "이미지 삭제 중 오류가 발생했습니다.");
             return ResponseEntity.status(500).body(response);
         }
     }
