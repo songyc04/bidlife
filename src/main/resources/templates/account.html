@@ -29,10 +29,6 @@
                     성공적으로 변경되었습니다.
                 </div>
 
-                <div class="alert-error" th:if="${errorMessage != null}" th:text="${errorMessage}">
-                    오류가 발생했습니다.
-                </div>
-
                 <div class="info-card">
                     <h3 class="info-card-title">기본 정보</h3>
                     <div class="info-row">
@@ -54,16 +50,18 @@
                         <h3 class="info-card-title">프로필 이미지</h3>
                         <form action="/account/update-profile-image" method="post" enctype="multipart/form-data" class="edit-form">
                             <div class="profile-upload-area" id="profileUploadArea">
-                                <div class="profile-preview" id="profilePreview">
-                                    <img th:if="${profileImage != null and !profileImage.isEmpty()}" 
-                                         th:src="${profileImage}" 
-                                         alt="프로필" 
+                                <div class="profile-preview" id="profilePreview"
+                                     th:style="'background: ' + (${profileGradientCss} != null ? ${profileGradientCss} : 'linear-gradient(135deg, #ff5a00, #ff7c33)') + ';'">
+                                    <img th:if="${profileImage != null and !profileImage.isEmpty()}"
+                                         th:src="${profileImage}"
+                                         alt="프로필"
                                          class="preview-img">
-                                    <span th:if="${profileImage == null or profileImage.isEmpty()}" 
-                                          class="preview-placeholder">이미지 없음</span>
+                                    <span th:if="${profileImage == null or profileImage.isEmpty()}"
+                                          class="preview-placeholder"
+                                          th:text="${nickname != null ? nickname.substring(0,1) : '?'}">?</span>
                                 </div>
                                 <div class="upload-controls">
-                                    <input type="file" id="profileImageInput" name="profileImage" 
+                                    <input type="file" id="profileImageInput" name="profileImage"
                                            accept="image/*" style="display:none">
                                     <button type="button" class="btn-upload-select" id="btnSelectImage">이미지 선택</button>
                                     <p class="upload-hint">JPG, PNG, GIF 형식 (최대 5MB 권장)</p>
@@ -78,7 +76,7 @@
                         <form action="/account/update-nickname" method="post" class="edit-form">
                             <div class="form-group">
                                 <label for="newNickname">새 닉네임</label>
-                                <input type="text" id="newNickname" name="newNickname" 
+                                <input type="text" id="newNickname" name="newNickname"
                                        th:value="${nickname}" required maxlength="50"
                                        placeholder="새 닉네임을 입력하세요">
                             </div>

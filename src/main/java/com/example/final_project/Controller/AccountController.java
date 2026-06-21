@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,15 +75,17 @@ public class AccountController {
 
         try {
             model.addAttribute("isLoggedIn", true);
-            model.addAttribute("errorMessage", null);
-            model.addAttribute("successMessage", null);
-            model.addAttribute("passwordErrorMessage", null);
-            model.addAttribute("passwordSuccessMessage", null);
+            if (!model.containsAttribute("errorMessage")) model.addAttribute("errorMessage", null);
+            if (!model.containsAttribute("successMessage")) model.addAttribute("successMessage", null);
+            if (!model.containsAttribute("passwordErrorMessage")) model.addAttribute("passwordErrorMessage", null);
+            if (!model.containsAttribute("passwordSuccessMessage")) model.addAttribute("passwordSuccessMessage", null);
             model.addAttribute("email", "");
             model.addAttribute("nickname", "");
             model.addAttribute("profileImage", null);
-            model.addAttribute("profileGradient", "");
-            model.addAttribute("profileGradientCss", "linear-gradient(135deg, #ff5a00, #ff7c33)");
+            if (!model.containsAttribute("profileGradient")) {
+                model.addAttribute("profileGradient", "");
+                model.addAttribute("profileGradientCss", "linear-gradient(135deg, #ff5a00, #ff7c33)");
+            }
             model.addAttribute("unreadCount", 0L);
 
             Optional<SignupEntity> user = signupRepository.findById(userId);
@@ -430,18 +433,22 @@ public class AccountController {
         return "redirect:/account/items/" + id + "/manage";
     }
 
-    @PostMapping("/update-nickname")
+    @PostMapping(value = "/update-nickname", produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public String updateNickname(HttpSession session,
                                   @RequestParam(name = "newNickname", required = false) String newNickname,
-                                  RedirectAttributes redirectAttributes) {
+                                  RedirectAttributes redirectAttributes,
+                                  jakarta.servlet.http.HttpServletRequest request) {
         Long userId = (Long) session.getAttribute("userId");
 
         if (userId == null) {
+            if (isAjax(request)) return jsonError("로그인이 필요합니다.");
             return "redirect:/login?redirect=/account";
         }
 
         try {
             if (newNickname == null || newNickname.trim().isEmpty()) {
+                if (isAjax(request)) return jsonError("닉네임을 입력해주세요.");
                 redirectAttributes.addFlashAttribute("errorMessage", "닉네임을 입력해주세요.");
                 return "redirect:/account";
             }
@@ -449,22 +456,26 @@ public class AccountController {
             newNickname = newNickname.trim();
 
             if (newNickname.length() > 50) {
+                if (isAjax(request)) return jsonError("닉네임은 50자 이하여야 합니다.");
                 redirectAttributes.addFlashAttribute("errorMessage", "닉네임은 50자 이하여야 합니다.");
                 return "redirect:/account";
             }
 
             Optional<SignupEntity> currentUser = signupRepository.findById(userId);
             if (currentUser.isEmpty()) {
+                if (isAjax(request)) return jsonError("사용자 정보를 찾을 수 없습니다.");
                 redirectAttributes.addFlashAttribute("errorMessage", "사용자 정보를 찾을 수 없습니다.");
                 return "redirect:/login";
             }
 
             if (currentUser.get().getNickname().equals(newNickname)) {
+                if (isAjax(request)) return jsonError("현재 닉네임과 동일합니다.");
                 redirectAttributes.addFlashAttribute("errorMessage", "현재 닉네임과 동일합니다.");
                 return "redirect:/account";
             }
 
             if (signupRepository.existsByNickname(newNickname)) {
+                if (isAjax(request)) return jsonError("이미 사용 중인 닉네임입니다.");
                 redirectAttributes.addFlashAttribute("errorMessage", "이미 사용 중인 닉네임입니다.");
                 return "redirect:/account";
             }
@@ -472,13 +483,25 @@ public class AccountController {
             currentUser.get().setNickname(newNickname);
             signupRepository.save(currentUser.get());
             session.setAttribute("nickname", newNickname);
+            if (isAjax(request)) {
+                return "{\"success\": true, \"message\": \"닉네임이 변경되었습니다.\", \"nickname\": \"" + newNickname + "\"}";
+            }
             redirectAttributes.addFlashAttribute("successMessage", "닉네임이 변경되었습니다.");
             return "redirect:/account";
         } catch (Exception e) {
             log.error("닉네임 변경 실패: userId={}, newNickname={}", userId, newNickname, e);
+            if (isAjax(request)) return jsonError("닉네임 변경 중 오류가 발생했습니다: " + e.getClass().getSimpleName());
             redirectAttributes.addFlashAttribute("errorMessage", "닉네임 변경 중 오류가 발생했습니다: " + e.getClass().getSimpleName());
             return "redirect:/account";
         }
+    }
+
+    private boolean isAjax(jakarta.servlet.http.HttpServletRequest request) {
+        return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+    }
+
+    private String jsonError(String message) {
+        return "{\"success\": false, \"message\": \"" + message.replace("\"", "\\\"") + "\"}";
     }
 
     @PostMapping("/update-password")

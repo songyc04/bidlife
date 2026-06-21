@@ -72,4 +72,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const nicknameForm = document.querySelector('form[action="/account/update-nickname"]');
+    if (nicknameForm) {
+        const nicknameCard = nicknameForm.closest('.info-card');
+        nicknameForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(nicknameForm);
+            const submitBtn = nicknameForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+
+            let alertBox = nicknameCard.querySelector('.inline-alert');
+            if (alertBox) alertBox.remove();
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '변경 중...';
+
+            try {
+                const response = await fetch(nicknameForm.action, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await response.json();
+
+                alertBox = document.createElement('div');
+                alertBox.className = 'alert-' + (data.success ? 'success' : 'error') + ' inline-alert';
+                alertBox.textContent = data.message;
+                nicknameForm.parentNode.insertBefore(alertBox, nicknameForm);
+
+                if (data.success && data.nickname) {
+                    window.location.href = '/account';
+                }
+            } catch (error) {
+                console.error('Nickname update error:', error);
+                alertBox = document.createElement('div');
+                alertBox.className = 'alert-error inline-alert';
+                alertBox.textContent = '서버 연결에 실패했습니다.';
+                nicknameForm.parentNode.insertBefore(alertBox, nicknameForm);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+    }
 });
