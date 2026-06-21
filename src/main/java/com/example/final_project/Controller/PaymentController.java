@@ -132,9 +132,9 @@ public class PaymentController {
     }
 
     @GetMapping("/payment/success")
-    public String paymentSuccess(@RequestParam String orderId,
-                                 @RequestParam String paymentKey,
-                                 @RequestParam Integer amount,
+    public String paymentSuccess(@RequestParam(name = "orderId") String orderId,
+                                 @RequestParam(name = "paymentKey") String paymentKey,
+                                 @RequestParam(name = "amount") Integer amount,
                                  HttpSession session,
                                  RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
@@ -173,8 +173,8 @@ public class PaymentController {
     }
 
     @GetMapping("/payment/fail")
-    public String paymentFail(@RequestParam String orderId,
-                              @RequestParam(required = false) String message,
+    public String paymentFail(@RequestParam(name = "orderId") String orderId,
+                              @RequestParam(name = "message", required = false) String message,
                               RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("errorMessage", "결제가 실패했습니다: " + (message != null ? message : "알 수 없는 오류"));
         return "redirect:/account/transactions";

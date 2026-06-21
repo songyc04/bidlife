@@ -50,4 +50,14 @@ public class NotificationService {
     public void deleteByItemId(Long itemId) {
         notificationRepository.deleteByItemId(itemId);
     }
+
+    @Transactional
+    public void deleteById(Long notificationId) {
+        notificationRepository.deleteById(notificationId);
+    }
+
+    @Transactional
+    public int deleteReadByUserId(Long userId) {
+        return notificationRepository.deleteByUserIdAndIsReadTrue(userId);
+    }
 }

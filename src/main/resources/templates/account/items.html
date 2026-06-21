@@ -6,6 +6,7 @@
     <title>BIDLIFE | 등록한 경매</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/account.css">
+    <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/my-items.css">
     <link rel="stylesheet" href="/css/modal.css">
     <script src="/js/modal.js"></script>
@@ -23,8 +24,13 @@
 
             <section class="account-content">
                 <div class="content-header">
-                    <h2>등록한 경매</h2>
-                    <p>내가 등록한 경매 물품을 관리하세요</p>
+                    <div class="content-header-top">
+                        <div>
+                            <h2>등록한 경매</h2>
+                            <p>내가 등록한 경매 물품을 관리하세요</p>
+                        </div>
+                        <a href="/account/items/new" class="btn-register-item">+ 경매 등록</a>
+                    </div>
                 </div>
 
                 <div class="alert-success" th:if="${successMessage != null}" th:text="${successMessage}">

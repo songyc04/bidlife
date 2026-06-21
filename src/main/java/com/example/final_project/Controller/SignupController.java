@@ -4,6 +4,7 @@ import com.example.final_project.DTO.JoinDTO;
 import com.example.final_project.Entity.SignupEntity;
 import com.example.final_project.Repository.SignupRepository;
 import com.example.final_project.Service.EmailService;
+import com.example.final_project.Service.ProfileGradientService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class SignupController {
     private final SignupRepository signupRepository;
     private final EmailService emailService;
+    private final ProfileGradientService profileGradientService;
 
     @GetMapping("")
     public String signup() {
@@ -25,7 +27,7 @@ public class SignupController {
 
     @PostMapping("/send-code")
     @ResponseBody
-    public String sendVerificationCode(@RequestParam String email, Model model) {
+    public String sendVerificationCode(@RequestParam(name = "email") String email, Model model) {
         try {
             // 이미 가입된 이메일인지 확인
             if (signupRepository.existsByEmail(email)) {
@@ -47,7 +49,7 @@ public class SignupController {
 
     @PostMapping("/verify-code")
     @ResponseBody
-    public String verifyCode(@RequestParam String email, @RequestParam String code, HttpSession session) {
+    public String verifyCode(@RequestParam(name = "email") String email, @RequestParam(name = "code") String code, HttpSession session) {
         boolean verified = emailService.verifyCode(email, code);
         
         if (verified) {
@@ -93,7 +95,8 @@ public class SignupController {
         signupEntity.setEmail(joinDTO.getEmail());
         signupEntity.setPassword(joinDTO.getPassword());
         signupEntity.setNickname(joinDTO.getNickname());
-        
+        signupEntity.setProfileGradient(profileGradientService.generateRandomGradient());
+
         signupRepository.save(signupEntity);
 
         session.removeAttribute("verifiedEmail");

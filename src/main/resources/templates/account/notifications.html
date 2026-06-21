@@ -6,6 +6,9 @@
     <title>BIDLIFE | 알림</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/account.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <script src="/js/modal.js"></script>
     <script src="/js/account.js" defer></script>
     <style>
         .notification-header {
@@ -28,6 +31,26 @@
         .btn-read-all:hover {
             border-color: #ff5a00;
             color: #ff5a00;
+        }
+        .btn-delete-read {
+            background: transparent;
+            border: 1px solid #ff4444;
+            color: #ff6666;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-delete-read:hover {
+            background-color: rgba(255, 68, 68, 0.1);
+            border-color: #ff6666;
+            color: #ff8888;
+        }
+        .notification-actions-top {
+            display: flex;
+            gap: 8px;
         }
         .notification-list {
             display: flex;
@@ -141,6 +164,20 @@
             border-color: #ff5a00;
             color: #ff5a00;
         }
+        .btn-delete-notification {
+            background: transparent;
+            border: 1px solid #333;
+            color: #888;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-delete-notification:hover {
+            border-color: #ff4444;
+            color: #ff6666;
+        }
         .empty-notifications {
             text-align: center;
             padding: 60px 20px;
@@ -185,9 +222,14 @@
                             (읽지 않음 <span th:text="${unreadCount}">0</span>개)
                         </span>
                     </span>
-                    <form action="/account/notifications/read-all" method="post" th:if="${unreadCount > 0}">
-                        <button type="submit" class="btn-read-all">모두 읽음 처리</button>
-                    </form>
+                    <div class="notification-actions-top">
+                        <form action="/account/notifications/read-all" method="post" th:if="${unreadCount > 0}" style="display: inline-block; margin-right: 8px;">
+                            <button type="submit" class="btn-read-all">모두 읽음 처리</button>
+                        </form>
+                        <form action="/account/notifications/delete-read" method="post" id="deleteReadForm" style="display: inline-block;">
+                            <button type="submit" class="btn-delete-read">🗑️ 읽은 알림 삭제</button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="notification-list" th:if="${notifications != null and !notifications.isEmpty()}">
@@ -220,9 +262,15 @@
                                    th:text="${notification.type == 'auction_seller_won' or notification.type == 'auction_failed' or notification.type == 'new_bid' or notification.type == 'payment_buyer_paid'} ? '관리 페이지로' : (${notification.type == 'auction_won' or notification.type == 'buy_now_complete' or notification.type == 'payment_pending_seller'} ? '결제하러 가기' : (${notification.type == 'transaction_completed'} ? '거래 내역 보기' : '경매 보기'))">경매 보기</a>
                             </div>
                         </div>
-                        <div class="notification-actions" th:if="${!notification.isRead}">
-                            <form th:action="'/account/notifications/' + ${notification.id} + '/read'" method="post">
+                        <div class="notification-actions">
+                            <form th:if="${!notification.isRead}"
+                                  th:action="'/account/notifications/' + ${notification.id} + '/read'" method="post"
+                                  style="display: inline-block; margin-right: 6px;">
                                 <button type="submit" class="btn-mark-read">읽음</button>
+                            </form>
+                            <form th:action="'/account/notifications/' + ${notification.id} + '/delete'" method="post"
+                                  class="delete-notification-form" style="display: inline-block;">
+                                <button type="submit" class="btn-delete-notification" title="삭제">🗑️</button>
                             </form>
                         </div>
                     </div>
@@ -239,6 +287,29 @@
     </main>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+        const deleteReadForm = document.getElementById('deleteReadForm');
+        if (deleteReadForm) {
+            deleteReadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                showConfirm('🗑️ 읽은 알림을 모두 삭제하시겠습니까?<br><br><span style="color: #ff6666; font-size: 13px;">⚠️ 읽지 않은 알림은 삭제되지 않으며, 삭제된 알림은 복구할 수 없습니다.</span>', function() {
+                    form.submit();
+                });
+            });
+        }
+
+        document.querySelectorAll('.delete-notification-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const target = this;
+                showConfirm('이 알림을 삭제하시겠습니까?', function() {
+                    target.submit();
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>

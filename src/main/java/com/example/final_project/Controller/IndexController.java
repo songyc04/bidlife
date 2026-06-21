@@ -73,14 +73,14 @@ public class IndexController {
         long totalMembers = signupRepository.count();
         long totalItems = itemRepository.count();
         long activeAuctions = itemRepository.countByStatus("bidding");
-        
-        // 최고가 낙찰 찾기 (ended 상태 중 currentPrice가 가장 높은 것)
-        Integer highestBid = itemService.getAllItems().stream()
-                .filter(item -> "ended".equals(item.getStatus()))
-                .map(item -> item.getCurrentPrice() != null ? item.getCurrentPrice() : item.getStartPrice())
+
+        // 최고가 낙찰 찾기 (거래 성사 완료된 상품 중 finalPrice가 가장 높은 것)
+        Integer highestBid = itemRepository.findByPaymentStatusOrderByFinalPriceDesc("completed").stream()
+                .map(ItemEntity::getFinalPrice)
+                .filter(price -> price != null)
                 .max(Integer::compareTo)
                 .orElse(0);
-        
+
         model.addAttribute("totalMembers", totalMembers);
         model.addAttribute("totalItems", totalItems);
         model.addAttribute("activeAuctions", activeAuctions);

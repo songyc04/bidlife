@@ -19,91 +19,10 @@ a {
     color: inherit;
 }
 
-.navbar {
-    background-color: rgba(5, 5, 5, 0.85);
-    backdrop-filter: blur(15px);
-    border-bottom: 1px solid rgba(255, 90, 0, 0.15);
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-}
 
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    height: 75px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-}
 
-.logo {
-    font-size: 26px;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    color: #ffffff;
-}
 
-.logo span {
-    color: #ff5a00;
-}
 
-.nav-menu {
-    display: flex;
-    gap: 35px;
-}
-
-.nav-link {
-    font-weight: 600;
-    font-size: 15px;
-    color: #888888;
-    transition: color 0.2s;
-}
-
-.nav-link:hover {
-    color: #ffffff;
-}
-
-.btn-create {
-    color: #ff5a00;
-}
-
-.nav-auth {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.btn-login {
-    color: #aaaaaa;
-    font-weight: 600;
-    font-size: 15px;
-    transition: color 0.2s;
-}
-
-.btn-login:hover {
-    color: #ffffff;
-}
-
-.btn-signup {
-    background-color: #ff5a00;
-    color: #000000;
-    padding: 10px 24px;
-    border-radius: 4px;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    transition: all 0.2s;
-}
-
-.btn-signup:hover {
-    background-color: #ff7c33;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(255, 90, 0, 0.4);
-}
 
 .login-section {
     flex: 1;

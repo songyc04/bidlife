@@ -2,14 +2,10 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <aside th:fragment="accountSidebar(activeMenu)" class="account-sidebar">
     <div class="sidebar-header">
-        <div class="profile-icon" th:attr="data-seed=${nickname != null ? nickname : 'U'}">
-            <img th:if="${profileImage != null and !profileImage.isEmpty()}" 
-                 th:src="${profileImage}" 
-                 th:alt="${nickname}" 
-                 class="profile-img">
-            <span th:if="${profileImage == null or profileImage.isEmpty()}" 
-                  th:text="${nickname != null ? nickname.substring(0,1) : '?'}">U</span>
-        </div>
+        <div class="profile-icon"
+             th:style="'background: ' + (${profileGradientCss} != null ? ${profileGradientCss} : 'linear-gradient(135deg, #ff5a00, #ff7c33)') + ';'"
+             th:attr="data-seed=${nickname != null ? nickname : 'U'}"
+             th:text="${nickname != null ? nickname.substring(0,1) : '?'}">U</div>
         <h3 th:text="${nickname != null ? nickname : '사용자'}">닉네임</h3>
     </div>
     <nav class="sidebar-menu">

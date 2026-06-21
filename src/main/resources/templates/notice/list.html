@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIDLIFE | 공지사항</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <style>
+        .notice-section { padding: 120px 20px 80px; max-width: 1000px; margin: 0 auto; }
+        .page-title { font-size: 36px; font-weight: 900; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .page-desc { color: #888; font-size: 15px; margin-bottom: 40px; }
+        .notice-list { display: flex; flex-direction: column; gap: 8px; }
+        .notice-item {
+            display: flex; align-items: center; gap: 16px;
+            background: #121212; border: 1px solid #222; border-radius: 8px;
+            padding: 20px 24px; text-decoration: none; color: inherit;
+            transition: all 0.2s;
+        }
+        .notice-item:hover { border-color: #ff5a00; transform: translateX(4px); }
+        .notice-item.important { border-left: 3px solid #ff5a00; }
+        .notice-badge {
+            background: #ff5a00; color: #000; font-size: 11px; font-weight: 800;
+            padding: 4px 10px; border-radius: 4px; flex-shrink: 0;
+        }
+        .notice-title { flex: 1; font-size: 16px; font-weight: 600; }
+        .notice-meta { display: flex; gap: 16px; color: #666; font-size: 13px; flex-shrink: 0; }
+        .notice-meta .views::before { content: "👁 "; }
+        .empty-state { text-align: center; padding: 80px 20px; color: #666; }
+        .empty-state-icon { font-size: 60px; margin-bottom: 16px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="notice-section">
+    <h1 class="page-title">📢 공지사항</h1>
+    <p class="page-desc">BIDLIFE의 새로운 소식과 중요한 안내를 확인하세요.</p>
+
+    <div class="notice-list" th:if="${notices != null and !notices.isEmpty()}">
+        <a th:each="notice : ${notices}"
+           th:href="'/notices/' + ${notice.id}"
+           class="notice-item"
+           th:classappend="${notice.isImportant} ? 'important'">
+            <span class="notice-badge" th:if="${notice.isImportant}">중요</span>
+            <span class="notice-title" th:text="${notice.title}">공지 제목</span>
+            <div class="notice-meta">
+                <span th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd')}">2026.01.01</span>
+                <span class="views" th:text="${notice.viewCount}">0</span>
+            </div>
+        </a>
+    </div>
+
+    <div class="empty-state" th:if="${notices == null or notices.isEmpty()}">
+        <div class="empty-state-icon">📭</div>
+        <h3>등록된 공지사항이 없습니다</h3>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-/* 기본 리셋 및 폰트 세팅 */
+/* 疫꿸퀡???귐딅?獄??怨좊뱜 ?紐낅샒 */
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +7,7 @@
 }
 
 body {
-    background-color: #050505; /* 매트한 딥 블랙 */
+    background-color: #050505; /* 筌띲끋??????됰뗀??*/
     color: #ffffff;
     overflow-x: hidden;
 }
@@ -17,91 +17,10 @@ a {
     color: inherit;
 }
 
-/* 1. 네비게이션 바 디자인 */
-.navbar {
-    background-color: rgba(5, 5, 5, 0.85);
-    backdrop-filter: blur(15px);
-    border-bottom: 1px solid rgba(255, 90, 0, 0.15); /* 오렌지색 투명 라인 */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-}
+/* 1. ??삵돩野껊슣???獄??遺우쁽??*/
 
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    height: 75px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-}
 
-.logo {
-    font-size: 26px;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    color: #ffffff;
-}
 
-.logo span {
-    color: #ff5a00; /* 시그니처 오렌지 */
-}
-
-.nav-menu {
-    display: flex;
-    gap: 35px;
-}
-
-.nav-link {
-    font-weight: 600;
-    font-size: 15px;
-    color: #888888;
-    transition: color 0.2s;
-}
-
-.nav-link:hover {
-    color: #ffffff;
-}
-
-.btn-create {
-    color: #ff5a00;
-}
-
-.nav-auth {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.btn-login {
-    color: #aaaaaa;
-    font-weight: 600;
-    font-size: 15px;
-    transition: color 0.2s;
-}
-.btn-login:hover {
-    color: #ffffff;
-}
-
-.btn-signup {
-    background-color: #ff5a00;
-    color: #000000;
-    padding: 10px 24px;
-    border-radius: 4px; /* 더 각진 솔리드 스타일 */
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    transition: all 0.2s;
-}
-
-.btn-signup:hover {
-    background-color: #ff7c33;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(255, 90, 0, 0.4);
-}
 
 .btn-mypage {
     color: #ff5a00;
@@ -114,22 +33,9 @@ a {
     color: #ff7c33;
 }
 
-.btn-logout {
-    border: 1px solid #333333;
-    color: #aaaaaa;
-    padding: 10px 24px;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.2s;
-}
 
-.btn-logout:hover {
-    border-color: #ff5a00;
-    color: #ff5a00;
-}
 
-/* 2. 히어로 섹션 디자인 */
+/* 2. ??됰선嚥??諭???遺우쁽??*/
 .hero-section {
     max-width: 1200px;
     /*max-width: 100%;*/
@@ -308,7 +214,7 @@ a {
     100% { transform: scale(1.15); opacity: 0.6; }
 }
 
-/* 3. 라이브 경매 프리뷰 디자인 */
+/* 3. ??깆뵠??野껋럥???袁ⓥ봺???遺우쁽??*/
 .live-preview-section {
     max-width: 1200px;
     margin: 0 auto;
@@ -354,9 +260,9 @@ a {
     }
 }
 
-/* 카드 스타일은 items.css에서 가져옴 */
+/* 燁삳?諭??????? items.css?癒?퐣 揶쎛?紐꾩긾 */
 
-/* 4. 푸터 디자인 */
+/* 4. ?紐낃숲 ?遺우쁽??*/
 .footer {
     border-top: 1px solid #151515;
     padding: 50px 20px;

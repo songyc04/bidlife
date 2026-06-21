@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${notice.title}">공지사항</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <style>
+        .notice-detail-section { padding: 120px 20px 80px; max-width: 1000px; margin: 0 auto; }
+        .detail-layout { display: grid; grid-template-columns: 1fr 280px; gap: 40px; }
+        .notice-content {
+            background: #121212; border: 1px solid #222; border-radius: 8px;
+            padding: 40px;
+        }
+        .notice-header { padding-bottom: 24px; border-bottom: 1px solid #222; margin-bottom: 24px; }
+        .notice-title { font-size: 28px; font-weight: 900; line-height: 1.4; margin-bottom: 16px; }
+        .notice-meta { display: flex; gap: 20px; color: #888; font-size: 14px; }
+        .important-badge {
+            display: inline-block; background: #ff5a00; color: #000;
+            font-size: 12px; font-weight: 800; padding: 4px 10px;
+            border-radius: 4px; margin-right: 12px; vertical-align: middle;
+        }
+        .notice-body { font-size: 15px; line-height: 1.8; color: #ddd; white-space: pre-wrap; min-height: 200px; }
+        .back-link {
+            display: inline-block; margin-top: 24px; color: #888; font-size: 14px;
+            text-decoration: none; padding: 10px 20px; border: 1px solid #333;
+            border-radius: 4px; transition: all 0.2s;
+        }
+        .back-link:hover { color: #ff5a00; border-color: #ff5a00; }
+        .sidebar-card { background: #121212; border: 1px solid #222; border-radius: 8px; padding: 24px; height: fit-content; }
+        .sidebar-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #222; }
+        .recent-list { display: flex; flex-direction: column; gap: 12px; }
+        .recent-item { font-size: 13px; color: #aaa; text-decoration: none; line-height: 1.5; transition: color 0.2s; }
+        .recent-item:hover { color: #ff5a00; }
+        @media (max-width: 768px) { .detail-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="notice-detail-section">
+    <div class="detail-layout">
+        <article class="notice-content">
+            <div class="notice-header">
+                <h1 class="notice-title">
+                    <span class="important-badge" th:if="${notice.isImportant}">중요</span>
+                    <span th:text="${notice.title}">공지 제목</span>
+                </h1>
+                <div class="notice-meta">
+                    <span>작성자: <strong th:text="${notice.author}">관리자</strong></span>
+                    <span th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd HH:mm')}">2026.01.01 12:00</span>
+                    <span>조회수: <strong th:text="${notice.viewCount}">0</strong></span>
+                </div>
+            </div>
+            <div class="notice-body" th:text="${notice.content}">공지 내용</div>
+            <a href="/notices" class="back-link">← 목록으로</a>
+        </article>
+
+        <aside class="sidebar-card" th:if="${recentNotices != null}">
+            <h3>최근 공지</h3>
+            <div class="recent-list">
+                <a th:each="recent : ${recentNotices}"
+                   th:href="'/notices/' + ${recent.id}"
+                   class="recent-item"
+                   th:text="${recent.title}">최근 공지</a>
+            </div>
+        </aside>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

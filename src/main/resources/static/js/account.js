@@ -20,12 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    document.querySelectorAll('.profile-icon[data-seed]').forEach(el => {
-        const seed = el.getAttribute('data-seed') || '';
-        const gradient = generateGradient(seed);
-        el.style.background = gradient;
-    });
-
     const profileImageInput = document.getElementById('profileImageInput');
     const btnSelectImage = document.getElementById('btnSelectImage');
     const profilePreview = document.getElementById('profilePreview');
@@ -52,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const passwordForm = document.getElementById('passwordForm');
-    
+
     if (passwordForm) {
         passwordForm.addEventListener('submit', (e) => {
             const currentPassword = document.getElementById('currentPassword').value;
@@ -73,40 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (newPassword !== confirmPassword) {
                 e.preventDefault();
-                showAlert('새 비밀번호가 일치하지 않습니다.', '🔒');
+                showAlert('비밀번호가 일치하지 않습니다.', '🔒');
                 return;
             }
         });
     }
 });
-
-function generateGradient(seed) {
-    const colors = [
-        ['#ff5a00', '#ff0055'],
-        ['#00c6ff', '#0072ff'],
-        ['#f857a6', '#ff5858'],
-        ['#11998e', '#38ef7d'],
-        ['#fc466b', '#3f5efb'],
-        ['#8360c3', '#2ebf91'],
-        ['#f7971e', '#ffd200'],
-        ['#00b09b', '#96c93d'],
-        ['#667eea', '#764ba2'],
-        ['#f093fb', '#f5576c'],
-        ['#4facfe', '#00f2fe'],
-        ['#43e97b', '#38f9d7'],
-        ['#fa709a', '#fee140'],
-        ['#30cfd0', '#330867'],
-        ['#a8edea', '#fed6e3']
-    ];
-    
-    let hash = 0;
-    for (let i = 0; i < seed.length; i++) {
-        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
-        hash = hash & hash;
-    }
-    
-    const index = Math.abs(hash) % colors.length;
-    const [color1, color2] = colors[index];
-    
-    return `linear-gradient(135deg, ${color1}, ${color2})`;
-}

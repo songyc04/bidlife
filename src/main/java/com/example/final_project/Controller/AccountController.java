@@ -65,28 +65,47 @@ public class AccountController {
     }
 
     @GetMapping("")
-    public String account(HttpSession session, Model model) {
+    public String account(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
 
         if (userId == null) {
             return "redirect:/login?redirect=/account";
         }
 
-        model.addAttribute("isLoggedIn", true);
+        try {
+            model.addAttribute("isLoggedIn", true);
+            model.addAttribute("errorMessage", null);
+            model.addAttribute("successMessage", null);
+            model.addAttribute("passwordErrorMessage", null);
+            model.addAttribute("passwordSuccessMessage", null);
+            model.addAttribute("email", "");
+            model.addAttribute("nickname", "");
+            model.addAttribute("profileImage", null);
+            model.addAttribute("profileGradient", "");
+            model.addAttribute("profileGradientCss", "linear-gradient(135deg, #ff5a00, #ff7c33)");
+            model.addAttribute("unreadCount", 0L);
 
-        Optional<SignupEntity> user = signupRepository.findById(userId);
+            Optional<SignupEntity> user = signupRepository.findById(userId);
 
-        if (user.isPresent()) {
-            model.addAttribute("email", user.get().getEmail());
-            model.addAttribute("nickname", user.get().getNickname());
-            model.addAttribute("profileImage", user.get().getProfileImage());
+            if (user.isPresent()) {
+                model.addAttribute("email", user.get().getEmail());
+                model.addAttribute("nickname", user.get().getNickname());
+                model.addAttribute("profileImage", user.get().getProfileImage());
+            }
+
+            try {
+                long unreadCount = notificationService.getUnreadCount(userId);
+                model.addAttribute("unreadCount", unreadCount);
+            } catch (Exception e) {
+                log.error("Error getting unread count for userId={}", userId, e);
+            }
+
+            return "account";
+        } catch (Exception e) {
+            log.error("Error loading account page for userId={}", userId, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "페이지를 불러오는 중 오류가 발생했습니다: " + e.getClass().getSimpleName());
+            return "redirect:/";
         }
-
-        // 읽지 않은 알림 개수
-        long unreadCount = notificationService.getUnreadCount(userId);
-        model.addAttribute("unreadCount", unreadCount);
-
-        return "account";
     }
 
     @GetMapping("/bids")
@@ -103,7 +122,6 @@ public class AccountController {
 
         if (user.isPresent()) {
             model.addAttribute("nickname", user.get().getNickname());
-            model.addAttribute("profileImage", user.get().getProfileImage());
         }
 
         // 읽지 않은 알림 개수
@@ -152,7 +170,6 @@ public class AccountController {
 
             if (user.isPresent()) {
                 model.addAttribute("nickname", user.get().getNickname());
-                model.addAttribute("profileImage", user.get().getProfileImage());
             }
 
             // 읽지 않은 알림 개수
@@ -184,7 +201,6 @@ public class AccountController {
 
         if (user.isPresent()) {
             model.addAttribute("nickname", user.get().getNickname());
-            model.addAttribute("profileImage", user.get().getProfileImage());
         }
 
         // 읽지 않은 알림 개수
@@ -232,7 +248,6 @@ public class AccountController {
 
         if (user.isPresent()) {
             model.addAttribute("nickname", user.get().getNickname());
-            model.addAttribute("profileImage", user.get().getProfileImage());
         }
 
         // 읽지 않은 알림 개수
@@ -244,14 +259,14 @@ public class AccountController {
 
     @PostMapping("/items/new")
     public String itemsNewPost(HttpSession session,
-                               @RequestParam String title,
-                               @RequestParam String category,
-                               @RequestParam String description,
-                               @RequestParam Integer startPrice,
-                               @RequestParam(required = false) Integer buyNowPrice,
-                               @RequestParam Integer bidUnit,
-                               @RequestParam String startTime,
-                               @RequestParam String endTime,
+                               @RequestParam(name = "title") String title,
+                               @RequestParam(name = "category") String category,
+                               @RequestParam(name = "description") String description,
+                               @RequestParam(name = "startPrice") Integer startPrice,
+                               @RequestParam(name = "buyNowPrice", required = false) Integer buyNowPrice,
+                               @RequestParam(name = "bidUnit") Integer bidUnit,
+                               @RequestParam(name = "startTime") String startTime,
+                               @RequestParam(name = "endTime") String endTime,
                                @RequestParam(required = false) MultipartFile[] images,
                                RedirectAttributes redirectAttributes) {
 
@@ -267,13 +282,25 @@ public class AccountController {
             return "redirect:/account/items/new";
         }
 
+        // 즉시 구매가 정규화: 0 또는 null이면 null로 처리 (일반 경매로 진행)
+        Integer normalizedBuyNowPrice = (buyNowPrice != null && buyNowPrice > 0) ? buyNowPrice : null;
+
+        // 즉시 구매가가 시작가보다 작으면 무효
+        if (normalizedBuyNowPrice != null && normalizedBuyNowPrice <= startPrice) {
+            redirectAttributes.addFlashAttribute("errorMessage", "즉시 구매가는 시작가보다 커야 합니다.");
+            return "redirect:/account/items/new";
+        }
+
         try {
             LocalDateTime startDt = LocalDateTime.parse(startTime);
             LocalDateTime endDt = LocalDateTime.parse(endTime);
 
-            itemService.saveItem(title, category, description, startPrice, buyNowPrice, bidUnit, startDt, endDt, userId, images);
+            itemService.saveItem(title, category, description, startPrice, normalizedBuyNowPrice, bidUnit, startDt, endDt, userId, images);
 
-            redirectAttributes.addFlashAttribute("successMessage", "경매가 성공적으로 등록되었습니다.");
+            String message = (normalizedBuyNowPrice != null)
+                    ? "경매가 성공적으로 등록되었습니다."
+                    : "경매가 성공적으로 등록되었습니다. (일반 경매로 진행됩니다)";
+            redirectAttributes.addFlashAttribute("successMessage", message);
             return "redirect:/account/items";
         } catch (Exception e) {
             log.error("경매 등록 실패: {}", e.getMessage(), e);
@@ -319,7 +346,6 @@ public class AccountController {
             Optional<SignupEntity> user = signupRepository.findById(userId);
             if (user.isPresent()) {
                 model.addAttribute("nickname", user.get().getNickname());
-                model.addAttribute("profileImage", user.get().getProfileImage());
             }
 
             // 읽지 않은 알림 개수
@@ -406,7 +432,7 @@ public class AccountController {
 
     @PostMapping("/update-nickname")
     public String updateNickname(HttpSession session,
-                                  @RequestParam String newNickname,
+                                  @RequestParam(name = "newNickname", required = false) String newNickname,
                                   RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
 
@@ -420,8 +446,21 @@ public class AccountController {
                 return "redirect:/account";
             }
 
+            newNickname = newNickname.trim();
+
             if (newNickname.length() > 50) {
                 redirectAttributes.addFlashAttribute("errorMessage", "닉네임은 50자 이하여야 합니다.");
+                return "redirect:/account";
+            }
+
+            Optional<SignupEntity> currentUser = signupRepository.findById(userId);
+            if (currentUser.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "사용자 정보를 찾을 수 없습니다.");
+                return "redirect:/login";
+            }
+
+            if (currentUser.get().getNickname().equals(newNickname)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "현재 닉네임과 동일합니다.");
                 return "redirect:/account";
             }
 
@@ -430,27 +469,23 @@ public class AccountController {
                 return "redirect:/account";
             }
 
-            Optional<SignupEntity> user = signupRepository.findById(userId);
-            if (user.isPresent()) {
-                user.get().setNickname(newNickname);
-                signupRepository.save(user.get());
-                session.setAttribute("nickname", newNickname);
-                redirectAttributes.addFlashAttribute("successMessage", "닉네임이 변경되었습니다.");
-            }
-
+            currentUser.get().setNickname(newNickname);
+            signupRepository.save(currentUser.get());
+            session.setAttribute("nickname", newNickname);
+            redirectAttributes.addFlashAttribute("successMessage", "닉네임이 변경되었습니다.");
             return "redirect:/account";
         } catch (Exception e) {
-            log.error("닉네임 변경 실패: {}", e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("errorMessage", "닉네임 변경 중 오류가 발생했습니다.");
+            log.error("닉네임 변경 실패: userId={}, newNickname={}", userId, newNickname, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "닉네임 변경 중 오류가 발생했습니다: " + e.getClass().getSimpleName());
             return "redirect:/account";
         }
     }
 
     @PostMapping("/update-password")
     public String updatePassword(HttpSession session,
-                                  @RequestParam String currentPassword,
-                                  @RequestParam String newPassword,
-                                  @RequestParam String confirmPassword,
+                                  @RequestParam(name = "currentPassword", required = false) String currentPassword,
+                                  @RequestParam(name = "newPassword", required = false) String newPassword,
+                                  @RequestParam(name = "confirmPassword", required = false) String confirmPassword,
                                   RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
 
@@ -474,22 +509,29 @@ public class AccountController {
                 return "redirect:/account";
             }
 
-            Optional<SignupEntity> user = signupRepository.findById(userId);
-            if (user.isPresent()) {
-                if (!user.get().getPassword().equals(currentPassword)) {
-                    redirectAttributes.addFlashAttribute("passwordErrorMessage", "현재 비밀번호가 일치하지 않습니다.");
-                    return "redirect:/account";
-                }
-
-                user.get().setPassword(newPassword);
-                signupRepository.save(user.get());
-                redirectAttributes.addFlashAttribute("passwordSuccessMessage", "비밀번호가 변경되었습니다.");
+            if (currentPassword.equals(newPassword)) {
+                redirectAttributes.addFlashAttribute("passwordErrorMessage", "새 비밀번호는 현재 비밀번호와 달라야 합니다.");
+                return "redirect:/account";
             }
 
+            Optional<SignupEntity> user = signupRepository.findById(userId);
+            if (user.isEmpty()) {
+                redirectAttributes.addFlashAttribute("passwordErrorMessage", "사용자 정보를 찾을 수 없습니다.");
+                return "redirect:/login";
+            }
+
+            if (!user.get().getPassword().equals(currentPassword)) {
+                redirectAttributes.addFlashAttribute("passwordErrorMessage", "현재 비밀번호가 일치하지 않습니다.");
+                return "redirect:/account";
+            }
+
+            user.get().setPassword(newPassword);
+            signupRepository.save(user.get());
+            redirectAttributes.addFlashAttribute("passwordSuccessMessage", "비밀번호가 변경되었습니다.");
             return "redirect:/account";
         } catch (Exception e) {
-            log.error("비밀번호 변경 실패: {}", e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("passwordErrorMessage", "비밀번호 변경 중 오류가 발생했습니다.");
+            log.error("비밀번호 변경 실패: userId={}", userId, e);
+            redirectAttributes.addFlashAttribute("passwordErrorMessage", "비밀번호 변경 중 오류가 발생했습니다: " + e.getClass().getSimpleName());
             return "redirect:/account";
         }
     }
@@ -558,7 +600,6 @@ public class AccountController {
 
         if (user.isPresent()) {
             model.addAttribute("nickname", user.get().getNickname());
-            model.addAttribute("profileImage", user.get().getProfileImage());
         }
 
         // 읽지 않은 알림 개수
@@ -613,7 +654,6 @@ public class AccountController {
         Optional<SignupEntity> user = signupRepository.findById(userId);
         if (user.isPresent()) {
             model.addAttribute("nickname", user.get().getNickname());
-            model.addAttribute("profileImage", user.get().getProfileImage());
         }
 
         long unreadCount = notificationService.getUnreadCount(userId);
@@ -647,14 +687,19 @@ public class AccountController {
     }
 
     @PostMapping("/notifications/{id}/read")
-    public String markNotificationAsRead(@PathVariable Long id, HttpSession session) {
+    public String markNotificationAsRead(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
 
         if (userId == null) {
             return "redirect:/login?redirect=/account/notifications";
         }
 
-        notificationService.markAsRead(id);
+        try {
+            notificationService.markAsRead(id);
+        } catch (Exception e) {
+            log.error("개별 알림 읽음 처리 실패: notificationId={}, userId={}", id, userId, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "알림 처리 중 오류가 발생했습니다.");
+        }
         return "redirect:/account/notifications";
     }
 
@@ -670,8 +715,39 @@ public class AccountController {
         return "redirect:/account/notifications";
     }
 
+    @PostMapping("/notifications/delete-read")
+    public String deleteReadNotifications(HttpSession session, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/notifications";
+        }
+
+        int deleted = notificationService.deleteReadByUserId(userId);
+        redirectAttributes.addFlashAttribute("successMessage", "읽은 알림 " + deleted + "개를 삭제했습니다.");
+        return "redirect:/account/notifications";
+    }
+
+    @PostMapping("/notifications/{id}/delete")
+    public String deleteNotification(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login?redirect=/account/notifications";
+        }
+
+        try {
+            notificationService.deleteById(id);
+            redirectAttributes.addFlashAttribute("successMessage", "알림이 삭제되었습니다.");
+        } catch (Exception e) {
+            log.error("개별 알림 삭제 실패: notificationId={}, userId={}", id, userId, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "알림 삭제 중 오류가 발생했습니다.");
+        }
+        return "redirect:/account/notifications";
+    }
+
     @PostMapping("/favorites/toggle")
-    public ResponseEntity<Map<String, Object>> toggleFavorite(@RequestParam Long itemId, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> toggleFavorite(@RequestParam(name = "itemId") Long itemId, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
 
         Map<String, Object> response = new HashMap<>();
@@ -725,7 +801,7 @@ public class AccountController {
 
     @PostMapping("/items/{id}/images/delete")
     public ResponseEntity<Map<String, Object>> deleteSingleImage(@PathVariable Long id,
-                                                                  @RequestParam String imagePath,
+                                                                  @RequestParam(name = "imagePath") String imagePath,
                                                                   HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         Map<String, Object> response = new HashMap<>();

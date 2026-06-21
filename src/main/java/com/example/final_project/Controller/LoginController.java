@@ -71,7 +71,7 @@ public class LoginController {
     }
 
     @PostMapping("/find-password")
-    public String findPasswordSubmit(@RequestParam String email, RedirectAttributes redirectAttributes) {
+    public String findPasswordSubmit(@RequestParam(name = "email") String email, RedirectAttributes redirectAttributes) {
         Optional<SignupEntity> user = signupRepository.findByEmail(email);
 
         if (user.isEmpty()) {
@@ -113,8 +113,8 @@ public class LoginController {
     }
 
     @PostMapping("/change-password")
-    public String changePasswordSubmit(@RequestParam String newPassword, 
-                                       @RequestParam String confirmPassword,
+    public String changePasswordSubmit(@RequestParam(name = "newPassword") String newPassword, 
+                                       @RequestParam(name = "confirmPassword") String confirmPassword,
                                        HttpSession session, 
                                        RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");

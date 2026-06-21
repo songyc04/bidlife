@@ -140,7 +140,7 @@ public class ItemsController {
 
     @PostMapping("/items/{id}/bid")
     public String placeBid(@PathVariable Long id,
-                           @RequestParam Integer bidAmount,
+                           @RequestParam(name = "bidAmount") Integer bidAmount,
                            HttpSession session,
                            RedirectAttributes redirectAttributes) {
         Long userId = (Long) session.getAttribute("userId");
