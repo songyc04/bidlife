@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/modal.css">
     <script src="/js/modal.js"></script>
-    <link rel="stylesheet" href="/css/responsive.css">`n</head>
+    <link rel="stylesheet" href="/css/responsive.css">
+</head>
 <body>
 
     <div th:replace="~{fragments/navbar :: navbar}"></div>
@@ -33,10 +34,10 @@
                 <div class="input-group">
                     <label for="email">이메일</label>
                     <div class="input-with-btn">
-                        <input type="email" id="email" placeholder="gmail.com 또는 naver.com 으로만 가입할 수 있어요" required>
+                        <input type="email" id="email" placeholder="이메일 주소 입력" required>
                         <button type="button" id="sendCodeBtn" class="btn-code">인증번호 발송</button>
                     </div>
-                    <span class="hint">다른 메일 계정 회원가입 기능은 준비 중이예요</span>
+                    <span class="hint">gmail.com 또는 naver.com 메일만 가입할 수 있어요</span>
                 </div>
 
                 <div class="input-group" id="codeGroup" style="display: none;">
